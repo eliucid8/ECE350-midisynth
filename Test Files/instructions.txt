@@ -1,0 +1,44 @@
+This program can assemble ECE350 limited-ISA MIPS assembly into machine code. 
+
+== Using the program
+
+asm [flags] <filename>
+
+Args:
+<filename>  name of the assembly file to assemble
+
+Optional Flags:
+-o      name of the output file
+-i      csv file containing custom instruction definitions
+-r      csv file containing custom register aliases
+-b      output base of instructions (only 2 or 16 supported). Defaults to binary.
+-l      number of 32-bit words in output file
+
+== Custom Instructions
+
+Custom instructions should be defined in a .csv file. Each row specifies a single instruction 
+and should match the following format: instruction, type, opcode.
+
+For example:
+
+print,J,11000
+draw,R,11001
+
+== Custom Register Aliases
+
+You can define additional register aliases in another .csv file. The first column of the row
+defines which register to assign aliases and following columns are all assigned as aliases.
+
+For example:
+2,sprite
+3,reg3
+3,register3
+3,three
+
+This will set "sprite" to be an alias for register 2 and "reg3", "register3", and "three"
+to be aliases for register 3. Then these aliases can be used in the assembly files in place of the
+register number.
+
+add $three, $sprite, $reg3 <==> add $3, $2, $3
+
+== author Jack Proudfoot
