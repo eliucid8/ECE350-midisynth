@@ -2,4 +2,5 @@
 *.vcd
 submission.zip
 Test Files/Output Files/*
+!.gitkeep
 .vscode
