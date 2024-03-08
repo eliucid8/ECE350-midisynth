@@ -35,7 +35,7 @@ module Wrapper (clock, reset);
 
 
 	// ADD YOUR MEMORY FILE HERE
-	localparam INSTR_FILE = "md_basic";
+	localparam INSTR_FILE = "md_fast";
 	
 	// Main Processing Unit
 	processor CPU(.clock(clock), .reset(reset), 

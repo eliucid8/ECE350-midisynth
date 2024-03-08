@@ -105,7 +105,7 @@ module processor(
     wire flush_FD;
     assign FDIRin = flush_FD ? 64'b0 : {address_imem, q_imem}; // We don't use pc+1 here bc idk, non blocking assignments.
     register #(64) FDIRlatch(
-        .clk(!clock), .writeEnable(1'b1), .reset(reset), .dataIn(FDIRin), .dataOut(FDIR)
+        .clk(!clock), .writeEnable(!stall_fetch), .reset(reset), .dataIn(FDIRin), .dataOut(FDIR)
     );
 
     // ========Decode========
