@@ -33,7 +33,7 @@
  *
  **/
 
-module Wrapper_tb #(parameter FILE = "mem_basic");
+module Wrapper_tb #(parameter FILE = "jal");
 
 	// FileData
 	localparam DIR = "Test Files/";
@@ -225,11 +225,11 @@ module Wrapper_tb #(parameter FILE = "mem_basic");
 				if (exp_result !== regA) begin
 					$fdisplay(diffFile, "Reg: %2d Expected: %11d Actual: %11d",
 						rs1_test, $signed(exp_result), $signed(regA));
-					$display("\tFAILED Reg: %2d Expected: %11d Actual: %11d",
+					$display("\t\x1b[31mFAILED Reg: %2d Expected: %11d Actual: %11d\x1b[0m",
 						rs1_test, $signed(exp_result), $signed(regA));
 					errors = errors + 1;
 				end else begin
-					$display("\tPASSED Reg: %2d", rs1_test);
+					$display("\t\x1b[32mPASSED Reg: %2d\x1b[0m", rs1_test);
 				end
 			end
 		end

@@ -17,6 +17,20 @@
  *
  *
  */
+
+/**
+ * Ye Olde TODO List
+ * TODO: j
+ * TODO: jr
+ * TODO: jal
+ * TODO: mul
+ * TODO: div
+ * TODO: bne
+ * TODO: blt
+ * TODO: setx
+ * TODO: bex
+ */
+
 module processor(
     // Control signals
     clock,                          // I: The master clock
@@ -61,21 +75,36 @@ module processor(
 	input [31:0] data_readRegA, data_readRegB;
 
 	/* YOUR CODE STARTS HERE */
-    localparam NUM_CTRL = 12;
-
+    // TODO: Change this when modifying Control!
+    localparam NUM_CTRL = 17;
+    localparam
+        wb_dst =            1,
+        reg_WE =            2,
+        use_mem =           3,
+        mem_WE =            4,
+        alu_imm =           5,
+        calcALUop =         10,
+        use_calc_ALUop =    11,
+        rtin =              12,
+        jr =                13,
+        branch =            14,
+        use_non_PC =        15,
+        jal =               16;
 
     // ========Fetch========
-    wire[31:0] next_pc;
+    wire[31:0] pcp1, next_pc; // pc plus 1
 
-    cla_32 pc_increment(.A(address_imem), .B(32'b1), .Cin(1'b0), .Sum(next_pc));
+    cla_32 pc_increment(.A(address_imem), .B(32'b1), .Cin(1'b0), .Sum(pcp1));
 
     register #(32) pc(
         .clk(clock), .writeEnable(1'b1), .reset(reset), .dataIn(next_pc), .dataOut(address_imem)
     );
 
-    wire[63:0] FDIR;
+    wire[63:0] FDIR, FDIRin;
+    wire flush_FD;
+    assign FDIRin = flush_FD ? 64'b0 : {address_imem, q_imem}; // We don't use pc+1 here bc idk, non blocking assignments.
     register #(64) FDIRlatch(
-        .clk(!clock), .writeEnable(1'b1), .reset(reset), .dataIn({next_pc, q_imem}), .dataOut(FDIR)
+        .clk(!clock), .writeEnable(1'b1), .reset(reset), .dataIn(FDIRin), .dataOut(FDIR)
     );
 
     // ========Decode========
@@ -96,16 +125,17 @@ module processor(
     // rs = 30 when bex.
     assign ctrl_readRegA = rs;
 
-    //rtin = mem_we = Dctrlbus[4]
-    assign ctrl_readRegB = Dctrlbus[4] ? rd : rt;
+    //rtin 
+    assign ctrl_readRegB = Dctrlbus[12] ? rd : rt;
 
-    // TODO: Change this when modifying Control!
     wire[NUM_CTRL-1:0] Dctrlbus;
 	insn_decode #(NUM_CTRL) insn_decoder(.opcode(opcode), .ctrlbus(Dctrlbus));
 
-    wire [NUM_CTRL+127:0] DXIR;
+    wire [NUM_CTRL+127:0] DXIR, DXIRin;
+    wire flush_DX;
+    assign DXIRin = flush_DX ? {NUM_CTRL+128{1'b0}} : {Dctrlbus, data_readRegA, data_readRegB, FDIR};
     register #(128 + NUM_CTRL) DXIRlatch(
-        .clk(!clock), .writeEnable(1'b1), .reset(reset), .dataIn({Dctrlbus, data_readRegA, data_readRegB, FDIR}), .dataOut(DXIR)
+        .clk(!clock), .writeEnable(1'b1), .reset(reset), .dataIn(DXIRin), .dataOut(DXIR)
     );
 
     // ========eXecute========
@@ -139,12 +169,30 @@ module processor(
         .isNotEqual(ALU_ne), .isLessThan(ALU_lt), .overflow(ALU_ovf)
     );
 
+
+    // ========Branchland========
+    wire[31:0] Tsx, jump_addr;
+    assign Tsx = {5'b0, {Xinsn[26:0]}};
+    assign jump_addr = Xctrlbus[13] ? XB : Tsx;
+
+
+    wire[31:0] cflow_addr; // control flow address
+    assign cflow_addr = Xctrlbus[14] ? 32'b0 : jump_addr;
+
+    assign next_pc = Xctrlbus[use_non_PC] ? cflow_addr : pcp1;
+
+    assign flush_FD = Xctrlbus[use_non_PC];
+    assign flush_DX = Xctrlbus[use_non_PC];
+
+    wire[31:0] executeOut;
+    assign executeOut = Xctrlbus[jal] ? DXIR[63:32] : alu_result;
+
     wire[NUM_CTRL+95:0] XMIR;
     register #(NUM_CTRL + 96) XMIRlatch(
-        .clk(!clock), .writeEnable(1'b1), .reset(reset), .dataIn({Xctrlbus, XB, alu_result, Xinsn}), .dataOut(XMIR)
+        .clk(!clock), .writeEnable(1'b1), .reset(reset), .dataIn({Xctrlbus, XB, executeOut, Xinsn}), .dataOut(XMIR)
     );
     
-    // TODO: ========Memory========
+    // ========Memory========
     wire[NUM_CTRL-1:0] Mctrlbus;
     assign Mctrlbus = XMIR[NUM_CTRL+95:96];
 
@@ -160,7 +208,7 @@ module processor(
         .clk(!clock), .writeEnable(1'b1), .reset(reset), .dataIn({Mctrlbus, Mresult, XMIR[31:0]}), .dataOut(MWIR)
     );
 
-    // Writeback
+    // ========Writeback========
     wire [NUM_CTRL-1:0] Wctrlbus = MWIR[NUM_CTRL+63:64];
     wire [31:0] Winsn = MWIR[31:0];
 
@@ -169,5 +217,4 @@ module processor(
     assign data_writeReg = MWIR[63:32];
 
 	/* END CODE */
-
 endmodule

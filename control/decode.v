@@ -4,7 +4,18 @@ module insn_decode #(
 (
     opcode, ctrlbus
 );
-    // localparam NUM_CTRL = 12;
+    localparam 
+        ADD = 0,
+        J = 1,
+        BNE = 2,
+        JAL = 3,
+        JR = 4,
+        ADDI = 5,
+        BLT = 6,
+        SW = 7,
+        LW = 8,
+        SETX = 21,
+        BEX = 22;
 
     input [4:0] opcode;
     /** Ideally, we order these so that the last ctrl signals used are the smallest just to avoid awkward shifts in the IR regs.
@@ -16,6 +27,10 @@ module insn_decode #(
      * ctrlbus[10:6]:   calcALUop
      * ctrlbus[11]:     use_calc_ALUop
      * ctrlbus[12]:     rtin (use rd if high)
+     * ctrlbus[13]:     jr
+     * ctrlbus[14]:     branch
+     * ctrlbus[15]:     use_non_PC 
+     * ctrlbus[16]:     jal
      */
     output[NUM_CTRL-1:0] ctrlbus;
 
@@ -34,7 +49,7 @@ module insn_decode #(
     assign ctrlbus[3] = insns[8];
 
     // mem_WE:
-    assign ctrlbus[4] = insns[7];
+    assign ctrlbus[4] = insns[SW];
 
     // alu_imm (use something other than rt for alu input b)
     assign ctrlbus[5] = |{insns[5], insns[7], insns[8]};
@@ -45,5 +60,20 @@ module insn_decode #(
     
     // use aluop
     assign ctrlbus[11] = |{insns[5], insns[7], insns[8], insns[2], insns[6]};
+
+    // rtin:
+    assign ctrlbus[12] = |{insns[SW], insns[JR]};
+
+    // jr:
+    assign ctrlbus[13] = insns[JR];
+
+    // branch:
+    assign ctrlbus[14] = |{insns[BNE], insns[BLT], insns[BEX]};
+
+    // use_non_PC:
+    assign ctrlbus[15] = |{insns[J], insns[BNE], insns[JAL], insns[JR], insns[BLT], insns[BEX]};
+
+    // jal:
+    assign ctrlbus[16] = insns[JAL];
 
 endmodule
