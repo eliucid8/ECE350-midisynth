@@ -93,11 +93,12 @@ module processor(
 
     // ========Fetch========
     wire[31:0] pcp1, next_pc; // pc plus 1
+    wire stall_fetch, stall_decode, stall_execute;
 
     cla_32 pc_increment(.A(address_imem), .B(32'b1), .Cin(1'b0), .Sum(pcp1));
 
     register #(32) pc(
-        .clk(clock), .writeEnable(1'b1), .reset(reset), .dataIn(next_pc), .dataOut(address_imem)
+        .clk(clock), .writeEnable(!stall_fetch), .reset(reset), .dataIn(next_pc), .dataOut(address_imem)
     );
 
     wire[63:0] FDIR, FDIRin;
@@ -135,7 +136,7 @@ module processor(
     wire flush_DX;
     assign DXIRin = flush_DX ? {NUM_CTRL+128{1'b0}} : {Dctrlbus, data_readRegA, data_readRegB, FDIR};
     register #(128 + NUM_CTRL) DXIRlatch(
-        .clk(!clock), .writeEnable(1'b1), .reset(reset), .dataIn(DXIRin), .dataOut(DXIR)
+        .clk(!clock), .writeEnable(!stall_decode), .reset(reset), .dataIn(DXIRin), .dataOut(DXIR)
     );
 
     // ========eXecute========
@@ -162,12 +163,20 @@ module processor(
 
     wire[4:0] Xshamt;
     assign Xshamt = Xinsn[11:7];
+    wire alu_result_ready;
 
     alu alu(
         .data_operandA(XA), .data_operandB(alu_inB), .ctrl_ALUopcode(ALUop), 
         .ctrl_shiftamt(Xshamt), .data_result(alu_result), 
-        .isNotEqual(ALU_ne), .isLessThan(ALU_lt), .overflow(ALU_ovf)
+        .isNotEqual(ALU_ne), .isLessThan(ALU_lt), .overflow(ALU_ovf),
+        .clock(clock), .result_rdy(alu_result_ready)
     );
+
+    wire div_stall;
+    assign div_stall = (ALUop == 5'b00111) && !alu_result_ready;
+    assign stall_fetch = div_stall;
+    assign stall_decode = div_stall;
+    assign stall_execute = div_stall;
 
 
     // ========Branchland========
@@ -179,7 +188,9 @@ module processor(
     wire[31:0] cflow_addr; // control flow address
     assign cflow_addr = Xctrlbus[14] ? 32'b0 : jump_addr;
 
+    wire[31:0] next_no_stall;
     assign next_pc = Xctrlbus[use_non_PC] ? cflow_addr : pcp1;
+    assign next_pc = stall_fetch ? address_imem : next_no_stall;
 
     assign flush_FD = Xctrlbus[use_non_PC];
     assign flush_DX = Xctrlbus[use_non_PC];
@@ -187,10 +198,14 @@ module processor(
     wire[31:0] executeOut;
     assign executeOut = Xctrlbus[jal] ? DXIR[63:32] : alu_result;
 
-    wire[NUM_CTRL+95:0] XMIR;
+    wire[NUM_CTRL+95:0] XMIR, XMIRout, XMIRnop;
+    assign XMIRnop = {(NUM_CTRL + 96){1'b0}};
+
     register #(NUM_CTRL + 96) XMIRlatch(
-        .clk(!clock), .writeEnable(1'b1), .reset(reset), .dataIn({Xctrlbus, XB, executeOut, Xinsn}), .dataOut(XMIR)
+        .clk(!clock), .writeEnable(!stall_execute), .reset(reset), .dataIn({Xctrlbus, XB, executeOut, Xinsn}), .dataOut(XMIRout)
     );
+
+    assign XMIR = stall_execute ? XMIRnop : XMIRout;
     
     // ========Memory========
     wire[NUM_CTRL-1:0] Mctrlbus;

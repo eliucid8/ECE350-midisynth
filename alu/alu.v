@@ -1,9 +1,14 @@
-module alu(data_operandA, data_operandB, ctrl_ALUopcode, ctrl_shiftamt, data_result, isNotEqual, isLessThan, overflow);
+module alu(
+    data_operandA, data_operandB, ctrl_ALUopcode, ctrl_shiftamt, 
+    data_result, isNotEqual, isLessThan, overflow, 
+    clock, result_rdy
+);
     input [31:0] data_operandA, data_operandB;
     input [4:0] ctrl_ALUopcode, ctrl_shiftamt;
+    input clock;
 
     output [31:0] data_result;
-    output isNotEqual, isLessThan, overflow;
+    output isNotEqual, isLessThan, overflow, result_rdy;
 
     wire Cout;
     wire[7:0] alu_ctrl;
@@ -36,6 +41,21 @@ module alu(data_operandA, data_operandB, ctrl_ALUopcode, ctrl_shiftamt, data_res
         .BAnd(and_output), .BOr(or_output)
         );
 
+    wire[31:0] md_result;
+    wire md_except, md_ready, divide_pulse;
+    edgedetector div_edge(.out(divide_pulse), .clock(clock), .sig(alu_ctrl[7]));
+
+    multdiv multdiv(
+        .data_operandA(data_operandA), .data_operandB(data_operandB),
+        .ctrl_MULT(alu_ctrl[6]), .ctrl_DIV(divide_pulse),
+        .clock(clock),
+        .data_result(md_result), .data_exception(md_except), .data_resultRDY(md_ready)
+    );
+
+    // result_rdy: hardwired to on unless we are dividing.
+    // shouldn't need to latch the fact that we are dividing if we stall the current insn.
+    assign result_rdy = (!alu_ctrl[7]) || md_ready;
+
     // shifters!
     left_barrel_shifter     sll(sll_output, data_operandA, ctrl_shiftamt);
     right_barrel_shifter    sra(sra_output, data_operandA, ctrl_shiftamt);
@@ -45,13 +65,13 @@ module alu(data_operandA, data_operandB, ctrl_ALUopcode, ctrl_shiftamt, data_res
     mux_8 output_decider(
         data_result, ctrl_ALUopcode[2:0], 
         add_output, add_output, and_output, or_output, 
-        sll_output, sra_output, 32'hdeadbeef, 32'hbadc0de
+        sll_output, sra_output, md_result, md_result
         );
 
     // overflow checker
     // TODO: minimize boolean logic?
     wire Asign, Bsign, Csign;
-    wire Asbar, Bsbar, Csbar, ovfSOP1, ovfSOP2;
+    wire Asbar, Bsbar, Csbar, ovfSOP1, ovfSOP2, add_ovf;
 
     assign Asign = data_operandA[31];
     assign Bsign = B_adder_input[31];
@@ -62,13 +82,13 @@ module alu(data_operandA, data_operandB, ctrl_ALUopcode, ctrl_shiftamt, data_res
 
     and ovfAnd1(ovfSOP1, Csbar, Asign, Bsign);
     and ovfAnd2(ovfSOP2, Csign, Asbar, Bsbar);
-    or  ovfOr(overflow, ovfSOP1, ovfSOP2);
+    or  ovfOr(add_ovf, ovfSOP1, ovfSOP2);
 
-    // FIXME: wiring these to 0 temporarily
+    assign overflow = (alu_ctrl[6] || alu_ctrl[7]) ? md_except : add_ovf;
 
     // not equal: ie A - B != 0 => or all inputs of A-B together
     or_32 ne_check(isNotEqual, add_output);
 
     // less than: A < B => A - B < 0, so we are looking for a sign bit 1. However, if we overflow, that means the result is reversed, because the sign of the end result is opposite what it would actually be if we had extra room.
-    xor le_check(isLessThan, add_output[31], overflow);
+    xor le_check(isLessThan, add_output[31], add_ovf);
 endmodule
