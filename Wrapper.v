@@ -35,7 +35,7 @@ module Wrapper (clock, reset);
 
 
 	// ADD YOUR MEMORY FILE HERE
-	localparam INSTR_FILE = "pos_arith";
+	localparam INSTR_FILE = "mem_basic";
 	
 	// Main Processing Unit
 	processor CPU(.clock(clock), .reset(reset), 

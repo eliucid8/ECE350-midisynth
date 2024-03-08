@@ -1,5 +1,4 @@
 module alu(data_operandA, data_operandB, ctrl_ALUopcode, ctrl_shiftamt, data_result, isNotEqual, isLessThan, overflow);
-        
     input [31:0] data_operandA, data_operandB;
     input [4:0] ctrl_ALUopcode, ctrl_shiftamt;
 
@@ -14,6 +13,8 @@ module alu(data_operandA, data_operandB, ctrl_ALUopcode, ctrl_shiftamt, data_res
      * 011 - or
      * 100 - sll
      * 101 - sra
+     * 110 - mul
+     * 111 - div
      */
 
     wire[31:0] B_not, B_adder_input;

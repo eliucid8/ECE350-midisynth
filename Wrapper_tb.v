@@ -33,7 +33,7 @@
  *
  **/
 
-module Wrapper_tb #(parameter FILE = "pos_arith");
+module Wrapper_tb #(parameter FILE = "mem_basic");
 
 	// FileData
 	localparam DIR = "Test Files/";
