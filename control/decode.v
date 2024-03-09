@@ -62,13 +62,13 @@ module insn_decode #(
     assign ctrlbus[11] = |{insns[5], insns[7], insns[8], insns[2], insns[6]};
 
     // rtin:
-    assign ctrlbus[12] = |{insns[SW], insns[JR]};
+    assign ctrlbus[12] = |{insns[SW], insns[JR], insns[BLT], insns[BNE]};
 
     // jr:
     assign ctrlbus[13] = insns[JR];
 
     // branch:
-    assign ctrlbus[14] = |{insns[BNE], insns[BLT], insns[BEX]};
+    assign ctrlbus[14] = |{insns[BNE], insns[BLT]};
 
     // use_non_PC:
     assign ctrlbus[15] = |{insns[J], insns[BNE], insns[JAL], insns[JR], insns[BLT], insns[BEX]};
@@ -76,4 +76,32 @@ module insn_decode #(
     // jal:
     assign ctrlbus[16] = insns[JAL];
 
+    // blt:
+    assign ctrlbus[17] = insns[BLT];
+
+    // bex:
+    assign ctrlbus[18] = insns[BEX];
+    
+    // setx:
+    assign ctrlbus[19] = insns[SETX];
+
+    // add_insn:
+    assign ctrlbus[20] = |{insns[ADD], insns[ADDI]};
+
+    // addi:
+    assign ctrlbus[21] = insns[ADDI];
+endmodule
+
+// TODO: Is it bad to have these unecessary wires hardwired to 0???
+module exceptionmap(rstatus, ALUop, addi, allow_except);
+    input[4:0] ALUop;
+    input addi;
+    output[31:0] rstatus;
+    output allow_except;
+
+    assign rstatus[31:3] = 29'b0;
+    assign rstatus[0] = (!(ALUop[2]) || (ALUop[1] && ALUop[0])) && !addi;
+    assign rstatus[1] = (!(ALUop[1]) && ALUop[0]) || addi;
+    assign rstatus[2] = ALUop[1];
+    assign allow_except = (!ALUop[1] || ALUop[2]) && (ALUop[0] || ALUop[1] || !ALUop[2]);
 endmodule

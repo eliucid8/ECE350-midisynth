@@ -18,19 +18,6 @@
  *
  */
 
-/**
- * Ye Olde TODO List
- * TODO: j
- * TODO: jr
- * TODO: jal
- * TODO: mul
- * TODO: div
- * TODO: bne
- * TODO: blt
- * TODO: setx
- * TODO: bex
- */
-
 module processor(
     // Control signals
     clock,                          // I: The master clock
@@ -76,7 +63,7 @@ module processor(
 
 	/* YOUR CODE STARTS HERE */
     // TODO: Change this when modifying Control!
-    localparam NUM_CTRL = 17;
+    localparam NUM_CTRL = 22;
     localparam
         wb_dst =            1,
         reg_WE =            2,
@@ -89,7 +76,12 @@ module processor(
         jr =                13,
         branch =            14,
         use_non_PC =        15,
-        jal =               16;
+        jal =               16,
+        blt =               17,
+        bex =               18,
+        setx =              19,
+        add_insn =          20,
+        addi =              21;
 
     // ========Fetch========
     wire[31:0] pcp1, next_pc; // pc plus 1
@@ -123,14 +115,15 @@ module processor(
     assign immed =          {{15{D_insn[16]}}, {D_insn[16:0]}};
     assign jump_target =    {5'b0, D_insn[26:0]};
 
+    wire[NUM_CTRL-1:0] Dctrlbus;
+	insn_decode #(NUM_CTRL) insn_decoder(.opcode(opcode), .ctrlbus(Dctrlbus));
+
     // rs = 30 when bex.
-    assign ctrl_readRegA = rs;
+    assign ctrl_readRegA = Dctrlbus[bex] ? 32'd30 : rs;
 
     //rtin 
     assign ctrl_readRegB = Dctrlbus[12] ? rd : rt;
 
-    wire[NUM_CTRL-1:0] Dctrlbus;
-	insn_decode #(NUM_CTRL) insn_decoder(.opcode(opcode), .ctrlbus(Dctrlbus));
 
     wire [NUM_CTRL+127:0] DXIR, DXIRin;
     wire flush_DX;
@@ -148,7 +141,9 @@ module processor(
     wire[31:0] XA, XB, Ximmed;
     assign XA = DXIR[127:96];
     assign XB = DXIR[95:64];
-    assign Ximmed = {{15{Xinsn[16]}}, {Xinsn[16:0]}};
+
+    // mux in 0 as Ximmed for bex, so that we can compare against it.
+    assign Ximmed = Xctrlbus[bex] ? 32'b0 : {{15{Xinsn[16]}}, {Xinsn[16:0]}};
 
     wire[31:0] alu_inB;
     assign alu_inB = Xctrlbus[5] ? Ximmed : XB;
@@ -178,31 +173,64 @@ module processor(
     assign stall_decode = div_stall;
     assign stall_execute = div_stall;
 
+    wire [31:0] rstatus_in, alu_except_result;
+    wire set_except, allow_except;
+    exceptionmap exception_map(.rstatus(rstatus_in), .ALUop(ALUop), .addi(Xctrlbus[addi]), .allow_except(allow_except));
+    assign set_except = (Xctrlbus[add_insn]) && allow_except && ALU_ovf;
+    assign alu_except_result = set_except ? rstatus_in : alu_result; // set ALU result to exception value if set_except triggered.  
+
+    // modify insn to write to r30 if exception.
+    wire[31:0] modified_Xinsn;
+    wire[4:0] modified_rd;
+    assign modified_rd = (set_except || Xctrlbus[setx]) ? 5'd30 : Xinsn[26:22];
+    assign modified_Xinsn = {Xinsn[31:27], modified_rd, Xinsn[21:0]}; 
+
+    // TODO: merge all modifications to result into 1 mux.
+    wire[31:0] alu_setx_result;
+    assign alu_setx_result = Xctrlbus[setx] ? jump_addr : alu_except_result;
 
     // ========Branchland========
-    wire[31:0] Tsx, jump_addr;
-    assign Tsx = {5'b0, {Xinsn[26:0]}};
-    assign jump_addr = Xctrlbus[13] ? XB : Tsx;
+    wire[31:0] Tsx, jump_addr, cur_pcp1, branch_target, branch_addr;
+    
+    // bex jumps to an absolute addr as well. don't do the jump if bex and the sub results in 0.
+    wire no_bex_jump = Xctrlbus[bex] && !ALU_ne;
+    assign Tsx = no_bex_jump ? pcp1 : {5'b0, {Xinsn[26:0]}}; // muxes in normal pc if bex fails.
+    
+    assign jump_addr = Xctrlbus[jr] ? XB : Tsx;
+    assign cur_pcp1 = DXIR[63:32];
+
+    // add immediate to pc+1 to see where this insn would branch to.
+    cla_32 branch_cla(.A(cur_pcp1), .B(Ximmed), .Cin(1'b0), .Sum(branch_target));
+    // ALU_lt tells us if rs < rd , but we want it the other way around.
+    // rd < rs => !(rs < rd) && rs != rd.
+    wire flipped_lt;
+    assign flipped_lt = !ALU_lt && ALU_ne;
+
+    wire do_branch = (!Xctrlbus[blt] && ALU_ne) || (Xctrlbus[blt] && flipped_lt); // hopefully this is readable?
+    assign branch_addr = do_branch ? branch_target : pcp1;
 
 
     wire[31:0] cflow_addr; // control flow address
-    assign cflow_addr = Xctrlbus[14] ? 32'b0 : jump_addr;
+    assign cflow_addr = Xctrlbus[branch] ? branch_addr : jump_addr;
 
     wire[31:0] next_no_stall;
+    wire cflow_flush;
+    assign cflow_flush = Xctrlbus[use_non_PC] && !(Xctrlbus[branch] && !do_branch); // don't flush if branch not taken.
+
     assign next_pc = Xctrlbus[use_non_PC] ? cflow_addr : pcp1;
     assign next_pc = stall_fetch ? address_imem : next_no_stall;
 
-    assign flush_FD = Xctrlbus[use_non_PC];
-    assign flush_DX = Xctrlbus[use_non_PC];
+    assign flush_FD = cflow_flush;
+    assign flush_DX = cflow_flush;
 
-    wire[31:0] executeOut;
-    assign executeOut = Xctrlbus[jal] ? DXIR[63:32] : alu_result;
+    wire[31:0] executeOut; // mux in this insn's pc+1
+    assign executeOut = Xctrlbus[jal] ? cur_pcp1 : alu_setx_result;
 
     wire[NUM_CTRL+95:0] XMIR, XMIRout, XMIRnop;
     assign XMIRnop = {(NUM_CTRL + 96){1'b0}};
 
     register #(NUM_CTRL + 96) XMIRlatch(
-        .clk(!clock), .writeEnable(!stall_execute), .reset(reset), .dataIn({Xctrlbus, XB, executeOut, Xinsn}), .dataOut(XMIRout)
+        .clk(!clock), .writeEnable(!stall_execute), .reset(reset), .dataIn({Xctrlbus, XB, executeOut, modified_Xinsn}), .dataOut(XMIRout)
     );
 
     assign XMIR = stall_execute ? XMIRnop : XMIRout;
