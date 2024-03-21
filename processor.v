@@ -130,7 +130,7 @@ module processor(
         .clk(!clock), .writeEnable(!stall_decode), .reset(reset), .dataIn(DXIRin), .dataOut(DXIR)
     );
 
-    // NOTE:====bypassing==== (couldn't figure out where to put this)
+    // ====bypassing==== (couldn't figure out where to put this)
     wire[1:0] XAsel, XBsel;
     wire MWDsel, memstall;
 
@@ -143,15 +143,28 @@ module processor(
         .XAsel(XAsel), .XBsel(XBsel), .MWDsel(MWDsel), .memstall(memstall)
     );
 
-    // NOTE:========eXecute========
+    wire[31:0] Mexecout, Wresult;
+
+    // ========eXecute========
     wire [NUM_CTRL-1:0] Xctrlbus;
     assign Xctrlbus = DXIR[NUM_CTRL + 127:128];
     wire [31:0] Xinsn;
     assign Xinsn = DXIR[31:0];
 
-    wire[31:0] XA, XB, Ximmed;
+    wire[31:0] XA, XB, Ximmed, XAby, XBby;
     assign XA = DXIR[127:96];
     assign XB = DXIR[95:64];
+
+    mux4 #(.WIDTH(32)) abypassmux(
+        .out(XAby), .sel(XAsel),
+        .in0(XA), .in1(Mexecout), .in2(Wresult), .in3(32'hdeadbeef)
+    );
+
+    mux4 #(.WIDTH(32)) bbypassmux(
+        .out(XBby), .sel(XBsel),
+        .in0(XB), .in1(Mexecout), .in2(Wresult), .in3(32'hdeadbeef)
+    );
+
 
     // mux in 0 as Ximmed for bex, so that we can compare against it.
     assign Ximmed = Xctrlbus[bex] ? 32'b0 : {{15{Xinsn[16]}}, {Xinsn[16:0]}};
@@ -259,13 +272,21 @@ module processor(
     wire[NUM_CTRL-1:0] Mctrlbus;
     assign Mctrlbus = XMIR[NUM_CTRL+95:96];
 
-    assign address_dmem = XMIR[63:32];
+    assign Mexecout = XMIR[63:32];
+    assign address_dmem = Mexecout;
     assign wren = Mctrlbus[4];
-    assign data = XMIR[95:64];
+    wire[31:0] MXB = XMIR[95:64];
+    wire[31:0] Mwritedata;
+    assign data = MXB;
     wire[31:0] Minsn = XMIR[31:0];
 
     wire[31:0] Mresult;
     assign Mresult = Mctrlbus[3] ? q_dmem : address_dmem; // decide between memory result and alu result
+
+    mux2 #(.WIDTH(32)) mwdbypassmux(
+        .out(Mwritedata), .sel(MWDsel),
+        .in0(MXB), .in1(Wresult)
+    );
 
     wire[NUM_CTRL + 63:0] MWIR;
     register #(NUM_CTRL + 64) MWIRlatch(
@@ -278,7 +299,8 @@ module processor(
 
     mux4 #(.WIDTH(5)) writeRegMux(ctrl_writeReg, Wctrlbus[1:0], Winsn[26:22], 5'bx, 5'd30, 5'd31);
     assign ctrl_writeEnable = Wctrlbus[2];
-    assign data_writeReg = MWIR[63:32];
+    assign Wresult = MWIR[63:32];
+    assign data_writeReg = Wresult;
 
 	/* END CODE */
 endmodule
