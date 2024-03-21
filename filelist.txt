@@ -12,6 +12,7 @@ alu/barrel_shifters.v
 alu/big_gates.v
 alu/cla.v
 control/decode.v
+control/bypass.v
 regfile/regfile.v
 regfile/register.v
 multdiv/dadda_mult.v

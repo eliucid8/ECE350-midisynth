@@ -10,7 +10,7 @@ addi $r2, $r0, 5		# r2 = 5
 nop
 sub $r3, $r0, $r1		# r3 = -4
 sub $r4, $r0, $r2		# r4 = -5
-nop #================================================================================================================================
+nop #========BNE========
 nop 				    # Basic Test of BNE: 2 
 bne $r1, $r2, b1		# r1 != r2 --> taken
 nop				        # flushed instruction
@@ -45,7 +45,7 @@ and $r10, $r0, $r10		# r10 should be 2
 and $r20, $r0, $r20		# r20 should be 0
 and $r21, $r0, $r21		# r21 should be 0
 and $r22, $r0, $r22		# r22 should be 0
-nop #================================================================================================================================
+nop #========BLT========
 nop # Basic Test of BLT: 6
 blt $r1, $r2, b3		# r1 < r2 --> taken
 nop				        # flushed instruction
@@ -110,7 +110,7 @@ and $r10, $r0, $r10		# r10 should be 6
 and $r20, $r0, $r20		# r20 should be 0
 and $r21, $r0, $r21		# r21 should be 0
 and $r22, $r0, $r22		# r22 should be 0
-nop #================================================================================================================================
+nop #========jump========
 nop 				    # Basic Test of J: 1
 j j1				    # Jump to j1
 nop				        # flushed instruction
@@ -139,7 +139,7 @@ and $r10, $r0, $r10		# r10 should be 1
 and $r20, $r0, $r20		# r20 should be 0
 and $r21, $r0, $r21		# r21 should be 0
 and $r22, $r0, $r22		# r22 should be 0
-nop #================================================================================================================================
+nop #========jal,jr========
 nop 				    # Basic test of JAL, JR: 2
 addi $r31, $r0, 139		# r31 = 139
 jal j2				    # Jump to j2, r31 = PC + 1 = 136
@@ -182,7 +182,7 @@ and $r10, $r0, $r10		# r10 should be 2
 and $r20, $r0, $r20		# r20 should be 0
 and $r21, $r0, $r21		# r21 should be 0
 and $r22, $r0, $r22		# r22 should be 0
-nop #================================================================================================================================
+nop # ========bex,setx========
 nop 				    # Basic Text of BEX, SETX: 2
 setx 0				    # r30 = 0
 nop				        # Avoid setx RAW hazard
@@ -225,7 +225,7 @@ and $r20, $r0, $r20		# r20 should be 0
 and $r21, $r0, $r21		# r21 should be 0
 and $r22, $r0, $r22		# r22 should be 0
 nop
-nop #================================================================================================================================
+nop #========flushing========
 nop                     # Test of Flushing: 2
 bne $r0, $r1, f1		# r0 != r1 --> taken
 addi $r20, $r20, 1		# r20 += 1 (Incorrect)

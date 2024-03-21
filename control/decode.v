@@ -4,6 +4,7 @@ module insn_decode #(
 (
     opcode, ctrlbus
 );
+    // TODO: Fold ALUOP into this as well???
     localparam 
         ADD = 0,
         J = 1,
@@ -48,7 +49,7 @@ module insn_decode #(
     // use_mem:
     assign ctrlbus[3] = insns[8];
 
-    // mem_WE:
+    // SW (mem_WE, bypass_WM):
     assign ctrlbus[4] = insns[SW];
 
     // alu_imm (use something other than rt for alu input b)
@@ -90,6 +91,15 @@ module insn_decode #(
 
     // addi:
     assign ctrlbus[21] = insns[ADDI];
+
+    // bypassA
+    assign ctrlbus[22] = ~|{insns[J], insns[JAL], insns[JR], insns[SETX]};
+    
+    // bypassB
+    assign ctrlbus[23] = |{insns[ADD], insns[ADDI], insns[BNE], insns[JR], insns[BLT]};
+
+    // lw
+    assign ctrlbus[24] = insns[LW];
 endmodule
 
 // TODO: Is it bad to have these unecessary wires hardwired to 0???

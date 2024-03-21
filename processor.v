@@ -63,12 +63,12 @@ module processor(
 
 	/* YOUR CODE STARTS HERE */
     // TODO: Change this when modifying Control!
-    localparam NUM_CTRL = 22;
+    localparam NUM_CTRL = 25;
     localparam
         wb_dst =            1,
         reg_WE =            2,
         use_mem =           3,
-        mem_WE =            4,
+        sw =                4,
         alu_imm =           5,
         calcALUop =         10,
         use_calc_ALUop =    11,
@@ -81,7 +81,10 @@ module processor(
         bex =               18,
         setx =              19,
         add_insn =          20,
-        addi =              21;
+        addi =              21,
+        bypassA =           22,
+        bypassB =           23,
+        lw =                24;
 
     // ========Fetch========
     wire[31:0] pcp1, next_pc; // pc plus 1
@@ -101,29 +104,24 @@ module processor(
     );
 
     // ========Decode========
-    wire[31:0] D_insn;
-    assign D_insn = FDIR[31:0];
-    wire[4:0] opcode, rd, rs, rt, shamt, insnALUop;
-    wire[31:0] immed;
-    wire[26:0] jump_target;
-    assign opcode =         D_insn[31:27];
-    assign rd =             D_insn[26:22];
-    assign rs =             D_insn[21:17];
-    assign rt =             D_insn[16:12];
-    assign shamt =          D_insn[11:7];
-    assign insnALUop =      D_insn[6:2];
-    assign immed =          {{15{D_insn[16]}}, {D_insn[16:0]}};
-    assign jump_target =    {5'b0, D_insn[26:0]};
+    wire[31:0] D_insn =         FDIR[31:0];
+    wire[4:0] Dopcode =         D_insn[31:27];
+    wire[4:0] Drd =             D_insn[26:22];
+    wire[4:0] Drs =             D_insn[21:17];
+    wire[4:0] Drt =             D_insn[16:12];
+    // wire[4:0] Dshamt =          D_insn[11:7];
+    // wire[4:0] DinsnALUop =      D_insn[6:2];
+    // wire[31:0] Dimmed =         {{15{D_insn[16]}}, {D_insn[16:0]}};
+    // wire[26:0] Djump_target =   {5'b0, D_insn[26:0]};
 
     wire[NUM_CTRL-1:0] Dctrlbus;
-	insn_decode #(NUM_CTRL) insn_decoder(.opcode(opcode), .ctrlbus(Dctrlbus));
+	insn_decode #(NUM_CTRL) insn_decoder(.opcode(Dopcode), .ctrlbus(Dctrlbus));
 
     // rs = 30 when bex.
-    assign ctrl_readRegA = Dctrlbus[bex] ? 32'd30 : rs;
+    assign ctrl_readRegA = Dctrlbus[bex] ? 32'd30 : Drs;
 
     //rtin 
-    assign ctrl_readRegB = Dctrlbus[12] ? rd : rt;
-
+    assign ctrl_readRegB = Dctrlbus[12] ? Drd : Drt;
 
     wire [NUM_CTRL+127:0] DXIR, DXIRin;
     wire flush_DX;
@@ -132,7 +130,20 @@ module processor(
         .clk(!clock), .writeEnable(!stall_decode), .reset(reset), .dataIn(DXIRin), .dataOut(DXIR)
     );
 
-    // ========eXecute========
+    // NOTE:====bypassing==== (couldn't figure out where to put this)
+    wire[1:0] XAsel, XBsel;
+    wire MWDsel, memstall;
+
+    bypass_controller bypass_ctrl(
+        .DXrs(Xinsn[21:17]), .DXrt(Xinsn[16:12]), .DXrd(Xinsn[26:22]), 
+        .XMrd(Minsn[26:22]), .MWrd(Winsn[26:22]),
+        .bypassA(Dctrlbus[bypassA]), .bypassB(Dctrlbus[bypassB]), 
+        .DX_rtin(Xctrlbus[rtin]), .DX_sw(Xctrlbus[sw]), .DX_setx(Xctrlbus[setx]),
+        .XM_lw(Mctrlbus[sw]), .XM_sw(Mctrlbus[lw]),
+        .XAsel(XAsel), .XBsel(XBsel), .MWDsel(MWDsel), .memstall(memstall)
+    );
+
+    // NOTE:========eXecute========
     wire [NUM_CTRL-1:0] Xctrlbus;
     assign Xctrlbus = DXIR[NUM_CTRL + 127:128];
     wire [31:0] Xinsn;
@@ -146,7 +157,7 @@ module processor(
     assign Ximmed = Xctrlbus[bex] ? 32'b0 : {{15{Xinsn[16]}}, {Xinsn[16:0]}};
 
     wire[31:0] alu_inB;
-    assign alu_inB = Xctrlbus[5] ? Ximmed : XB;
+    assign alu_inB = Xctrlbus[alu_imm] ? Ximmed : XB;
 
     wire[31:0] alu_result;
     wire ALU_ne, ALU_lt, ALU_ovf;
@@ -167,12 +178,14 @@ module processor(
         .clock(clock), .result_rdy(alu_result_ready)
     );
 
+    // ====Stalls====
     wire div_stall;
     assign div_stall = (ALUop == 5'b00111) && !alu_result_ready;
     assign stall_fetch = div_stall;
     assign stall_decode = div_stall;
     assign stall_execute = div_stall;
 
+    // ====Exceptions====
     wire [31:0] rstatus_in, alu_except_result;
     wire set_except, allow_except;
     exceptionmap exception_map(.rstatus(rstatus_in), .ALUop(ALUop), .addi(Xctrlbus[addi]), .allow_except(allow_except));
@@ -186,10 +199,17 @@ module processor(
     assign modified_Xinsn = {Xinsn[31:27], modified_rd, Xinsn[21:0]}; 
 
     // TODO: merge all modifications to result into 1 mux.
+    /* executeOut
+     * default:     alu_result
+     * add_insn:    set_except ? rstatus_in : alu_result
+     * setx:        jump_addr
+     * jal:         cur_pcp1
+     */
+
     wire[31:0] alu_setx_result;
     assign alu_setx_result = Xctrlbus[setx] ? jump_addr : alu_except_result;
 
-    // ========Branchland========
+    // ====Branchland====
     wire[31:0] Tsx, jump_addr, cur_pcp1, branch_target, branch_addr;
     
     // bex jumps to an absolute addr as well. don't do the jump if bex and the sub results in 0.
@@ -217,8 +237,8 @@ module processor(
     wire cflow_flush;
     assign cflow_flush = Xctrlbus[use_non_PC] && !(Xctrlbus[branch] && !do_branch); // don't flush if branch not taken.
 
-    assign next_pc = Xctrlbus[use_non_PC] ? cflow_addr : pcp1;
-    assign next_pc = stall_fetch ? address_imem : next_no_stall;
+    assign next_no_stall = Xctrlbus[use_non_PC] ? cflow_addr : pcp1; // is next_no_stall necessary???
+    assign next_pc = stall_fetch ? address_imem : next_no_stall; 
 
     assign flush_FD = cflow_flush;
     assign flush_DX = cflow_flush;
@@ -242,13 +262,14 @@ module processor(
     assign address_dmem = XMIR[63:32];
     assign wren = Mctrlbus[4];
     assign data = XMIR[95:64];
+    wire[31:0] Minsn = XMIR[31:0];
 
     wire[31:0] Mresult;
     assign Mresult = Mctrlbus[3] ? q_dmem : address_dmem; // decide between memory result and alu result
 
     wire[NUM_CTRL + 63:0] MWIR;
     register #(NUM_CTRL + 64) MWIRlatch(
-        .clk(!clock), .writeEnable(1'b1), .reset(reset), .dataIn({Mctrlbus, Mresult, XMIR[31:0]}), .dataOut(MWIR)
+        .clk(!clock), .writeEnable(1'b1), .reset(reset), .dataIn({Mctrlbus, Mresult, Minsn}), .dataOut(MWIR)
     );
 
     // ========Writeback========
