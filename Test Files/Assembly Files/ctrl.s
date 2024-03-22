@@ -1,298 +1,96 @@
-nop                     # Basic Control Test with no Data Hazards
-nop                     # Values initialized using addi (positive only) and sub
-nop                     # Registers 10,11 track correct and 20-23 track incorrect
-nop                     # Values and comments in the test of JR must be updated if code modified.
-nop                     # Author: Nathaniel Brooke, Modified by Will Denton
+nop 				# Advanced Control Test with Bypassing
+nop 				# Values initialized using addi (positive only)
+nop 				# Registers 10,11 track correct and 20,21 track incorrect
+nop 				# Values in the first two tests be updated if the number of lines is modified
+nop 				# Author: Nathaniel Brooke
 nop
-nop                     # Initialize Values
-addi $r1, $r0, 4		# r1 = 4
-addi $r2, $r0, 5		# r2 = 5
 nop
-sub $r3, $r0, $r1		# r3 = -4
-sub $r4, $r0, $r2		# r4 = -5
-nop #========BNE========
-nop 				    # Basic Test of BNE: 2 
-bne $r1, $r2, b1		# r1 != r2 --> taken
-nop				        # flushed instruction
-nop				        # flushed instruction
+nop 				    # Test Bypassing into JR
+addi $r31, $r0, 12		# r31 = 12
+nop				        # Avoid RAW hazard for jr
+addi $r31, $r0, 16		# r31 = 16 (with RAW hazard)
+jr $r31     			# PC = r31 = 16
 addi $r20, $r20, 1		# r20 += 1 (Incorrect)
-addi $r21, $r21, 1		# r21 += 1 (Incorrect)
-addi $r22, $r22, 1		# r22 += 1 (Incorrect)
-b1: addi $r10, $r10, 1	# r10 += 1 (Correct)
-# addi $r12, $r12, 1
-bne $r2, $r2, b2		# r2 == r2 --> not taken
-nop				        # nop in case of flush
-nop				        # nop in case of flush
-nop				        # Spacer
+addi $r20, $r20, 1		# r20 += 1 (Incorrect)
+addi $r20, $r20, 1		# r20 += 1 (Incorrect)
+addi $r20, $r20, 1		# r20 += 1 (Incorrect)
 addi $r10, $r10, 1		# r10 += 1 (Correct)
-# addi $r12, $r12, 1
-b2: nop				    # Landing pad for branch
-nop				        # Avoid add RAW hazard
-add $r11, $r10, $r11	# Accumulate r10 score
-add $r23, $r23, $r20	# Accumulate r20 score
-nop                     # Stalls to avoid addi bypassing
-nop                         
-nop
-add $r23, $r23, $r21	# Accumulate r21 score
-nop                     # Stalls to avoid addi bypassing
-nop
-nop
-add $r23, $r23, $r22	# Accumulate r22 score
-nop                     # Stalls to avoid addi bypassing
-nop
-nop
-and $r10, $r0, $r10		# r10 should be 2
-and $r20, $r0, $r20		# r20 should be 0
-and $r21, $r0, $r21		# r21 should be 0
-and $r22, $r0, $r22		# r22 should be 0
-nop #========BLT========
-nop # Basic Test of BLT: 6
-blt $r1, $r2, b3		# r1 < r2 --> taken
-nop				        # flushed instruction
-nop				        # flushed instruction
-addi $r20, $r20, 1		# r20 += 1 (Incorrect)
-addi $r21, $r21, 1		# r21 += 1 (Incorrect)
-addi $r22, $r22, 1		# r22 += 1 (Incorrect)
-b3: addi $r10, $r10, 1	# r10 += 1 (Correct)
-# addi $r13, $r13, 1
-blt $r2, $r2, b4		# r2 == r2 --> not taken
-nop				        # nop in case of flush
-nop				        # nop in case of flush
-nop				        # Spacer
-addi $r10, $r10, 1		# r10 += 1 (Correct)
-# addi $r13, $r13, 1
-b4: nop				    # Landing pad for branch
-blt $r4, $r1, b5		# r4 < r1 --> taken
-nop				        # flushed instruction
-nop				        # flushed instruction
-addi $r20, $r20, 1		# r20 += 1 (Incorrect)
-addi $r21, $r21, 1		# r21 += 1 (Incorrect)
-addi $r22, $r22, 1		# r22 += 1 (Incorrect)
-b5: addi $r10, $r10, 1	# r10 += 1 (Correct)
-# addi $r13, $r13, 1
-blt $r2, $r1, b6		# r2 > r1 --> not taken
-nop				        # nop in case of flush
-nop				        # nop in case of flush
-nop				        # Spacer
-addi $r10, $r10, 1		# r10 += 1 (Correct)
-# addi $r13, $r13, 1
-b6: nop				    # Landing pad for branch
-blt $r4, $r3, b7		# r4 < r3 --> taken
-nop				        # flushed instruction
-nop				        # flushed instruction
-addi $r20, $r20, 1		# r20 += 1 (Incorrect)
-addi $r21, $r21, 1		# r21 += 1 (Incorrect)
-addi $r22, $r22, 1		# r22 += 1 (Incorrect)
-b7: addi $r10, $r10, 1	# r10 += 1 (Correct)
-# addi $r13, $r13, 1
-blt $r3, $r4, b8		# r3 > r4 --> not taken
-nop				        # nop in case of flush
-nop				        # nop in case of flush
-nop				        # Spacer
-addi $r10, $r10, 1		# r10 += 1 (Correct)
-# addi $r13, $r13, 1
-b8: nop				    # Landing pad for branch
-nop				        # Avoid add RAW hazard
-add $r11, $r10, $r11	# Accumulate r10 score
-add $r23, $r23, $r20	# Accumulate r20 score
-nop                     # Stalls to avoid addi bypassing
-nop                         
-nop
-add $r23, $r23, $r21	# Accumulate r21 score
-nop                     # Stalls to avoid addi bypassing
-nop
-nop
-add $r23, $r23, $r22	# Accumulate r22 score
-nop                     # Stalls to avoid addi bypassing
-nop
-nop
-and $r10, $r0, $r10		# r10 should be 6
-and $r20, $r0, $r20		# r20 should be 0
-and $r21, $r0, $r21		# r21 should be 0
-and $r22, $r0, $r22		# r22 should be 0
-nop #========jump========
-nop 				    # Basic Test of J: 1
-j j1				    # Jump to j1
-nop				        # flushed instruction
-nop				        # flushed instruction
-addi $r20, $r20, 1		# r20 += 1 (Incorrect)
-addi $r21, $r21, 1		# r21 += 1 (Incorrect)
-addi $r22, $r22, 1		# r22 += 1 (Incorrect)
-j1: addi $r10, $r10, 1	# r10 += 1 (Correct)
-# addi $r14, $r14, 1
-nop				        # Avoid add RAW hazard
-nop				        # Avoid add RAW hazard
-add $r11, $r10, $r11	# Accumulate r10 score
-add $r23, $r23, $r20	# Accumulate r20 score
-nop                     # Stalls to avoid addi bypassing
-nop                         
-nop
-add $r23, $r23, $r21	# Accumulate r21 score
-nop                     # Stalls to avoid addi bypassing
-nop
-nop
-add $r23, $r23, $r22	# Accumulate r22 score
-nop                     # Stalls to avoid addi bypassing
-nop
-nop
+add $r11, $r10, $r11		# Accumulate r10 score
+add $r21, $r20, $r21		# Accumulate r20 score
 and $r10, $r0, $r10		# r10 should be 1
 and $r20, $r0, $r20		# r20 should be 0
-and $r21, $r0, $r21		# r21 should be 0
-and $r22, $r0, $r22		# r22 should be 0
-nop #========jal,jr========
-nop 				    # Basic test of JAL, JR: 2
-addi $r31, $r0, 139		# r31 = 139
-jal j2				    # Jump to j2, r31 = PC + 1 = 136
-nop				        # flushed instruction
-nop				        # flushed instruction
-addi $r20, $r20, 1		# r20 += 1 (Incorrect)
-addi $r21, $r21, 1		# r21 += 1 (Incorrect)
-addi $r22, $r22, 1		# r22 += 1 (Incorrect)
-j2: addi $r10, $r10, 1	# r10 += 1 (Correct)
-# addi $r15, $r15, 1
-nop				        # nop to avoid JAL hazard
-addi $r31, $r31, 17		# r31 = r31 + 17 = 153
-nop				        # Avoid add RAW hazard
-nop				        # Avoid add RAW hazard
 nop
-jr $r31				    # PC = r31 = 153
-nop				        # flushed instruction
-nop				        # flushed instruction
+nop 				# Test JAL into JR
+addi $r31, $r0, 32		# r31 = 32
+nop				# Avoid RAW hazard for jr
+jal j1				# jal to jr (with RAW hazard)
+nop				# Spacer
+nop				# Spacer
+j end1				# Jump to test cleanup
+nop				# Spacer
+nop				# Spacer
+j1: jr $r31 			# jr immediately after jal
 addi $r20, $r20, 1		# r20 += 1 (Incorrect)
-addi $r21, $r21, 1		# r21 += 1 (Incorrect)
-addi $r22, $r22, 1		# r22 += 1 (Incorrect)
+addi $r20, $r20, 1		# r20 += 1 (Incorrect)
+end1: nop			# Landing pad for jump
+add $r11, $r10, $r11		# Accumulate r10 score
+add $r21, $r20, $r21		# Accumulate r20 score
+and $r10, $r0, $r10		# r10 should be 0
+and $r20, $r0, $r20		# r20 should be 0
+nop
+nop 				# Test Bypassing into Branch (with loops)
+addi $r1, $r0, 5		# r1 = 5
+b1: addi $r2, $r2, 1		# r2 += 1
+blt $r2, $r1, b1		# if r2 < r1 take branch (5 times)
+b2: addi $r1, $r1, 1		# r1 += 1
+addi $r3, $r3, 2		# r3 += 2
+blt $r3, $r1, b2		# if r3 < r1 take branch (4 times)
+add $r10, $r2, $r3		# r10 = r2 + r3
+add $r11, $r10, $r11		# Accumulate r10 score
+add $r21, $r20, $r21		# Accumulate r20 score
+and $r10, $r0, $r10		# r10 should be 15
+and $r20, $r0, $r20		# r20 should be 0
+nop
+nop 				# Test bypassing into bex
+setx 0				# r30 = 0
+nop				# Avoid RAW hazard from first setx
+setx 10				# r30 = 10 (with RAW hazard)
+bex e1				# r30 != 0 --> taken
+addi $r20, $r20, 1		# r20 += 1 (Incorrect)
+addi $r20, $r20, 1		# r20 += 1 (Incorrect)
+addi $r20, $r20, 1		# r20 += 1 (Incorrect)
+addi $r20, $r20, 1		# r20 += 1 (Incorrect)
+addi $r20, $r20, 1		# r20 += 1 (Incorrect)
+e1: addi $r10, $r10, 1		# r10 += 1 (Correct)
+add $r11, $r10, $r11		# Accumulate r10 score
+add $r21, $r20, $r21		# Accumulate r20 score
+and $r10, $r0, $r10		# r10 should be 1
+and $r20, $r0, $r20		# r20 should be 0
+nop
+nop 				# Test Branch/Jump Race Condition
+addi $r4, $r0, 1		# r4 = 1
+nop				# Avoid RAW hazard
+bne $r4, $r0, rgood		# Branch racing (should branch)
+j rbad				# Jump racing (should not jump)
+nop				# Spacer
+nop				# Spacer
+nop				# Spacer
+nop				# Spacer
+rbad: nop			# Landing pad for jump
+addi $r20, $r20, 1		# r20 += 1 (Incorrect)
+addi $r20, $r20, 1		# r20 += 1 (Incorrect)
+j end2				# Jump to test cleanup
+nop				# Spacer
+rgood: nop			# Landing pad for branch
 addi $r10, $r10, 1		# r10 += 1 (Correct)
-# addi $r15, $r15, 1
-nop				        # Avoid add RAW hazard
-nop				        # Avoid add RAW hazard
-add $r11, $r10, $r11	# Accumulate r10 score
-add $r23, $r23, $r20	# Accumulate r20 score
-nop                     # Stalls to avoid addi bypassing
-nop                         
-nop
-add $r23, $r23, $r21	# Accumulate r21 score
-nop                     # Stalls to avoid addi bypassing
-nop
-nop
-add $r23, $r23, $r22	# Accumulate r22 score
-nop                     # Stalls to avoid addi bypassing
-nop
-nop
+addi $r10, $r10, 1		# r10 += 1 (Correct)
+end2: nop			# Landing pad for jump
+nop				# Avoid RAW hazard
+add $r11, $r10, $r11		# Accumulate r10 score
+add $r21, $r20, $r21		# Accumulate r20 score
 and $r10, $r0, $r10		# r10 should be 2
 and $r20, $r0, $r20		# r20 should be 0
-and $r21, $r0, $r21		# r21 should be 0
-and $r22, $r0, $r22		# r22 should be 0
-nop # ========bex,setx========
-nop 				    # Basic Text of BEX, SETX: 2
-setx 0				    # r30 = 0
-nop				        # Avoid setx RAW hazard
-nop				        # Avoid setx RAW hazard
-bex e1				    # r30 == 0 --> not taken
-nop				        # nop in case of flush
-nop				        # nop in case of flush
-nop				        # Spacer
-addi $r10, $r10, 1		# r10 += 1 (Correct)
-# addi $r16, $r16, 1
-e1: nop				    # Landing pad for branch
-setx 10				    # r30 = 10
-nop				        # Avoid setx RAW hazard
-nop				        # Avoid setx RAW hazard
-bex e2			    	# r30 != 0 --> taken
-nop				        # flushed instruction
-nop				        # flushed instruction
-addi $r20, $r20, 1		# r20 += 1 (Incorrect)
-addi $r21, $r21, 1		# r21 += 1 (Incorrect)
-addi $r22, $r22, 1		# r22 += 1 (Incorrect)
-e2: addi $r10, $r10, 1	# r10 += 1 (Correct)
-# addi $r16, $r16, 1
-nop				        # Avoid add RAW hazard
-nop				        # Avoid add RAW hazard
-add $r11, $r10, $r11	# Accumulate r10 score
-add $r23, $r23, $r20	# Accumulate r20 score
-nop                     # Stalls to avoid addi bypassing
-nop                         
 nop
-add $r23, $r23, $r21	# Accumulate r21 score
-nop                     # Stalls to avoid addi bypassing
-nop
-nop
-add $r23, $r23, $r22	# Accumulate r22 score
-nop                     # Stalls to avoid addi bypassing
-nop
-nop
-and $r10, $r0, $r10		# r10 should be 2
-and $r20, $r0, $r20		# r20 should be 0
-and $r21, $r0, $r21		# r21 should be 0
-and $r22, $r0, $r22		# r22 should be 0
-nop
-nop #========flushing========
-nop                     # Test of Flushing: 2
-bne $r0, $r1, f1		# r0 != r1 --> taken
-addi $r20, $r20, 1		# r20 += 1 (Incorrect)
-addi $r21, $r21, 1		# r21 += 1 (Incorrect)
-nop				        # Spacer
-nop				        # Spacer
-nop				        # Spacer
-f1: 
-nop				    # Landing pad for branch
-bne $r0, $r0, f2		# r0 == r0 --> not taken
-addi $r10, $r10, 1		# r10 += 1 (Correct)
-# addi $r17, $r17, 1
-nop				        # Spacer
-nop				        # Spacer
-nop				        # Spacer
-nop				        # Spacer
-f2: nop				    # Landing pad for branch
-blt $r0, $r1, f3		# r0 < r1 --> taken
-addi $r20, $r20, 1		# r20 += 1 (Incorrect)
-addi $r21, $r21, 1		# r21 += 1 (Incorrect)
-nop				        # Spacer
-nop				        # Spacer
-nop				        # Spacer
-f3: nop				    # Landing pad for branch
-blt $r0, $r0, f4		# r0 == r0 --> not taken
-nop				        # Spacer
-addi $r10, $r10, 1		# r10 += 1 (Correct)
-# addi $r17, $r17, 1
-nop				        # Spacer
-nop				        # Spacer
-nop				        # Spacer
-f4: nop				    # Landing pad for branch
-j f5				    # Jump to f5
-addi $r20, $r20, 1		# r20 += 1 (Incorrect)
-addi $r21, $r21, 1		# r21 += 1 (Incorrect)
-nop				        # Spacer
-nop				        # Spacer
-nop				        # Spacer
-f5: nop				    # Landing pad for jump
-jal f6				    # Jump to f
-addi $r20, $r20, 1		# r20 += 1 (Incorrect)
-addi $r21, $r21, 1		# r21 += 1 (Incorrect)
-nop				        # Spacer
-nop				        # Spacer
-nop				        # Spacer
-f6: nop				    # Landing pad for jump
-bex f7				    # r30 != 0 --> taken
-addi $r20, $r20, 1		# r20 += 1 (Incorrect)
-addi $r21, $r21, 1		# r20 += 1 (Incorrect)
-nop				        # Spacer
-nop				        # Spacer
-nop				        # Spacer
-f7: nop				    # Landing pad for branch
-nop				        # Avoid add RAW hazard
-add $r11, $r10, $r11	# Accumulate r10 score
-add $r23, $r23, $r20	# Accumulate r20 score
-nop                     # Stalls to avoid addi bypassing
-nop                         
-nop
-add $r23, $r23, $r21	# Accumulate r21 score
-nop                     # Stalls to avoid addi bypassing
-nop
-nop
-and $r10, $r0, $r10		# r10 should be 2
-and $r20, $r0, $r20		# r20 should be 0
-and $r21, $r0, $r21		# r21 should be 0
-nop
-nop                     # Final Check (All Correct)
-and $r0, $r11, $r11		# r11 should be 15
-and $r0, $r23, $r23		# r23 should be 0
+nop 				# Final Check (All Correct)
+and $r0, $r11, $r11		# r11 should be 19
+and $r0, $r21, $r21		# r21 should be 0

@@ -86,21 +86,31 @@ module processor(
         bypassB =           23,
         lw =                24;
 
+    // FIXME: FIXME: FIXME: FIXME: temporary to help skip sort test
+    // reg halt = 0;
+    // always @(posedge clock) begin
+    //     if(q_imem == 32'h2ec00f00) begin
+    //         halt = 1;
+    //     end
+    // end
+    // assign address_imem = halt ? 32'hffffffff : addr_imem_out;
+    assign address_imem = addr_imem_out;
+
     // ========Fetch========
-    wire[31:0] pcp1, next_pc; // pc plus 1
+    wire[31:0] pcp1, next_pc, addr_imem_out; // pc plus 1
     wire stall_fetch, stall_decode, stall_execute;
 
-    cla_32 pc_increment(.A(address_imem), .B(32'b1), .Cin(1'b0), .Sum(pcp1));
+    cla_32 pc_increment(.A(addr_imem_out), .B(32'b1), .Cin(1'b0), .Sum(pcp1));
 
     register #(32) pc(
-        .clk(clock), .writeEnable(!stall_fetch), .reset(reset), .dataIn(next_pc), .dataOut(address_imem)
+        .clk(clock), .writeEnable(!stall_fetch), .reset(reset), .dataIn(next_pc), .dataOut(addr_imem_out)
     );
 
     wire[63:0] FDIR, FDIRin;
     wire flush_FD;
-    assign FDIRin = flush_FD ? 64'b0 : {address_imem, q_imem}; // We don't use pc+1 here bc idk, non blocking assignments.
+    assign FDIRin = flush_FD ? 64'b0 : {addr_imem_out, q_imem}; // We don't use pc+1 here bc idk, non blocking assignments.
     register #(64) FDIRlatch(
-        .clk(!clock), .writeEnable(!stall_fetch), .reset(reset), .dataIn(FDIRin), .dataOut(FDIR)
+        .clk(!clock), .writeEnable(!stall_decode), .reset(reset), .dataIn(FDIRin), .dataOut(FDIR)
     );
 
     // ========Decode========
@@ -127,7 +137,7 @@ module processor(
     wire flush_DX;
     assign DXIRin = flush_DX ? {NUM_CTRL+128{1'b0}} : {Dctrlbus, data_readRegA, data_readRegB, FDIR};
     register #(128 + NUM_CTRL) DXIRlatch(
-        .clk(!clock), .writeEnable(!stall_decode), .reset(reset), .dataIn(DXIRin), .dataOut(DXIR)
+        .clk(!clock), .writeEnable(!stall_execute), .reset(reset), .dataIn(DXIRin), .dataOut(DXIR)
     );
 
     // ====bypassing==== (couldn't figure out where to put this)
@@ -137,9 +147,10 @@ module processor(
     bypass_controller bypass_ctrl(
         .DXrs(Xinsn[21:17]), .DXrt(Xinsn[16:12]), .DXrd(Xinsn[26:22]), 
         .XMrd(Minsn[26:22]), .MWrd(Winsn[26:22]),
-        .bypassA(Dctrlbus[bypassA]), .bypassB(Dctrlbus[bypassB]), 
+        .bypassA(Xctrlbus[bypassA]), .bypassB(Xctrlbus[bypassB]),
+        .XM_reg_WE(Mctrlbus[reg_WE]), .MW_reg_WE(Wctrlbus[reg_WE]),
         .DX_rtin(Xctrlbus[rtin]), .DX_sw(Xctrlbus[sw]), .DX_setx(Xctrlbus[setx]),
-        .XM_lw(Mctrlbus[sw]), .XM_sw(Mctrlbus[lw]),
+        .XM_lw(Mctrlbus[lw]), .XM_sw(Mctrlbus[sw]),
         .XAsel(XAsel), .XBsel(XBsel), .MWDsel(MWDsel), .memstall(memstall)
     );
 
@@ -170,7 +181,7 @@ module processor(
     assign Ximmed = Xctrlbus[bex] ? 32'b0 : {{15{Xinsn[16]}}, {Xinsn[16:0]}};
 
     wire[31:0] alu_inB;
-    assign alu_inB = Xctrlbus[alu_imm] ? Ximmed : XB;
+    assign alu_inB = Xctrlbus[alu_imm] ? Ximmed : XBby;
 
     wire[31:0] alu_result;
     wire ALU_ne, ALU_lt, ALU_ovf;
@@ -185,7 +196,7 @@ module processor(
     wire alu_result_ready;
 
     alu alu(
-        .data_operandA(XA), .data_operandB(alu_inB), .ctrl_ALUopcode(ALUop), 
+        .data_operandA(XAby), .data_operandB(alu_inB), .ctrl_ALUopcode(ALUop), 
         .ctrl_shiftamt(Xshamt), .data_result(alu_result), 
         .isNotEqual(ALU_ne), .isLessThan(ALU_lt), .overflow(ALU_ovf),
         .clock(clock), .result_rdy(alu_result_ready)
@@ -194,9 +205,9 @@ module processor(
     // ====Stalls====
     wire div_stall;
     assign div_stall = (ALUop == 5'b00111) && !alu_result_ready;
-    assign stall_fetch = div_stall;
-    assign stall_decode = div_stall;
-    assign stall_execute = div_stall;
+    assign stall_fetch = div_stall   || memstall;
+    assign stall_decode = div_stall  || memstall;
+    assign stall_execute = div_stall || memstall;
 
     // ====Exceptions====
     wire [31:0] rstatus_in, alu_except_result;
@@ -251,7 +262,7 @@ module processor(
     assign cflow_flush = Xctrlbus[use_non_PC] && !(Xctrlbus[branch] && !do_branch); // don't flush if branch not taken.
 
     assign next_no_stall = Xctrlbus[use_non_PC] ? cflow_addr : pcp1; // is next_no_stall necessary???
-    assign next_pc = stall_fetch ? address_imem : next_no_stall; 
+    assign next_pc = stall_fetch ? addr_imem_out : next_no_stall; 
 
     assign flush_FD = cflow_flush;
     assign flush_DX = cflow_flush;
@@ -259,16 +270,17 @@ module processor(
     wire[31:0] executeOut; // mux in this insn's pc+1
     assign executeOut = Xctrlbus[jal] ? cur_pcp1 : alu_setx_result;
 
-    wire[NUM_CTRL+95:0] XMIR, XMIRout, XMIRnop;
+    wire[NUM_CTRL+95:0] XMIR, XMIRin, XMIRnop;
     assign XMIRnop = {(NUM_CTRL + 96){1'b0}};
 
+    assign XMIRin = stall_execute ? XMIRnop : {Xctrlbus, XB, executeOut, modified_Xinsn};
+
     register #(NUM_CTRL + 96) XMIRlatch(
-        .clk(!clock), .writeEnable(!stall_execute), .reset(reset), .dataIn({Xctrlbus, XB, executeOut, modified_Xinsn}), .dataOut(XMIRout)
+        .clk(!clock), .writeEnable(1'b1), .reset(reset), .dataIn(XMIRin), .dataOut(XMIR)
     );
 
-    assign XMIR = stall_execute ? XMIRnop : XMIRout;
-    
     // ========Memory========
+
     wire[NUM_CTRL-1:0] Mctrlbus;
     assign Mctrlbus = XMIR[NUM_CTRL+95:96];
 
@@ -277,7 +289,7 @@ module processor(
     assign wren = Mctrlbus[4];
     wire[31:0] MXB = XMIR[95:64];
     wire[31:0] Mwritedata;
-    assign data = MXB;
+    assign data = Mwritedata;
     wire[31:0] Minsn = XMIR[31:0];
 
     wire[31:0] Mresult;
