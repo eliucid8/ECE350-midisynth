@@ -27,16 +27,17 @@ module multdiv(
     );
 
     wire[31:0] divider_out, div_res;
-    wire div0, div_ready;
-    assign div0 = ~|data_operandB; // divide by zero
+    wire div0, div_hardware_ready, div_ready;
+     // divide by zero
+    assign div_ready = div0 ? 1'b1 : div_hardware_ready;
 
     div div(
         .dividend(data_operandA), .divisor(data_operandB),
         .reset(ctrl_DIV), .clk(clock),
-        .quot(divider_out), .ready(div_ready)
+        .quot(divider_out), .ready(div_hardware_ready), .div0(div0)
     );
     // set result to 0 if we divide by 0.
-    assign div_res = div0 ? 0 : divider_out;
+    assign div_res = div0 ? 32'b0 : divider_out;
 
     assign data_resultRDY = operation ? mult_ready : div_ready;
 

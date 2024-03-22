@@ -240,7 +240,7 @@ module processor(
     wire no_bex_jump = Xctrlbus[bex] && !ALU_ne;
     assign Tsx = no_bex_jump ? pcp1 : {5'b0, {Xinsn[26:0]}}; // muxes in normal pc if bex fails.
     
-    assign jump_addr = Xctrlbus[jr] ? XB : Tsx;
+    assign jump_addr = Xctrlbus[jr] ? XBby : Tsx;
     assign cur_pcp1 = DXIR[63:32];
 
     // add immediate to pc+1 to see where this insn would branch to.
@@ -273,7 +273,7 @@ module processor(
     wire[NUM_CTRL+95:0] XMIR, XMIRin, XMIRnop;
     assign XMIRnop = {(NUM_CTRL + 96){1'b0}};
 
-    assign XMIRin = stall_execute ? XMIRnop : {Xctrlbus, XB, executeOut, modified_Xinsn};
+    assign XMIRin = stall_execute ? XMIRnop : {Xctrlbus, XBby, executeOut, modified_Xinsn};
 
     register #(NUM_CTRL + 96) XMIRlatch(
         .clk(!clock), .writeEnable(1'b1), .reset(reset), .dataIn(XMIRin), .dataOut(XMIR)

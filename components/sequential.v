@@ -73,6 +73,6 @@ endmodule
 
 module edgedetector(output out, input clock, input sig);
     wire prev_sig;
-    dffe_ref prev(.q(prev_sig), .d(sig), .clk(clock), .en(1'b1), .clr(1'b0));
+    dffe_ref prev(.q(prev_sig), .d(sig), .clk(clock), .en(1'b1));
     assign out = !prev_sig && sig;
 endmodule

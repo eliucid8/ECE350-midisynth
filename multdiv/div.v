@@ -1,13 +1,13 @@
 module div(
     dividend, divisor,
     reset, clk,
-    quot, ready
+    quot, ready, div0
 );
 
     input[31:0] dividend, divisor;
     input reset, clk;
     output[31:0] quot;
-    output ready;
+    output ready, div0;
 
     wire[31:0] negDiv, dvdIn, negQ, negInput, negOutput;
     // reuse negator hardware at end, mux between inputs/outputs based on reset signal.
@@ -25,6 +25,7 @@ module div(
     register #(32) dvsReg(
         .clk(clk), .writeEnable(reset), .reset(1'b0), .dataIn(divisor), .dataOut(dvs)
     );
+    assign div0 = ~|{dvs};
     
     wire dvdSign, dvsSign;
     assign dvsSign = dvs[31];

@@ -5,7 +5,7 @@ nop 				# Values in the first two tests be updated if the number of lines is mod
 nop 				# Author: Nathaniel Brooke
 nop
 nop
-nop 				    # Test Bypassing into JR
+nop 				    # ====Test Bypassing into JR====
 addi $r31, $r0, 12		# r31 = 12
 nop				        # Avoid RAW hazard for jr
 addi $r31, $r0, 16		# r31 = 16 (with RAW hazard)
@@ -20,7 +20,7 @@ add $r21, $r20, $r21		# Accumulate r20 score
 and $r10, $r0, $r10		# r10 should be 1
 and $r20, $r0, $r20		# r20 should be 0
 nop
-nop 				# Test JAL into JR
+nop 				# ====Test JAL into JR====
 addi $r31, $r0, 32		# r31 = 32
 nop				# Avoid RAW hazard for jr
 jal j1				# jal to jr (with RAW hazard)
@@ -38,7 +38,7 @@ add $r21, $r20, $r21		# Accumulate r20 score
 and $r10, $r0, $r10		# r10 should be 0
 and $r20, $r0, $r20		# r20 should be 0
 nop
-nop 				# Test Bypassing into Branch (with loops)
+nop 				# ====Test Bypassing into Branch (with loops)====
 addi $r1, $r0, 5		# r1 = 5
 b1: addi $r2, $r2, 1		# r2 += 1
 blt $r2, $r1, b1		# if r2 < r1 take branch (5 times)
@@ -51,7 +51,7 @@ add $r21, $r20, $r21		# Accumulate r20 score
 and $r10, $r0, $r10		# r10 should be 15
 and $r20, $r0, $r20		# r20 should be 0
 nop
-nop 				# Test bypassing into bex
+nop 				# ====Test bypassing into bex====
 setx 0				# r30 = 0
 nop				# Avoid RAW hazard from first setx
 setx 10				# r30 = 10 (with RAW hazard)
@@ -67,7 +67,7 @@ add $r21, $r20, $r21		# Accumulate r20 score
 and $r10, $r0, $r10		# r10 should be 1
 and $r20, $r0, $r20		# r20 should be 0
 nop
-nop 				# Test Branch/Jump Race Condition
+nop 				# ====Test Branch/Jump Race Condition====
 addi $r4, $r0, 1		# r4 = 1
 nop				# Avoid RAW hazard
 bne $r4, $r0, rgood		# Branch racing (should branch)

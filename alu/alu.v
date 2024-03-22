@@ -42,12 +42,14 @@ module alu(
         );
 
     wire[31:0] md_result;
-    wire md_except, md_ready, divide_pulse;
-    edgedetector div_edge(.out(divide_pulse), .clock(clock), .sig(alu_ctrl[7]));
+    wire md_except, md_ready, div_pulsed, ctrl_div;
+    // edgedetector div_edge(.out(divide_pulse), .clock(clock), .sig(alu_ctrl[7]));
+    dffe_ref div_pulse_latch(.q(div_pulsed), .d(alu_ctrl[7] && !md_ready), .clk(clock), .en(1'b1), .clr(1'b0));
+    assign ctrl_div = alu_ctrl[7] && !div_pulsed;
 
     multdiv multdiv(
         .data_operandA(data_operandA), .data_operandB(data_operandB),
-        .ctrl_MULT(alu_ctrl[6]), .ctrl_DIV(divide_pulse),
+        .ctrl_MULT(alu_ctrl[6]), .ctrl_DIV(ctrl_div),
         .clock(clock),
         .data_result(md_result), .data_exception(md_except), .data_resultRDY(md_ready)
     );
