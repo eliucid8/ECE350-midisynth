@@ -35,7 +35,7 @@ module Wrapper (clock, reset);
 
 
 	// ADD YOUR MEMORY FILE HERE
-	localparam INSTR_FILE = "sort";
+	localparam INSTR_FILE = "by";
 	
 	// Main Processing Unit
 	processor CPU(.clock(clock), .reset(reset), 

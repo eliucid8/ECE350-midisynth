@@ -96,7 +96,7 @@ module insn_decode #(
     assign ctrlbus[22] = ~|{insns[J], insns[JAL], insns[JR], insns[SETX]};
     
     // bypassB
-    assign ctrlbus[23] = |{insns[ADD], insns[ADDI], insns[BNE], insns[JR], insns[BLT]};
+    assign ctrlbus[23] = |{insns[ADD], insns[ADDI], insns[BNE], insns[JR], insns[BLT], insns[SW]};
 
     // lw
     assign ctrlbus[24] = insns[LW];

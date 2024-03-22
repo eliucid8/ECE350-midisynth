@@ -114,15 +114,15 @@ module processor(
     );
 
     // ========Decode========
-    wire[31:0] D_insn =         FDIR[31:0];
-    wire[4:0] Dopcode =         D_insn[31:27];
-    wire[4:0] Drd =             D_insn[26:22];
-    wire[4:0] Drs =             D_insn[21:17];
-    wire[4:0] Drt =             D_insn[16:12];
-    // wire[4:0] Dshamt =          D_insn[11:7];
-    // wire[4:0] DinsnALUop =      D_insn[6:2];
-    // wire[31:0] Dimmed =         {{15{D_insn[16]}}, {D_insn[16:0]}};
-    // wire[26:0] Djump_target =   {5'b0, D_insn[26:0]};
+    wire[31:0] Dinsn =         FDIR[31:0];
+    wire[4:0] Dopcode =         Dinsn[31:27];
+    wire[4:0] Drd =             Dinsn[26:22];
+    wire[4:0] Drs =             Dinsn[21:17];
+    wire[4:0] Drt =             Dinsn[16:12];
+    // wire[4:0] Dshamt =          Dinsn[11:7];
+    // wire[4:0] DinsnALUop =      Dinsn[6:2];
+    // wire[31:0] Dimmed =         {{15{Dinsn[16]}}, {Dinsn[16:0]}};
+    // wire[26:0] Djump_target =   {5'b0, Dinsn[26:0]};
 
     wire[NUM_CTRL-1:0] Dctrlbus;
 	insn_decode #(NUM_CTRL) insn_decoder(.opcode(Dopcode), .ctrlbus(Dctrlbus));
@@ -131,7 +131,7 @@ module processor(
     assign ctrl_readRegA = Dctrlbus[bex] ? 32'd30 : Drs;
 
     //rtin 
-    assign ctrl_readRegB = Dctrlbus[12] ? Drd : Drt;
+    assign ctrl_readRegB = Dctrlbus[rtin] ? Drd : Drt;
 
     wire [NUM_CTRL+127:0] DXIR, DXIRin;
     wire flush_DX;
@@ -143,9 +143,10 @@ module processor(
     // ====bypassing==== (couldn't figure out where to put this)
     wire[1:0] XAsel, XBsel;
     wire MWDsel, memstall;
+    wire[4:0] modified_rd;
 
     bypass_controller bypass_ctrl(
-        .DXrs(Xinsn[21:17]), .DXrt(Xinsn[16:12]), .DXrd(Xinsn[26:22]), 
+        .DXrs(Xinsn[21:17]), .DXrt(Xinsn[16:12]), .DXrd(/* Xinsn[26:22] */ modified_rd), 
         .XMrd(Minsn[26:22]), .MWrd(Winsn[26:22]),
         .bypassA(Xctrlbus[bypassA]), .bypassB(Xctrlbus[bypassB]),
         .XM_reg_WE(Mctrlbus[reg_WE]), .MW_reg_WE(Wctrlbus[reg_WE]),
@@ -218,8 +219,12 @@ module processor(
 
     // modify insn to write to r30 if exception.
     wire[31:0] modified_Xinsn;
-    wire[4:0] modified_rd;
-    assign modified_rd = (set_except || Xctrlbus[setx]) ? 5'd30 : Xinsn[26:22];
+    // wire[4:0] modified_rd;
+    mux4 #(5) rd_modifier(
+        .out(modified_rd), .sel({Xctrlbus[jal], (set_except || Xctrlbus[setx])}),
+        .in0(Xinsn[26:22]), .in1(5'd30), .in2(5'd31), .in3(5'bx)
+    );
+    // assign modified_rd = (set_except || Xctrlbus[setx]) ? 5'd30 : Xinsn[26:22];
     assign modified_Xinsn = {Xinsn[31:27], modified_rd, Xinsn[21:0]}; 
 
     // TODO: merge all modifications to result into 1 mux.
