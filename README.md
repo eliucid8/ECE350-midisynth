@@ -15,8 +15,8 @@ This is a 5-stage pipelined processor that implements a reduced version of the M
 |sra $rd, $rs, shamt|00000 (00101)|R|$rd = $rs >>> $rt|
 |mul $rd, $rs, $rt|00000 (00110)|R|$rd = $rs * $rt|
 |div $rd, $rs, $rt|00000 (00111)|R|$rd = $rs / $rt|
-|sw $rd, N($rs)|00111|I|MEM[$rs + N] = $rd|
-|lw $rd, N($rs)|01000|I|$rd = MEM[$rs + N]|
+|sw \$rd, N(\$rs)|00111|I|MEM[$rs + N] = $rd|
+|lw \$rd, N(\$rs)|01000|I|\$rd = MEM[\$rs + N]|
 |j T|00111|JI|PC = T|
 |bne $rd, $rs, N|00010|I|if($rd != $rs), PC = PC + 1 + N|
 |jal T|00011|JI|$r31 = PC + 1, PC = T|
@@ -26,8 +26,11 @@ This is a 5-stage pipelined processor that implements a reduced version of the M
 |setx T|10101|JI|$rstatus = T|
 
 R type:     | opcode [31:27] | rd [26:22] | rs [21:17] | rt [16:12] | shamt [11:7] | aluop [6:2] | zero [1:0] |
+
 I type:     | opcode [31:27] | rd [26:22] | rs [21:17] | immed [16:0] |
+
 JI type:    | opcode [31:27] | target [26:0] |
+
 JII type:   | opcode [31:27] | rd [26:22] | zeroes [21:0] |
 
 ## Pipelining:
@@ -68,3 +71,4 @@ I haven't fully tested interactions between subsequent divides, so there may be 
 
 ## Testing:
 Compile the desired assembly file using `asm.exe`, found in the `'Test Files/'` folder. Move the resulting `.mem` file to `Memory Files/`. Change the default `instr_file` and `FILE` fields in `Wrapper.v` and `Wrapper_tb.v`, respectively, to be the name of the assembly file (without the .s). Compile using `filelist.txt` as the control file, setting `Wrapper_tb` to be the top-level module. More info can be found in [in the Test Files folder](/Test%20Files/instructions.txt).
+If you will be modifying the assembly a lot, you you can modify `update_and_run.ps1` to automatically assemble and run your code.
