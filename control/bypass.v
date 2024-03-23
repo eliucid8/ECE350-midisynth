@@ -1,16 +1,18 @@
 module bypass_controller(
+    FDrs, FDrt, FDrd,
     DXrs, DXrt, DXrd, 
     XMrd, MWrd, 
     bypassA, bypassB, 
     XM_reg_WE, MW_reg_WE,
-    DX_rtin, DX_sw, DX_setx, 
+    DX_rtin, DX_sw, DX_setx, DX_lw,
+    FD_rtin, FD_sw, FD_setx,
     XM_lw, XM_sw,
     XAsel, XBsel, MWDsel, memstall
 );
 // register numbers
-input[4:0] DXrs, DXrt, DXrd, XMrd, MWrd;
+input[4:0] FDrs, FDrt, FDrd, DXrs, DXrt, DXrd, XMrd, MWrd;
 // control signals
-input bypassA, bypassB, XM_reg_WE, MW_reg_WE, DX_rtin, DX_sw, DX_setx, XM_lw, XM_sw;
+input bypassA, bypassB, XM_reg_WE, MW_reg_WE, DX_rtin, DX_sw, DX_setx, DX_lw, FD_rtin, FD_sw, FD_setx, XM_lw, XM_sw;
 
 output[1:0] XAsel, XBsel;
 output MWDsel, memstall;
@@ -49,5 +51,7 @@ assign MWDsel = XM_sw && (XMrd == MWrd) && XMrd && MW_reg_WE;
  * memstall = XM_lw && ((XA == XMrd) || (XB == XMrd) && !DX_sw)
  * bypass MWrd value into MWD if we have sw there.
  */
-assign memstall = XM_lw && ((XA == XMrd) || (XB == XMrd) && !DX_sw);
+wire[4:0] DA = FD_setx ? 5'd30 : FDrs;
+wire[4:0] DB = FD_rtin ? FDrd : FDrt;
+assign memstall = DX_lw && ((DA == DXrd) || (DB == DXrd) && !FD_sw);
 endmodule

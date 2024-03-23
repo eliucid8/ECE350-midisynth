@@ -83,11 +83,14 @@ sll     $r12,   $r12,   1               # subtest 4
 lw      $r4,    3($r0)
 lw      $r3,    2($r0)
 blt     $r4,    $r3,    bad34
-j done34
+j good34
 bad34:
 addi    $r22,   $r0,    1               # you messed up.
 addi    $r22,   $r0,    1
 addi    $r22,   $r0,    1
+j done34
+good34:
+addi    $r12,   $r12,   1
 done34:
 and     $r3,    $r0,    $r0             
 and     $r4,    $r0,    $r0

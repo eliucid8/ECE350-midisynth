@@ -49,77 +49,23 @@ _sortrecur:  addi $t7, $zero, 0                 # $t7 = 0
             j _siguard
 _sortiter:  lw $t2, 0($t1)                      # $t2 = current.data
             lw $t3, 0($t6)                      # $t3 = current.next.data
-nop
-nop
-nop
             blt $t2, $t3, _sinext
-nop
-nop
-nop
             addi $t7, $zero, 1                  # $t7 = 1
-nop
-nop
-nop
             lw $t4, 1($t1)                      # $t4 = current.prev
-nop
-nop
-nop
             bne $t4, $zero, _supprev
-nop
-nop
-nop
             j _supprevd
-nop
-nop
-nop
 _supprev:    sw $t6, 2($t4)                      # current.prev.next = current.next
-nop
-nop
-nop
 _supprevd:  sw $t4, 1($t6)                      # current.next.prev = current.prev
-nop
-nop
-nop
             lw $t5, 2($t6)                      # $t5 = current.next.next
-nop
-nop
-nop
             bne $t5, $zero, _supnnprev
-nop
-nop
-nop
             j _supnnprevd
-nop
-nop
-nop
 _supnnprev: sw $t1, 1($t5)                      # current.next.next.prev = current
-nop
-nop
-nop
 _supnnprevd: sw $t5, 2($t1)                      # current.next = current.next.next
-nop
-nop
-nop
             sw $t1, 2($t6)                      # current.next.next = current
-nop
-nop
-nop
             sw $t6, 1($t1)                      # current.prev = current.next
-nop
-nop
-nop
             bne $t0, $t1, _sinext
-nop
-nop
-nop
             add $t0, $t6, $zero                 # head = current.next
-nop
-nop
-nop
 _sinext:     add $t1, $t6, $zero                # $t1 = current.next
-nop
-nop
-nop
 _siguard:   lw $t6, 2($t1)                      # $t6 = current.next
             bne $t6, $zero, _sortiter
             add $a0, $t0, $zero
