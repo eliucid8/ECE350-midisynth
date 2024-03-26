@@ -1,0 +1,447 @@
+
+*** Running vivado
+    with args -log Wrapper.vds -m64 -product Vivado -mode batch -messageDb vivado.pb -notrace -source Wrapper.tcl
+
+
+
+****** Vivado v2021.1 (64-bit)
+  **** SW Build 3247384 on Thu Jun 10 19:36:33 MDT 2021
+  **** IP Build 3246043 on Fri Jun 11 00:30:35 MDT 2021
+    ** Copyright 1986-2021 Xilinx, Inc. All Rights Reserved.
+
+source Wrapper.tcl -notrace
+Command: synth_design -top Wrapper -part xc7a100tcsg324-1
+Starting synth_design
+Attempting to get a license for feature 'Synthesis' and/or device 'xc7a100t'
+INFO: [Common 17-349] Got license for feature 'Synthesis' and/or device 'xc7a100t'
+INFO: [Device 21-403] Loading part xc7a100tcsg324-1
+INFO: [Synth 8-7079] Multithreading enabled for synth_design using a maximum of 2 processes.
+INFO: [Synth 8-7078] Launching helper process for spawning children vivado processes
+INFO: [Synth 8-7075] Helper process launched with PID 31824
+---------------------------------------------------------------------------------
+Starting RTL Elaboration : Time (s): cpu = 00:00:02 ; elapsed = 00:00:03 . Memory (MB): peak = 1154.688 ; gain = 0.000
+---------------------------------------------------------------------------------
+INFO: [Synth 8-6157] synthesizing module 'Wrapper' [C:/Users/erict/development/ECE350/cp4_processor/Wrapper.v:27]
+INFO: [Synth 8-6157] synthesizing module 'processor' [C:/Users/erict/development/ECE350/cp4_processor/processor.v:21]
+INFO: [Synth 8-6157] synthesizing module 'cla_32' [C:/Users/erict/development/ECE350/cp4_processor/alu/cla.v:86]
+INFO: [Synth 8-6157] synthesizing module 'cla_8' [C:/Users/erict/development/ECE350/cp4_processor/alu/cla.v:144]
+INFO: [Synth 8-6155] done synthesizing module 'cla_8' (1#1) [C:/Users/erict/development/ECE350/cp4_processor/alu/cla.v:144]
+INFO: [Synth 8-6155] done synthesizing module 'cla_32' (2#1) [C:/Users/erict/development/ECE350/cp4_processor/alu/cla.v:86]
+WARNING: [Synth 8-7071] port 'Cout' of module 'cla_32' is unconnected for instance 'pc_increment' [C:/Users/erict/development/ECE350/cp4_processor/processor.v:95]
+WARNING: [Synth 8-7071] port 'BAnd' of module 'cla_32' is unconnected for instance 'pc_increment' [C:/Users/erict/development/ECE350/cp4_processor/processor.v:95]
+WARNING: [Synth 8-7071] port 'BOr' of module 'cla_32' is unconnected for instance 'pc_increment' [C:/Users/erict/development/ECE350/cp4_processor/processor.v:95]
+WARNING: [Synth 8-7023] instance 'pc_increment' of module 'cla_32' has 7 connections declared, but only 4 given [C:/Users/erict/development/ECE350/cp4_processor/processor.v:95]
+INFO: [Synth 8-6157] synthesizing module 'register' [C:/Users/erict/development/ECE350/cp4_processor/regfile/register.v:1]
+	Parameter WIDTH bound to: 32 - type: integer 
+INFO: [Synth 8-6157] synthesizing module 'dffe_ref' [C:/Users/erict/development/ECE350/cp4_processor/components/dffe_ref.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'dffe_ref' (3#1) [C:/Users/erict/development/ECE350/cp4_processor/components/dffe_ref.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'register' (4#1) [C:/Users/erict/development/ECE350/cp4_processor/regfile/register.v:1]
+INFO: [Synth 8-6157] synthesizing module 'register__parameterized0' [C:/Users/erict/development/ECE350/cp4_processor/regfile/register.v:1]
+	Parameter WIDTH bound to: 64 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'register__parameterized0' (4#1) [C:/Users/erict/development/ECE350/cp4_processor/regfile/register.v:1]
+INFO: [Synth 8-6157] synthesizing module 'insn_decode' [C:/Users/erict/development/ECE350/cp4_processor/control/decode.v:1]
+	Parameter NUM_CTRL bound to: 25 - type: integer 
+INFO: [Synth 8-6157] synthesizing module 'decoder32' [C:/Users/erict/development/ECE350/cp4_processor/components/wiring.v:43]
+INFO: [Synth 8-6155] done synthesizing module 'decoder32' (5#1) [C:/Users/erict/development/ECE350/cp4_processor/components/wiring.v:43]
+INFO: [Synth 8-6155] done synthesizing module 'insn_decode' (6#1) [C:/Users/erict/development/ECE350/cp4_processor/control/decode.v:1]
+INFO: [Synth 8-6157] synthesizing module 'bypass_controller' [C:/Users/erict/development/ECE350/cp4_processor/control/bypass.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'bypass_controller' (7#1) [C:/Users/erict/development/ECE350/cp4_processor/control/bypass.v:1]
+INFO: [Synth 8-6157] synthesizing module 'register__parameterized1' [C:/Users/erict/development/ECE350/cp4_processor/regfile/register.v:1]
+	Parameter WIDTH bound to: 153 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'register__parameterized1' (7#1) [C:/Users/erict/development/ECE350/cp4_processor/regfile/register.v:1]
+INFO: [Synth 8-6157] synthesizing module 'mux4' [C:/Users/erict/development/ECE350/cp4_processor/components/wiring.v:64]
+	Parameter WIDTH bound to: 32 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'mux4' (8#1) [C:/Users/erict/development/ECE350/cp4_processor/components/wiring.v:64]
+INFO: [Synth 8-6157] synthesizing module 'alu' [C:/Users/erict/development/ECE350/cp4_processor/alu/alu.v:1]
+INFO: [Synth 8-6157] synthesizing module 'decoder_8' [C:/Users/erict/development/ECE350/cp4_processor/components/wiring.v:31]
+INFO: [Synth 8-6157] synthesizing module 'left_barrel_shifter' [C:/Users/erict/development/ECE350/cp4_processor/alu/barrel_shifters.v:1]
+INFO: [Synth 8-6157] synthesizing module 'lshift' [C:/Users/erict/development/ECE350/cp4_processor/components/shifts.v:1]
+	Parameter WIDTH bound to: 32 - type: integer 
+	Parameter SHAMT bound to: 1 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'lshift' (9#1) [C:/Users/erict/development/ECE350/cp4_processor/components/shifts.v:1]
+INFO: [Synth 8-6157] synthesizing module 'lshift__parameterized0' [C:/Users/erict/development/ECE350/cp4_processor/components/shifts.v:1]
+	Parameter WIDTH bound to: 32 - type: integer 
+	Parameter SHAMT bound to: 2 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'lshift__parameterized0' (9#1) [C:/Users/erict/development/ECE350/cp4_processor/components/shifts.v:1]
+INFO: [Synth 8-6157] synthesizing module 'lshift__parameterized1' [C:/Users/erict/development/ECE350/cp4_processor/components/shifts.v:1]
+	Parameter WIDTH bound to: 32 - type: integer 
+	Parameter SHAMT bound to: 4 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'lshift__parameterized1' (9#1) [C:/Users/erict/development/ECE350/cp4_processor/components/shifts.v:1]
+INFO: [Synth 8-6157] synthesizing module 'lshift__parameterized2' [C:/Users/erict/development/ECE350/cp4_processor/components/shifts.v:1]
+	Parameter WIDTH bound to: 32 - type: integer 
+	Parameter SHAMT bound to: 8 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'lshift__parameterized2' (9#1) [C:/Users/erict/development/ECE350/cp4_processor/components/shifts.v:1]
+INFO: [Synth 8-6157] synthesizing module 'lshift__parameterized3' [C:/Users/erict/development/ECE350/cp4_processor/components/shifts.v:1]
+	Parameter WIDTH bound to: 32 - type: integer 
+	Parameter SHAMT bound to: 16 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'lshift__parameterized3' (9#1) [C:/Users/erict/development/ECE350/cp4_processor/components/shifts.v:1]
+INFO: [Synth 8-6157] synthesizing module 'mux_2' [C:/Users/erict/development/ECE350/cp4_processor/components/wiring.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'mux_2' (10#1) [C:/Users/erict/development/ECE350/cp4_processor/components/wiring.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'left_barrel_shifter' (11#1) [C:/Users/erict/development/ECE350/cp4_processor/alu/barrel_shifters.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'decoder_8' (12#1) [C:/Users/erict/development/ECE350/cp4_processor/components/wiring.v:31]
+INFO: [Synth 8-6157] synthesizing module 'bitwise_not' [C:/Users/erict/development/ECE350/cp4_processor/alu/big_gates.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'bitwise_not' (13#1) [C:/Users/erict/development/ECE350/cp4_processor/alu/big_gates.v:1]
+INFO: [Synth 8-6157] synthesizing module 'multdiv' [C:/Users/erict/development/ECE350/cp4_processor/multdiv/multdiv.v:1]
+INFO: [Synth 8-6157] synthesizing module 'mult' [C:/Users/erict/development/ECE350/cp4_processor/multdiv/mult.v:1]
+INFO: [Synth 8-6157] synthesizing module 'negator' [C:/Users/erict/development/ECE350/cp4_processor/alu/cla.v:243]
+WARNING: [Synth 8-7071] port 'Cout' of module 'cla_32' is unconnected for instance 'cla' [C:/Users/erict/development/ECE350/cp4_processor/alu/cla.v:247]
+WARNING: [Synth 8-7071] port 'BAnd' of module 'cla_32' is unconnected for instance 'cla' [C:/Users/erict/development/ECE350/cp4_processor/alu/cla.v:247]
+WARNING: [Synth 8-7071] port 'BOr' of module 'cla_32' is unconnected for instance 'cla' [C:/Users/erict/development/ECE350/cp4_processor/alu/cla.v:247]
+WARNING: [Synth 8-7023] instance 'cla' of module 'cla_32' has 7 connections declared, but only 4 given [C:/Users/erict/development/ECE350/cp4_processor/alu/cla.v:247]
+INFO: [Synth 8-6155] done synthesizing module 'negator' (14#1) [C:/Users/erict/development/ECE350/cp4_processor/alu/cla.v:243]
+INFO: [Synth 8-6157] synthesizing module 'dadda_mult' [C:/Users/erict/development/ECE350/cp4_processor/multdiv/dadda_mult.v:1]
+INFO: [Synth 8-6157] synthesizing module 'half_adder' [C:/Users/erict/development/ECE350/cp4_processor/alu/cla.v:262]
+INFO: [Synth 8-6155] done synthesizing module 'half_adder' (15#1) [C:/Users/erict/development/ECE350/cp4_processor/alu/cla.v:262]
+INFO: [Synth 8-6157] synthesizing module 'full_adder' [C:/Users/erict/development/ECE350/cp4_processor/alu/cla.v:250]
+INFO: [Synth 8-6155] done synthesizing module 'full_adder' (16#1) [C:/Users/erict/development/ECE350/cp4_processor/alu/cla.v:250]
+INFO: [Synth 8-6157] synthesizing module 'cla_64' [C:/Users/erict/development/ECE350/cp4_processor/alu/cla.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'cla_64' (17#1) [C:/Users/erict/development/ECE350/cp4_processor/alu/cla.v:1]
+WARNING: [Synth 8-7071] port 'Cout' of module 'cla_64' is unconnected for instance 'cla' [C:/Users/erict/development/ECE350/cp4_processor/multdiv/dadda_mult.v:1396]
+WARNING: [Synth 8-7071] port 'BAnd' of module 'cla_64' is unconnected for instance 'cla' [C:/Users/erict/development/ECE350/cp4_processor/multdiv/dadda_mult.v:1396]
+WARNING: [Synth 8-7071] port 'BOr' of module 'cla_64' is unconnected for instance 'cla' [C:/Users/erict/development/ECE350/cp4_processor/multdiv/dadda_mult.v:1396]
+WARNING: [Synth 8-7023] instance 'cla' of module 'cla_64' has 7 connections declared, but only 4 given [C:/Users/erict/development/ECE350/cp4_processor/multdiv/dadda_mult.v:1396]
+INFO: [Synth 8-6155] done synthesizing module 'dadda_mult' (18#1) [C:/Users/erict/development/ECE350/cp4_processor/multdiv/dadda_mult.v:1]
+INFO: [Synth 8-6157] synthesizing module 'counter' [C:/Users/erict/development/ECE350/cp4_processor/components/sequential.v:1]
+	Parameter WIDTH bound to: 6 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'counter' (19#1) [C:/Users/erict/development/ECE350/cp4_processor/components/sequential.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'mult' (20#1) [C:/Users/erict/development/ECE350/cp4_processor/multdiv/mult.v:1]
+INFO: [Synth 8-6157] synthesizing module 'div' [C:/Users/erict/development/ECE350/cp4_processor/multdiv/div.v:1]
+INFO: [Synth 8-6157] synthesizing module 'register__parameterized2' [C:/Users/erict/development/ECE350/cp4_processor/regfile/register.v:1]
+	Parameter WIDTH bound to: 1 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'register__parameterized2' (20#1) [C:/Users/erict/development/ECE350/cp4_processor/regfile/register.v:1]
+INFO: [Synth 8-6157] synthesizing module 'initRegister' [C:/Users/erict/development/ECE350/cp4_processor/regfile/register.v:29]
+	Parameter WIDTH bound to: 64 - type: integer 
+INFO: [Synth 8-6157] synthesizing module 'dffe_init' [C:/Users/erict/development/ECE350/cp4_processor/components/dffe_ref.v:33]
+INFO: [Synth 8-6155] done synthesizing module 'dffe_init' (21#1) [C:/Users/erict/development/ECE350/cp4_processor/components/dffe_ref.v:33]
+INFO: [Synth 8-6155] done synthesizing module 'initRegister' (22#1) [C:/Users/erict/development/ECE350/cp4_processor/regfile/register.v:29]
+WARNING: [Synth 8-7071] port 'Cout' of module 'cla_32' is unconnected for instance 'cla' [C:/Users/erict/development/ECE350/cp4_processor/multdiv/div.v:54]
+WARNING: [Synth 8-7071] port 'BAnd' of module 'cla_32' is unconnected for instance 'cla' [C:/Users/erict/development/ECE350/cp4_processor/multdiv/div.v:54]
+WARNING: [Synth 8-7071] port 'BOr' of module 'cla_32' is unconnected for instance 'cla' [C:/Users/erict/development/ECE350/cp4_processor/multdiv/div.v:54]
+WARNING: [Synth 8-7023] instance 'cla' of module 'cla_32' has 7 connections declared, but only 4 given [C:/Users/erict/development/ECE350/cp4_processor/multdiv/div.v:54]
+INFO: [Synth 8-6155] done synthesizing module 'div' (23#1) [C:/Users/erict/development/ECE350/cp4_processor/multdiv/div.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'multdiv' (24#1) [C:/Users/erict/development/ECE350/cp4_processor/multdiv/multdiv.v:1]
+INFO: [Synth 8-6157] synthesizing module 'right_barrel_shifter' [C:/Users/erict/development/ECE350/cp4_processor/alu/barrel_shifters.v:22]
+INFO: [Synth 8-6157] synthesizing module 'rshift' [C:/Users/erict/development/ECE350/cp4_processor/components/shifts.v:18]
+	Parameter WIDTH bound to: 32 - type: integer 
+	Parameter SHAMT bound to: 1 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'rshift' (25#1) [C:/Users/erict/development/ECE350/cp4_processor/components/shifts.v:18]
+INFO: [Synth 8-6157] synthesizing module 'rshift__parameterized0' [C:/Users/erict/development/ECE350/cp4_processor/components/shifts.v:18]
+	Parameter WIDTH bound to: 32 - type: integer 
+	Parameter SHAMT bound to: 2 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'rshift__parameterized0' (25#1) [C:/Users/erict/development/ECE350/cp4_processor/components/shifts.v:18]
+INFO: [Synth 8-6157] synthesizing module 'rshift__parameterized1' [C:/Users/erict/development/ECE350/cp4_processor/components/shifts.v:18]
+	Parameter WIDTH bound to: 32 - type: integer 
+	Parameter SHAMT bound to: 4 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'rshift__parameterized1' (25#1) [C:/Users/erict/development/ECE350/cp4_processor/components/shifts.v:18]
+INFO: [Synth 8-6157] synthesizing module 'rshift__parameterized2' [C:/Users/erict/development/ECE350/cp4_processor/components/shifts.v:18]
+	Parameter WIDTH bound to: 32 - type: integer 
+	Parameter SHAMT bound to: 8 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'rshift__parameterized2' (25#1) [C:/Users/erict/development/ECE350/cp4_processor/components/shifts.v:18]
+INFO: [Synth 8-6157] synthesizing module 'rshift__parameterized3' [C:/Users/erict/development/ECE350/cp4_processor/components/shifts.v:18]
+	Parameter WIDTH bound to: 32 - type: integer 
+	Parameter SHAMT bound to: 16 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'rshift__parameterized3' (25#1) [C:/Users/erict/development/ECE350/cp4_processor/components/shifts.v:18]
+INFO: [Synth 8-6155] done synthesizing module 'right_barrel_shifter' (26#1) [C:/Users/erict/development/ECE350/cp4_processor/alu/barrel_shifters.v:22]
+INFO: [Synth 8-6157] synthesizing module 'mux_8' [C:/Users/erict/development/ECE350/cp4_processor/components/wiring.v:19]
+INFO: [Synth 8-6157] synthesizing module 'mux_4' [C:/Users/erict/development/ECE350/cp4_processor/components/wiring.v:8]
+INFO: [Synth 8-6155] done synthesizing module 'mux_4' (27#1) [C:/Users/erict/development/ECE350/cp4_processor/components/wiring.v:8]
+INFO: [Synth 8-6155] done synthesizing module 'mux_8' (28#1) [C:/Users/erict/development/ECE350/cp4_processor/components/wiring.v:19]
+INFO: [Synth 8-6157] synthesizing module 'or_32' [C:/Users/erict/development/ECE350/cp4_processor/alu/big_gates.v:19]
+INFO: [Synth 8-6155] done synthesizing module 'or_32' (29#1) [C:/Users/erict/development/ECE350/cp4_processor/alu/big_gates.v:19]
+INFO: [Synth 8-6155] done synthesizing module 'alu' (30#1) [C:/Users/erict/development/ECE350/cp4_processor/alu/alu.v:1]
+INFO: [Synth 8-6157] synthesizing module 'exceptionmap' [C:/Users/erict/development/ECE350/cp4_processor/control/decode.v:106]
+INFO: [Synth 8-6155] done synthesizing module 'exceptionmap' (31#1) [C:/Users/erict/development/ECE350/cp4_processor/control/decode.v:106]
+INFO: [Synth 8-6157] synthesizing module 'mux4__parameterized0' [C:/Users/erict/development/ECE350/cp4_processor/components/wiring.v:64]
+	Parameter WIDTH bound to: 5 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'mux4__parameterized0' (31#1) [C:/Users/erict/development/ECE350/cp4_processor/components/wiring.v:64]
+WARNING: [Synth 8-7071] port 'Cout' of module 'cla_32' is unconnected for instance 'branch_cla' [C:/Users/erict/development/ECE350/cp4_processor/processor.v:246]
+WARNING: [Synth 8-7071] port 'BAnd' of module 'cla_32' is unconnected for instance 'branch_cla' [C:/Users/erict/development/ECE350/cp4_processor/processor.v:246]
+WARNING: [Synth 8-7071] port 'BOr' of module 'cla_32' is unconnected for instance 'branch_cla' [C:/Users/erict/development/ECE350/cp4_processor/processor.v:246]
+WARNING: [Synth 8-7023] instance 'branch_cla' of module 'cla_32' has 7 connections declared, but only 4 given [C:/Users/erict/development/ECE350/cp4_processor/processor.v:246]
+INFO: [Synth 8-6157] synthesizing module 'register__parameterized3' [C:/Users/erict/development/ECE350/cp4_processor/regfile/register.v:1]
+	Parameter WIDTH bound to: 121 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'register__parameterized3' (31#1) [C:/Users/erict/development/ECE350/cp4_processor/regfile/register.v:1]
+INFO: [Synth 8-6157] synthesizing module 'mux2' [C:/Users/erict/development/ECE350/cp4_processor/components/wiring.v:52]
+	Parameter WIDTH bound to: 32 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'mux2' (32#1) [C:/Users/erict/development/ECE350/cp4_processor/components/wiring.v:52]
+INFO: [Synth 8-6157] synthesizing module 'register__parameterized4' [C:/Users/erict/development/ECE350/cp4_processor/regfile/register.v:1]
+	Parameter WIDTH bound to: 89 - type: integer 
+INFO: [Synth 8-6155] done synthesizing module 'register__parameterized4' (32#1) [C:/Users/erict/development/ECE350/cp4_processor/regfile/register.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'processor' (33#1) [C:/Users/erict/development/ECE350/cp4_processor/processor.v:21]
+INFO: [Synth 8-6157] synthesizing module 'ROM' [C:/Users/erict/development/ECE350/cp4_processor/ROM.v:2]
+	Parameter MEMFILE bound to: 64'b0111001101101111011100100111010000101110011011010110010101101101 
+INFO: [Synth 8-3876] $readmem data file 'sort.mem' is read successfully [C:/Users/erict/development/ECE350/cp4_processor/ROM.v:12]
+INFO: [Synth 8-6155] done synthesizing module 'ROM' (34#1) [C:/Users/erict/development/ECE350/cp4_processor/ROM.v:2]
+INFO: [Synth 8-6157] synthesizing module 'regfile' [C:/Users/erict/development/ECE350/cp4_processor/regfile/regfile.v:1]
+INFO: [Synth 8-6155] done synthesizing module 'regfile' (35#1) [C:/Users/erict/development/ECE350/cp4_processor/regfile/regfile.v:1]
+INFO: [Synth 8-6157] synthesizing module 'RAM' [C:/Users/erict/development/ECE350/cp4_processor/RAM.v:2]
+INFO: [Synth 8-6155] done synthesizing module 'RAM' (36#1) [C:/Users/erict/development/ECE350/cp4_processor/RAM.v:2]
+INFO: [Synth 8-6155] done synthesizing module 'Wrapper' (37#1) [C:/Users/erict/development/ECE350/cp4_processor/Wrapper.v:27]
+---------------------------------------------------------------------------------
+Finished RTL Elaboration : Time (s): cpu = 00:00:04 ; elapsed = 00:00:05 . Memory (MB): peak = 1154.688 ; gain = 0.000
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:00:04 ; elapsed = 00:00:06 . Memory (MB): peak = 1154.688 ; gain = 0.000
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 1 : Time (s): cpu = 00:00:04 ; elapsed = 00:00:06 . Memory (MB): peak = 1154.688 ; gain = 0.000
+---------------------------------------------------------------------------------
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.159 . Memory (MB): peak = 1154.688 ; gain = 0.000
+INFO: [Project 1-570] Preparing netlist for logic optimization
+
+Processing XDC Constraints
+Initializing timing engine
+Parsing XDC File [C:/Users/erict/development/ECE350/master.xdc]
+WARNING: [Vivado 12-584] No ports matched 'LED[0]'. [C:/Users/erict/development/ECE350/master.xdc:30]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [C:/Users/erict/development/ECE350/master.xdc:30]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'LED[1]'. [C:/Users/erict/development/ECE350/master.xdc:31]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [C:/Users/erict/development/ECE350/master.xdc:31]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'LED[2]'. [C:/Users/erict/development/ECE350/master.xdc:32]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [C:/Users/erict/development/ECE350/master.xdc:32]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'LED[3]'. [C:/Users/erict/development/ECE350/master.xdc:33]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [C:/Users/erict/development/ECE350/master.xdc:33]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+WARNING: [Vivado 12-584] No ports matched 'LED[4]'. [C:/Users/erict/development/ECE350/master.xdc:34]
+CRITICAL WARNING: [Common 17-55] 'set_property' expects at least one object. [C:/Users/erict/development/ECE350/master.xdc:34]
+Resolution: If [get_<value>] was used to populate the object, check to make sure this command returns at least one valid object.
+Finished Parsing XDC File [C:/Users/erict/development/ECE350/master.xdc]
+Completed Processing XDC Constraints
+
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.017 . Memory (MB): peak = 1163.086 ; gain = 0.000
+INFO: [Project 1-111] Unisim Transformation Summary:
+No Unisim elements were transformed.
+
+Constraint Validation Runtime : Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.097 . Memory (MB): peak = 1163.086 ; gain = 0.000
+---------------------------------------------------------------------------------
+Finished Constraint Validation : Time (s): cpu = 00:00:13 ; elapsed = 00:00:16 . Memory (MB): peak = 1163.086 ; gain = 8.398
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Loading Part and Timing Information
+---------------------------------------------------------------------------------
+Loading part: xc7a100tcsg324-1
+---------------------------------------------------------------------------------
+Finished Loading Part and Timing Information : Time (s): cpu = 00:00:13 ; elapsed = 00:00:16 . Memory (MB): peak = 1163.086 ; gain = 8.398
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Applying 'set_property' XDC Constraints
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished applying 'set_property' XDC Constraints : Time (s): cpu = 00:00:13 ; elapsed = 00:00:16 . Memory (MB): peak = 1163.086 ; gain = 8.398
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished RTL Optimization Phase 2 : Time (s): cpu = 00:00:17 ; elapsed = 00:00:21 . Memory (MB): peak = 1163.086 ; gain = 8.398
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start RTL Component Statistics 
+---------------------------------------------------------------------------------
+Detailed RTL Component Info : 
++---XORs : 
+	   3 Input      1 Bit         XORs := 1219  
+	   2 Input      1 Bit         XORs := 36    
++---Registers : 
+	               32 Bit    Registers := 1     
+	               30 Bit    Registers := 1     
+	                1 Bit    Registers := 1658  
++---RAMs : 
+	             128K Bit	(4096 X 32 bit)          RAMs := 1     
++---ROMs : 
+	                    ROMs := 1     
++---Muxes : 
+	   2 Input  153 Bit        Muxes := 1     
+	   2 Input  121 Bit        Muxes := 1     
+	   2 Input   64 Bit        Muxes := 2     
+	   2 Input   32 Bit        Muxes := 50    
+	   2 Input    5 Bit        Muxes := 13    
+	   2 Input    1 Bit        Muxes := 132   
+---------------------------------------------------------------------------------
+Finished RTL Component Statistics 
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Part Resource Summary
+---------------------------------------------------------------------------------
+Part Resources:
+DSPs: 240 (col length:80)
+BRAMs: 270 (col length: RAMB18 80 RAMB36 40)
+---------------------------------------------------------------------------------
+Finished Part Resource Summary
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Cross Boundary and Area Optimization
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Cross Boundary and Area Optimization : Time (s): cpu = 00:01:04 ; elapsed = 00:01:12 . Memory (MB): peak = 1422.262 ; gain = 267.574
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start ROM, RAM, DSP, Shift Register and Retiming Reporting
+---------------------------------------------------------------------------------
+
+ROM: Preliminary Mapping Report
++------------+---------------------+---------------+----------------+
+|Module Name | RTL Object          | Depth x Width | Implemented As | 
++------------+---------------------+---------------+----------------+
+|Wrapper     | InstMem/dataOut_reg | 4096x30       | Block RAM      | 
++------------+---------------------+---------------+----------------+
+
+
+Block RAM: Preliminary Mapping Report (see note below)
++------------+-------------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+|Module Name | RTL Object              | PORT A (Depth x Width) | W | R | PORT B (Depth x Width) | W | R | Ports driving FF | RAMB18 | RAMB36 | 
++------------+-------------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+|Wrapper     | ProcMem/MemoryArray_reg | 4 K x 32(NO_CHANGE)    | W | R |                        |   |   | Port A           | 0      | 4      | 
++------------+-------------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+
+Note: The table above is a preliminary report that shows the Block RAMs at the current stage of the synthesis flow. Some Block RAMs may be reimplemented as non Block RAM primitives later in the synthesis flow. Multiple instantiated Block RAMs are reported only once. 
+---------------------------------------------------------------------------------
+Finished ROM, RAM, DSP, Shift Register and Retiming Reporting
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Applying XDC Timing Constraints
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Applying XDC Timing Constraints : Time (s): cpu = 00:01:13 ; elapsed = 00:01:22 . Memory (MB): peak = 1422.262 ; gain = 267.574
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Timing Optimization
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Timing Optimization : Time (s): cpu = 00:01:25 ; elapsed = 00:01:35 . Memory (MB): peak = 1422.262 ; gain = 267.574
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start ROM, RAM, DSP, Shift Register and Retiming Reporting
+---------------------------------------------------------------------------------
+
+Block RAM: Final Mapping Report
++------------+-------------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+|Module Name | RTL Object              | PORT A (Depth x Width) | W | R | PORT B (Depth x Width) | W | R | Ports driving FF | RAMB18 | RAMB36 | 
++------------+-------------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+|Wrapper     | ProcMem/MemoryArray_reg | 4 K x 32(NO_CHANGE)    | W | R |                        |   |   | Port A           | 0      | 4      | 
++------------+-------------------------+------------------------+---+---+------------------------+---+---+------------------+--------+--------+
+
+---------------------------------------------------------------------------------
+Finished ROM, RAM, DSP, Shift Register and Retiming Reporting
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Technology Mapping
+---------------------------------------------------------------------------------
+INFO: [Synth 8-7052] The timing for the instance ProcMem/MemoryArray_reg_0 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance ProcMem/MemoryArray_reg_1 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance ProcMem/MemoryArray_reg_2 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance ProcMem/MemoryArray_reg_3 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance InstMem/dataOut_reg_0 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance InstMem/dataOut_reg_1 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance InstMem/dataOut_reg_2 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+INFO: [Synth 8-7052] The timing for the instance InstMem/dataOut_reg_3 (implemented as a Block RAM) might be sub-optimal as no optional output register could be merged into the ram block. Providing additional output register may help in improving timing.
+---------------------------------------------------------------------------------
+Finished Technology Mapping : Time (s): cpu = 00:01:30 ; elapsed = 00:01:42 . Memory (MB): peak = 1525.320 ; gain = 370.633
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Flattening Before IO Insertion
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Final Netlist Cleanup
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished IO Insertion : Time (s): cpu = 00:01:34 ; elapsed = 00:01:46 . Memory (MB): peak = 1525.320 ; gain = 370.633
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Instances
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Instances : Time (s): cpu = 00:01:34 ; elapsed = 00:01:46 . Memory (MB): peak = 1525.320 ; gain = 370.633
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Rebuilding User Hierarchy
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Rebuilding User Hierarchy : Time (s): cpu = 00:01:35 ; elapsed = 00:01:47 . Memory (MB): peak = 1525.320 ; gain = 370.633
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Ports
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Ports : Time (s): cpu = 00:01:35 ; elapsed = 00:01:47 . Memory (MB): peak = 1525.320 ; gain = 370.633
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Handling Custom Attributes
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Handling Custom Attributes : Time (s): cpu = 00:01:35 ; elapsed = 00:01:48 . Memory (MB): peak = 1525.320 ; gain = 370.633
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Renaming Generated Nets
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Finished Renaming Generated Nets : Time (s): cpu = 00:01:35 ; elapsed = 00:01:48 . Memory (MB): peak = 1525.320 ; gain = 370.633
+---------------------------------------------------------------------------------
+---------------------------------------------------------------------------------
+Start Writing Synthesis Report
+---------------------------------------------------------------------------------
+
+Report BlackBoxes: 
++-+--------------+----------+
+| |BlackBox name |Instances |
++-+--------------+----------+
++-+--------------+----------+
+
+Report Cell Usage: 
++------+---------+------+
+|      |Cell     |Count |
++------+---------+------+
+|1     |BUFG     |     1|
+|2     |LUT1     |     5|
+|3     |LUT2     |   579|
+|4     |LUT3     |   566|
+|5     |LUT4     |   414|
+|6     |LUT5     |   825|
+|7     |LUT6     |  2963|
+|8     |MUXF7    |     9|
+|9     |RAMB36E1 |     8|
+|14    |FDCE     |  1412|
+|15    |FDPE     |    33|
+|16    |FDRE     |    67|
+|17    |FDSE     |    32|
+|18    |LDC      |    32|
+|19    |IBUF     |     2|
+|20    |OBUF     |     5|
++------+---------+------+
+---------------------------------------------------------------------------------
+Finished Writing Synthesis Report : Time (s): cpu = 00:01:35 ; elapsed = 00:01:48 . Memory (MB): peak = 1525.320 ; gain = 370.633
+---------------------------------------------------------------------------------
+Synthesis finished with 0 errors, 0 critical warnings and 0 warnings.
+Synthesis Optimization Runtime : Time (s): cpu = 00:01:30 ; elapsed = 00:01:45 . Memory (MB): peak = 1525.320 ; gain = 362.234
+Synthesis Optimization Complete : Time (s): cpu = 00:01:36 ; elapsed = 00:01:48 . Memory (MB): peak = 1525.320 ; gain = 370.633
+INFO: [Project 1-571] Translating synthesized netlist
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.247 . Memory (MB): peak = 1525.320 ; gain = 0.000
+INFO: [Netlist 29-17] Analyzing 49 Unisim elements for replacement
+INFO: [Netlist 29-28] Unisim Transformation completed in 1 CPU seconds
+INFO: [Project 1-570] Preparing netlist for logic optimization
+INFO: [Opt 31-138] Pushed 0 inverter(s) to 0 load pin(s).
+Netlist sorting complete. Time (s): cpu = 00:00:00 ; elapsed = 00:00:00.010 . Memory (MB): peak = 1525.320 ; gain = 0.000
+INFO: [Project 1-111] Unisim Transformation Summary:
+  A total of 32 instances were transformed.
+  LDC => LDCE: 32 instances
+
+Synth Design complete, checksum: 20e3e4b5
+INFO: [Common 17-83] Releasing license: Synthesis
+125 Infos, 25 Warnings, 5 Critical Warnings and 0 Errors encountered.
+synth_design completed successfully
+synth_design: Time (s): cpu = 00:01:42 ; elapsed = 00:01:56 . Memory (MB): peak = 1525.320 ; gain = 370.633
+INFO: [runtcl-6] Synthesis results are not added to the cache due to CRITICAL_WARNING
+INFO: [Common 17-1381] The checkpoint 'C:/Users/erict/development/ECE350/cp4_processor/cp4_processor.runs/synth_1/Wrapper.dcp' has been generated.
+INFO: [runtcl-4] Executing : report_utilization -file Wrapper_utilization_synth.rpt -pb Wrapper_utilization_synth.pb
+INFO: [Common 17-206] Exiting Vivado at Tue Mar 26 00:41:04 2024...

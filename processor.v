@@ -86,11 +86,11 @@ module processor(
         bypassB =           23,
         lw =                24;
 
-    assign address_imem = addr_imem_out;
-
     // ========Fetch========
     wire[31:0] pcp1, next_pc, addr_imem_out; // pc plus 1
     wire stall_fetch, stall_decode, stall_execute;
+
+    assign address_imem = addr_imem_out;
 
     cla_32 pc_increment(.A(addr_imem_out), .B(32'b1), .Cin(1'b0), .Sum(pcp1));
 
@@ -229,11 +229,11 @@ module processor(
      * jal:         cur_pcp1
      */
 
-    wire[31:0] alu_setx_result;
-    assign alu_setx_result = Xctrlbus[setx] ? jump_addr : alu_except_result;
-
     // ====Branchland====
     wire[31:0] Tsx, jump_addr, cur_pcp1, branch_target, branch_addr;
+    
+    wire[31:0] alu_setx_result;
+    assign alu_setx_result = Xctrlbus[setx] ? jump_addr : alu_except_result;
     
     // bex jumps to an absolute addr as well. don't do the jump if bex and the sub results in 0.
     wire no_bex_jump = Xctrlbus[bex] && !ALU_ne;

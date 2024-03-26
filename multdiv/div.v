@@ -9,7 +9,7 @@ module div(
     output[31:0] quot;
     output ready, div0;
 
-    wire[31:0] negDiv, dvdIn, negQ, negInput, negOutput;
+    wire[31:0] negDiv, dvdIn, negQ, negInput, negOutput, R, Q;
     // reuse negator hardware at end, mux between inputs/outputs based on reset signal.
     assign negInput = reset ? dividend : Q;
     assign negDiv = negOutput;
@@ -38,7 +38,6 @@ module div(
     counter #(6) county_dude(.count(cycle), .clr(reset), .clk(clk));
     assign ready = cycle[5];
 
-    wire[31:0] R, Q;
     wire[63:0] rqIn, afterSub;
     assign rqIn = reset ? {32'b0, dividend} : afterSub; 
 

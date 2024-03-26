@@ -1,0 +1,217 @@
+Copyright 1986-2021 Xilinx, Inc. All Rights Reserved.
+------------------------------------------------------------------------------------
+| Tool Version : Vivado v.2021.1 (win64) Build 3247384 Thu Jun 10 19:36:33 MDT 2021
+| Date         : Tue Mar 26 00:42:08 2024
+| Host         : Sarsaparilla running 64-bit major release  (build 9200)
+| Command      : report_control_sets -verbose -file Wrapper_control_sets_placed.rpt
+| Design       : Wrapper
+| Device       : xc7a100t
+------------------------------------------------------------------------------------
+
+Control Set Information
+
+Table of Contents
+-----------------
+1. Summary
+2. Histogram
+3. Flip-Flop Distribution
+4. Detailed Control Set Information
+
+1. Summary
+----------
+
++----------------------------------------------------------+-------+
+|                          Status                          | Count |
++----------------------------------------------------------+-------+
+| Total control sets                                       |   139 |
+|    Minimum number of control sets                        |   139 |
+|    Addition due to synthesis replication                 |     0 |
+|    Addition due to physical synthesis replication        |     0 |
+| Unused register locations in slices containing registers |   704 |
++----------------------------------------------------------+-------+
+* Control sets can be merged at opt_design using control_set_merge or merge_equivalent_drivers
+** Run report_qor_suggestions for automated merging and remapping suggestions
+
+
+2. Histogram
+------------
+
++--------------------+-------+
+|       Fanout       | Count |
++--------------------+-------+
+| Total control sets |   139 |
+| >= 0 to < 4        |    97 |
+| >= 4 to < 6        |     1 |
+| >= 6 to < 8        |     1 |
+| >= 8 to < 10       |     0 |
+| >= 10 to < 12      |     0 |
+| >= 12 to < 14      |     0 |
+| >= 14 to < 16      |     0 |
+| >= 16              |    40 |
++--------------------+-------+
+* Control sets can be remapped at either synth_design or opt_design
+
+
+3. Flip-Flop Distribution
+-------------------------
+
++--------------+-----------------------+------------------------+-----------------+--------------+
+| Clock Enable | Synchronous Set/Reset | Asynchronous Set/Reset | Total Registers | Total Slices |
++--------------+-----------------------+------------------------+-----------------+--------------+
+| No           | No                    | No                     |               2 |            2 |
+| No           | No                    | Yes                    |             156 |           92 |
+| No           | Yes                   | No                     |              32 |           32 |
+| Yes          | No                    | No                     |              65 |           28 |
+| Yes          | No                    | Yes                    |            1289 |          616 |
+| Yes          | Yes                   | No                     |              32 |           13 |
++--------------+-----------------------+------------------------+-----------------+--------------+
+
+
+4. Detailed Control Set Information
+-----------------------------------
+
++---------------------------------------------+-------------------------------------------------------------------+--------------------------------------------+------------------+----------------+--------------+
+|                 Clock Signal                |                           Enable Signal                           |              Set/Reset Signal              | Slice Load Count | Bel Load Count | Bels / Slice |
++---------------------------------------------+-------------------------------------------------------------------+--------------------------------------------+------------------+----------------+--------------+
+|  CPU/DXIRlatch/genblk1[3].r_dff/q_reg_8     |                                                                   | CPU/DXIRlatch/genblk1[3].r_dff/q_reg_9     |                1 |              1 |         1.00 |
+|  CPU/DXIRlatch/genblk1[18].r_dff/q_reg_50   |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_51   |                1 |              1 |         1.00 |
+|  CPU/DXIRlatch/genblk1[18].r_dff/q_reg_47   |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_49   |                1 |              1 |         1.00 |
+|  CPU/DXIRlatch/genblk1[18].r_dff/q_reg_31   |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_30   |                1 |              1 |         1.00 |
+|  CPU/DXIRlatch/genblk1[18].r_dff/q_reg_35   |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_36   |                1 |              1 |         1.00 |
+|  CPU/DXIRlatch/genblk1[18].r_dff/q_reg_37   |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_38   |                1 |              1 |         1.00 |
+|  CPU/DXIRlatch/genblk1[18].r_dff/q_reg_25   |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_24   |                1 |              1 |         1.00 |
+|  CPU/DXIRlatch/genblk1[18].r_dff/q_reg_39   |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_41   |                1 |              1 |         1.00 |
+|  CPU/DXIRlatch/genblk1[18].r_dff/q_reg_42   |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_44   |                1 |              1 |         1.00 |
+|  CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C    |                                                                   | CPU/DXIRlatch/genblk1[3].r_dff/q_reg_6     |                1 |              1 |         1.00 |
+|  CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_10 |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_11 |                1 |              1 |         1.00 |
+|  CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_12 |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_13 |                1 |              1 |         1.00 |
+|  CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_0  |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_1  |                1 |              1 |         1.00 |
+|  CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_16 |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_17 |                1 |              1 |         1.00 |
+|  CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_18 |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_19 |                1 |              1 |         1.00 |
+|  CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_2  |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_3  |                1 |              1 |         1.00 |
+|  CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_22 |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_23 |                1 |              1 |         1.00 |
+|  CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_14 |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_15 |                1 |              1 |         1.00 |
+|  CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_20 |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_21 |                1 |              1 |         1.00 |
+|  CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_6  |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_7  |                1 |              1 |         1.00 |
+|  CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_28 |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_29 |                1 |              1 |         1.00 |
+|  CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_32 |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_33 |                1 |              1 |         1.00 |
+|  CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_34 |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_35 |                1 |              1 |         1.00 |
+|  CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_4  |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_5  |                1 |              1 |         1.00 |
+|  CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_42 |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_43 |                1 |              1 |         1.00 |
+|  CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_24 |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_25 |                1 |              1 |         1.00 |
+|  CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_26 |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_27 |                1 |              1 |         1.00 |
+|  CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_30 |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_31 |                1 |              1 |         1.00 |
+|  CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_36 |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_37 |                1 |              1 |         1.00 |
+|  CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_40 |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_41 |                1 |              1 |         1.00 |
+|  CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_38 |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_39 |                1 |              1 |         1.00 |
+|  CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_8  |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_9  |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            | CPU/alu/multdiv/div/county_dude/genblk2[5].tff/div_hardware_ready | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_36 |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            | CPU/alu/multdiv/div/county_dude/genblk2[5].tff/div_hardware_ready | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_40 |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            | CPU/alu/multdiv/div/county_dude/genblk2[5].tff/div_hardware_ready | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_38 |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            |                                                                   | CPU/DXIRlatch/genblk1[3].r_dff/q_reg_6     |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            |                                                                   | CPU/DXIRlatch/genblk1[3].r_dff/q_reg_9     |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_30   |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_41   |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_49   |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_24   |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_36   |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_38   |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_51   |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_44   |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_13 |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_17 |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_11 |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_15 |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_19 |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_1  |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_21 |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_29 |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_35 |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_25 |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_5  |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_7  |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_33 |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_39 |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_3  |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_43 |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_37 |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_27 |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_23 |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_31 |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_41 |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            |                                                                   | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_9  |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            | CPU/alu/multdiv/div/county_dude/genblk2[5].tff/div_hardware_ready | CPU/DXIRlatch/genblk1[3].r_dff/q_reg_8     |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            | CPU/alu/multdiv/div/county_dude/genblk2[5].tff/div_hardware_ready | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_8  |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            | CPU/alu/multdiv/div/county_dude/genblk2[5].tff/div_hardware_ready | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_50   |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            | CPU/alu/multdiv/div/county_dude/genblk2[5].tff/div_hardware_ready | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_47   |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            | CPU/alu/multdiv/div/county_dude/genblk2[5].tff/div_hardware_ready | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_31   |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            | CPU/alu/multdiv/div/county_dude/genblk2[5].tff/div_hardware_ready | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_35   |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            | CPU/alu/multdiv/div/county_dude/genblk2[5].tff/div_hardware_ready | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_37   |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            | CPU/alu/multdiv/div/county_dude/genblk2[5].tff/div_hardware_ready | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_25   |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            | CPU/alu/multdiv/div/county_dude/genblk2[5].tff/div_hardware_ready | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_39   |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            | CPU/alu/multdiv/div/county_dude/genblk2[5].tff/div_hardware_ready | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_42   |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            | CPU/alu/multdiv/div/county_dude/genblk2[5].tff/div_hardware_ready | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C    |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            | CPU/alu/multdiv/div/county_dude/genblk2[5].tff/div_hardware_ready | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_10 |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            | CPU/alu/multdiv/div/county_dude/genblk2[5].tff/div_hardware_ready | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_12 |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            | CPU/alu/multdiv/div/county_dude/genblk2[5].tff/div_hardware_ready | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_0  |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            | CPU/alu/multdiv/div/county_dude/genblk2[5].tff/div_hardware_ready | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_16 |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            | CPU/alu/multdiv/div/county_dude/genblk2[5].tff/div_hardware_ready | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_18 |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            | CPU/alu/multdiv/div/county_dude/genblk2[5].tff/div_hardware_ready | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_2  |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            | CPU/alu/multdiv/div/county_dude/genblk2[5].tff/div_hardware_ready | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_22 |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            | CPU/alu/multdiv/div/county_dude/genblk2[5].tff/div_hardware_ready | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_14 |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            | CPU/alu/multdiv/div/county_dude/genblk2[5].tff/div_hardware_ready | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_20 |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            | CPU/alu/multdiv/div/county_dude/genblk2[5].tff/div_hardware_ready | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_6  |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            | CPU/alu/multdiv/div/county_dude/genblk2[5].tff/div_hardware_ready | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_28 |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            | CPU/alu/multdiv/div/county_dude/genblk2[5].tff/div_hardware_ready | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_32 |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            | CPU/alu/multdiv/div/county_dude/genblk2[5].tff/div_hardware_ready | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_34 |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            | CPU/alu/multdiv/div/county_dude/genblk2[5].tff/div_hardware_ready | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_4  |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            | CPU/alu/multdiv/div/county_dude/genblk2[5].tff/div_hardware_ready | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_42 |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            | CPU/alu/multdiv/div/county_dude/genblk2[5].tff/div_hardware_ready | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_24 |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            | CPU/alu/multdiv/div/county_dude/genblk2[5].tff/div_hardware_ready | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_26 |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            | CPU/alu/multdiv/div/county_dude/genblk2[5].tff/div_hardware_ready | CPU/DXIRlatch/genblk1[18].r_dff/q_reg_C_30 |                1 |              1 |         1.00 |
+|  clock_IBUF_BUFG                            |                                                                   |                                            |                2 |              2 |         1.00 |
+|  clock_IBUF_BUFG                            |                                                                   | CPU/DXIRlatch/genblk1[4].r_dff/alu_ctrl[0] |                1 |              4 |         4.00 |
+|  clock_IBUF_BUFG                            |                                                                   | CPU/DXIRlatch/genblk1[3].r_dff/q_reg_7     |                2 |              6 |         3.00 |
+|  clock_IBUF_BUFG                            | CPU/DXIRlatch/genblk1[3].r_dff/q_reg_7                            | CPU/DXIRlatch/genblk1[16].r_dff/q_reg_3    |                9 |             16 |         1.78 |
+|  clock_IBUF_BUFG                            | CPU/DXIRlatch/genblk1[4].r_dff/alu_ctrl[0]                        | CPU/DXIRlatch/genblk1[16].r_dff/q_reg_2    |                4 |             16 |         4.00 |
+|  clock_IBUF_BUFG                            | CPU/DXIRlatch/genblk1[3].r_dff/q_reg_7                            |                                            |               10 |             17 |         1.70 |
+|  clock_IBUF_BUFG                            | CPU/alu/multdiv/div/county_dude/genblk2[5].tff/div_hardware_ready | CPU/DXIRlatch/genblk1[3].r_dff/q_reg_7     |               24 |             32 |         1.33 |
+|  clock_IBUF_BUFG                            | CPU/MWIRlatch/genblk1[26].r_dff/en                                | reset_IBUF                                 |               14 |             32 |         2.29 |
+|  clock_IBUF_BUFG                            | CPU/DXIRlatch/genblk1[24].r_dff/q_i_3__72_0                       | reset_IBUF                                 |               30 |             32 |         1.07 |
+|  clock_IBUF_BUFG                            | CPU/MWIRlatch/genblk1[23].r_dff/q_reg_1                           | reset_IBUF                                 |               30 |             32 |         1.07 |
+|  clock_IBUF_BUFG                            | CPU/MWIRlatch/genblk1[25].r_dff/q_reg_2                           | reset_IBUF                                 |               16 |             32 |         2.00 |
+|  clock_IBUF_BUFG                            | CPU/MWIRlatch/genblk1[25].r_dff/q_reg_6                           | reset_IBUF                                 |                9 |             32 |         3.56 |
+|  clock_IBUF_BUFG                            | CPU/MWIRlatch/genblk1[25].r_dff/q_reg_1                           | reset_IBUF                                 |                8 |             32 |         4.00 |
+|  clock_IBUF_BUFG                            | CPU/MWIRlatch/genblk1[25].r_dff/q_reg_3                           | reset_IBUF                                 |                7 |             32 |         4.57 |
+|  clock_IBUF_BUFG                            | CPU/MWIRlatch/genblk1[25].r_dff/q_reg_5                           | reset_IBUF                                 |               10 |             32 |         3.20 |
+|  clock_IBUF_BUFG                            | CPU/MWIRlatch/genblk1[25].r_dff/q_reg_7                           | reset_IBUF                                 |               20 |             32 |         1.60 |
+|  clock_IBUF_BUFG                            | CPU/MWIRlatch/genblk1[25].r_dff/q_reg_8                           | reset_IBUF                                 |                9 |             32 |         3.56 |
+|  clock_IBUF_BUFG                            | CPU/MWIRlatch/genblk1[25].r_dff/q_reg_4                           | reset_IBUF                                 |                8 |             32 |         4.00 |
+|  clock_IBUF_BUFG                            | CPU/MWIRlatch/genblk1[26].r_dff/q_reg_3                           | reset_IBUF                                 |               11 |             32 |         2.91 |
+|  clock_IBUF_BUFG                            | CPU/MWIRlatch/genblk1[26].r_dff/q_reg_7                           | reset_IBUF                                 |               12 |             32 |         2.67 |
+|  clock_IBUF_BUFG                            | CPU/MWIRlatch/genblk1[26].r_dff/q_reg_6                           | reset_IBUF                                 |               31 |             32 |         1.03 |
+|  clock_IBUF_BUFG                            | CPU/MWIRlatch/genblk1[26].r_dff/q_reg_5                           | reset_IBUF                                 |                9 |             32 |         3.56 |
+|  clock_IBUF_BUFG                            | CPU/MWIRlatch/genblk1[26].r_dff/q_reg_9                           | reset_IBUF                                 |               12 |             32 |         2.67 |
+|  clock_IBUF_BUFG                            | CPU/MWIRlatch/genblk1[26].r_dff/q_reg_8                           | reset_IBUF                                 |                8 |             32 |         4.00 |
+|  clock_IBUF_BUFG                            | CPU/MWIRlatch/genblk1[26].r_dff/q_reg_4                           | reset_IBUF                                 |               17 |             32 |         1.88 |
+|  clock_IBUF_BUFG                            | CPU/MWIRlatch/genblk1[66].r_dff/q_reg_1                           | reset_IBUF                                 |               12 |             32 |         2.67 |
+|  clock_IBUF_BUFG                            | CPU/MWIRlatch/genblk1[66].r_dff/q_reg_3                           | reset_IBUF                                 |               15 |             32 |         2.13 |
+|  clock_IBUF_BUFG                            | CPU/MWIRlatch/genblk1[26].r_dff/q_reg_11                          | reset_IBUF                                 |               24 |             32 |         1.33 |
+|  clock_IBUF_BUFG                            | CPU/MWIRlatch/genblk1[26].r_dff/q_reg_13                          | reset_IBUF                                 |                9 |             32 |         3.56 |
+|  clock_IBUF_BUFG                            | CPU/MWIRlatch/genblk1[26].r_dff/q_reg_15                          | reset_IBUF                                 |               13 |             32 |         2.46 |
+|  clock_IBUF_BUFG                            | CPU/MWIRlatch/genblk1[26].r_dff/q_reg_17                          | reset_IBUF                                 |               26 |             32 |         1.23 |
+|  clock_IBUF_BUFG                            | CPU/MWIRlatch/genblk1[26].r_dff/q_reg_18                          | reset_IBUF                                 |               14 |             32 |         2.29 |
+|  clock_IBUF_BUFG                            | CPU/MWIRlatch/genblk1[26].r_dff/q_reg_19                          | reset_IBUF                                 |               15 |             32 |         2.13 |
+|  clock_IBUF_BUFG                            | CPU/MWIRlatch/genblk1[26].r_dff/q_reg_16                          | reset_IBUF                                 |               16 |             32 |         2.00 |
+|  clock_IBUF_BUFG                            | CPU/MWIRlatch/genblk1[26].r_dff/q_reg_1                           | reset_IBUF                                 |               17 |             32 |         1.88 |
+|  clock_IBUF_BUFG                            | CPU/MWIRlatch/genblk1[26].r_dff/q_reg_10                          | reset_IBUF                                 |               17 |             32 |         1.88 |
+|  clock_IBUF_BUFG                            | CPU/MWIRlatch/genblk1[26].r_dff/q_reg_2                           | reset_IBUF                                 |                8 |             32 |         4.00 |
+|  clock_IBUF_BUFG                            | CPU/MWIRlatch/genblk1[26].r_dff/q_reg_14                          | reset_IBUF                                 |               11 |             32 |         2.91 |
+|  clock_IBUF_BUFG                            | CPU/MWIRlatch/genblk1[26].r_dff/q_reg_12                          | reset_IBUF                                 |               14 |             32 |         2.29 |
+|  clock_IBUF_BUFG                            | CPU/DXIRlatch/genblk1[4].r_dff/alu_ctrl[0]                        |                                            |               18 |             48 |         2.67 |
+| ~clock_IBUF_BUFG                            | CPU/DXIRlatch/genblk1[24].r_dff/q_i_3__72_0                       | reset_IBUF                                 |               22 |             62 |         2.82 |
+| ~clock_IBUF_BUFG                            |                                                                   | reset_IBUF                                 |               57 |            114 |         2.00 |
+| ~clock_IBUF_BUFG                            | CPU/DXIRlatch/genblk1[139].r_dff/writeEnable0                     | reset_IBUF                                 |               66 |            139 |         2.11 |
++---------------------------------------------+-------------------------------------------------------------------+--------------------------------------------+------------------+----------------+--------------+
+
+

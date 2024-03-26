@@ -33,7 +33,7 @@ module initRegister #(
     writeEnable, reset, init,
     dataIn, dataOut
 );
-    input   clk, writeEnable, readEnable, reset;
+    input   clk, writeEnable, reset;
     input   [WIDTH-1:0] dataIn, init;
     output  [WIDTH-1:0] dataOut;
 
