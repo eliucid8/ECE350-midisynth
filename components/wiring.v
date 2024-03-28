@@ -58,7 +58,6 @@ module mux2 #(
 );
 
     assign out = sel ? in1 : in0;
-
 endmodule
 
 module mux4 #(
@@ -74,5 +73,19 @@ module mux4 #(
     ) : (
         sel[0] ? in1 : in0
     );
+endmodule
+
+module mux8 #(
+    parameter WIDTH = 32
+) (
+    output[WIDTH-1:0] out,
+    input[2:0] sel,
+    input[WIDTH-1:0] in0, in1, in2, in3, in4, in5, in6, in7
+);
+    wire[WIDTH-1:0] outlo, outhi;
+
+    mux4 #(WIDTH) lo(outlo, sel[1:0], in0, in1, in2, in3);
+    mux4 #(WIDTH) hi(outhi, sel[1:0], in4, in5, in6, in7);
+    assign out = sel[2] ? outhi : outlo;
 
 endmodule

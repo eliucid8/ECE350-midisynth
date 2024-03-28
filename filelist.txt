@@ -19,3 +19,4 @@ multdiv/dadda_mult.v
 multdiv/div.v
 multdiv/mult.v
 multdiv/multdiv.v
+io/sevenseg.v
