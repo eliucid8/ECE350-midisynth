@@ -1,0 +1,26 @@
+0.7
+2020.2
+Jun 10 2021
+20:04:57
+C:/Users/erict/development/ECE350/cp4_processor/RAM.v,1708961115,verilog,,C:/Users/erict/development/ECE350/cp4_processor/ROM.v,,RAM,,,,,,,,
+C:/Users/erict/development/ECE350/cp4_processor/ROM.v,1709281034,verilog,,C:/Users/erict/development/ECE350/cp4_processor/alu/alu.v,,ROM,,,,,,,,
+C:/Users/erict/development/ECE350/cp4_processor/Wrapper_tb.v,1711488173,verilog,,,,Wrapper_tb,,,,,,,,
+C:/Users/erict/development/ECE350/cp4_processor/alu/alu.v,1711075158,verilog,,C:/Users/erict/development/ECE350/cp4_processor/alu/barrel_shifters.v,,alu,,,,,,,,
+C:/Users/erict/development/ECE350/cp4_processor/alu/barrel_shifters.v,1708962051,verilog,,C:/Users/erict/development/ECE350/cp4_processor/alu/big_gates.v,,left_barrel_shifter;right_barrel_shifter,,,,,,,,
+C:/Users/erict/development/ECE350/cp4_processor/alu/big_gates.v,1708962170,verilog,,C:/Users/erict/development/ECE350/cp4_processor/control/bypass.v,,bitwise_not;or_32,,,,,,,,
+C:/Users/erict/development/ECE350/cp4_processor/alu/cla.v,1708707215,verilog,,C:/Users/erict/development/ECE350/cp4_processor/multdiv/dadda_mult.v,,cla_32;cla_64;cla_8;full_adder;half_adder;negator,,,,,,,,
+C:/Users/erict/development/ECE350/cp4_processor/components/dffe_ref.v,1707854414,verilog,,C:/Users/erict/development/ECE350/cp4_processor/multdiv/div.v,,dffe_init;dffe_ref;tffe,,,,,,,,
+C:/Users/erict/development/ECE350/cp4_processor/components/sequential.v,1711074568,verilog,,C:/Users/erict/development/ECE350/cp4_processor/io/sevenseg.v,,counter;edgedetector;lShiftReg;rShiftReg,,,,,,,,
+C:/Users/erict/development/ECE350/cp4_processor/components/shifts.v,1708962102,verilog,,C:/Users/erict/development/ECE350/cp4_processor/components/wiring.v,,lshift;rshift,,,,,,,,
+C:/Users/erict/development/ECE350/cp4_processor/components/wiring.v,1711485870,verilog,,C:/Users/erict/development/ECE350/cp4_processor/Wrapper_tb.v,,decoder32;decoder_8;mux2;mux4;mux8;mux_2;mux_4;mux_8,,,,,,,,
+C:/Users/erict/development/ECE350/cp4_processor/control/bypass.v,1711166493,verilog,,C:/Users/erict/development/ECE350/cp4_processor/alu/cla.v,,bypass_controller,,,,,,,,
+C:/Users/erict/development/ECE350/cp4_processor/control/decode.v,1711122639,verilog,,C:/Users/erict/development/ECE350/cp4_processor/components/dffe_ref.v,,exceptionmap;insn_decode,,,,,,,,
+C:/Users/erict/development/ECE350/cp4_processor/cp4_processor.sim/sim_1/impl/timing/xsim/Wrapper_tb_time_impl.v,1711489472,verilog,,C:/Users/erict/development/ECE350/cp4_processor/RAM.v,,Wrapper;glbl,,,,,,,,
+C:/Users/erict/development/ECE350/cp4_processor/io/sevenseg.v,1711485793,verilog,,C:/Users/erict/development/ECE350/cp4_processor/components/shifts.v,,sevenseg_controller;sevenseg_logic,,,,,,,,
+C:/Users/erict/development/ECE350/cp4_processor/multdiv/dadda_mult.v,1708707127,verilog,,C:/Users/erict/development/ECE350/cp4_processor/control/decode.v,,dadda_mult,,,,,,,,
+C:/Users/erict/development/ECE350/cp4_processor/multdiv/div.v,1711427297,verilog,,C:/Users/erict/development/ECE350/cp4_processor/multdiv/mult.v,,div,,,,,,,,
+C:/Users/erict/development/ECE350/cp4_processor/multdiv/mult.v,1708705311,verilog,,C:/Users/erict/development/ECE350/cp4_processor/multdiv/multdiv.v,,mult,,,,,,,,
+C:/Users/erict/development/ECE350/cp4_processor/multdiv/multdiv.v,1711074683,verilog,,C:/Users/erict/development/ECE350/cp4_processor/processor.v,,multdiv,,,,,,,,
+C:/Users/erict/development/ECE350/cp4_processor/processor.v,1711484751,verilog,,C:/Users/erict/development/ECE350/cp4_processor/regfile/regfile.v,,processor,,,,,,,,
+C:/Users/erict/development/ECE350/cp4_processor/regfile/regfile.v,1707505589,verilog,,C:/Users/erict/development/ECE350/cp4_processor/regfile/register.v,,regfile,,,,,,,,
+C:/Users/erict/development/ECE350/cp4_processor/regfile/register.v,1711425584,verilog,,C:/Users/erict/development/ECE350/cp4_processor/components/sequential.v,,initRegister;register,,,,,,,,

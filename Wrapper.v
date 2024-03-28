@@ -24,8 +24,29 @@
  *
  **/
 
-module Wrapper (clock, reset);
-	input clock, reset;
+module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW);
+	input CLK100MHZ, CPU_RESETN;
+	wire reset = ~CPU_RESETN;
+	
+	reg clock50mhz, clk1khz;
+	reg clk50_divider;
+	reg[15:0] clock_div16_counter;
+	localparam clock_div16_limit = 16'd50001;
+	always @(posedge CLK100MHZ) begin
+		clock50mhz <= ~clock50mhz;
+		if(clock_div16_counter < clock_div16_limit) begin
+			clock_div16_counter <= ~clock_div16_counter;
+		end else begin
+			clock_div16_counter <= 16'd0;
+			clk1khz <= ~clk1khz;
+		end
+	end
+
+	input manual_clock, SW;
+	wire clock = SW ? manual_clock : clock50mhz;
+	
+
+	output[7:0] sevenseg, AN;
 
 	wire rwe, mwe;
 	wire[4:0] rd, rs1, rs2;
@@ -35,7 +56,7 @@ module Wrapper (clock, reset);
 
 
 	// ADD YOUR MEMORY FILE HERE
-	localparam INSTR_FILE = "by";
+	localparam INSTR_FILE = "sort";
 	
 	// Main Processing Unit
 	processor CPU(.clock(clock), .reset(reset), 
@@ -71,5 +92,10 @@ module Wrapper (clock, reset);
 		.addr(memAddr[11:0]), 
 		.dataIn(memDataIn), 
 		.dataOut(memDataOut));
+
+	// ====io====
+	
+
+	sevenseg_controller sevenseg_ctrl(.downclock(clk1khz), .word(instData), .segments(sevenseg), .enables(AN));
 
 endmodule

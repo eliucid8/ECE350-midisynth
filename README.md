@@ -1,5 +1,5 @@
-# Processor
-## Eric Liu (el260)
+# MIDI Synth
+## Authors: Annabel Lee & Eric Liu
 
 ## Description of Design
 This is a 5-stage pipelined processor that implements a reduced version of the MIPS ISA. 
@@ -72,4 +72,5 @@ I haven't fully tested interactions between subsequent divides, so there may be 
 ## Testing:
 Compile the desired assembly file using `asm.exe`, found in the `'Test Files/'` folder. Move the resulting `.mem` file to `Memory Files/`. Change the default `instr_file` and `FILE` fields in `Wrapper.v` and `Wrapper_tb.v`, respectively, to be the name of the assembly file (without the .s). Compile using `filelist.txt` as the control file, setting `Wrapper_tb` to be the top-level module. More info can be found in [in the Test Files folder](/Test%20Files/instructions.txt).
 If you will be modifying the assembly a lot, you you can modify `update_and_run.ps1` to automatically assemble and run your code.
+
 **UPDATE** I updated update_and_run to automatically replace the arguments in Wrapper.v and Wrapper_tb.v as well. I asked copilot to write the bash version of that, idk if it actually works.
