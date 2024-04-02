@@ -76,3 +76,35 @@ module edgedetector(output out, input clock, input sig);
     dffe_ref prev(.q(prev_sig), .d(sig), .clk(clock), .en(1'b1));
     assign out = !prev_sig && sig;
 endmodule
+
+module debouncer #(
+    parameter DELAY_CYCLES = 100000 
+) (
+    output debounced,
+    input sig,
+    input clock );
+
+    reg[$clog2(DELAY_CYCLES):0] debounce_timer;
+    reg dblatch;
+    wire debounce_ready;
+
+    assign debounced = dblatch;
+    assign debounce_ready = (debounce_timer == DELAY_CYCLES);
+
+    initial begin
+        dblatch = 0;
+    end
+
+    always @(posedge clock) begin
+        if(debounce_timer < DELAY_CYCLES) begin
+            debounce_timer <= debounce_timer + 1;
+        end
+        if(sig != dblatch) begin
+            if(debounce_ready) begin
+                dblatch <= sig;
+            end
+            debounce_timer <= 0;
+        end
+    end
+    
+endmodule

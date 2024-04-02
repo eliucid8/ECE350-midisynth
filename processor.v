@@ -105,7 +105,7 @@ module processor(
         .clk(!clock), .writeEnable(!stall_decode), .reset(reset), .dataIn(FDIRin), .dataOut(FDIR)
     );
 
-    // ========Decode========
+    // ========Decode======== 
     wire[31:0] Dinsn =         FDIR[31:0];
     wire[4:0] Dopcode =         Dinsn[31:27];
     wire[4:0] Drd =             Dinsn[26:22];

@@ -74,3 +74,5 @@ Compile the desired assembly file using `asm.exe`, found in the `'Test Files/'` 
 If you will be modifying the assembly a lot, you you can modify `update_and_run.ps1` to automatically assemble and run your code.
 
 **UPDATE** I updated update_and_run to automatically replace the arguments in Wrapper.v and Wrapper_tb.v as well. I asked copilot to write the bash version of that, idk if it actually works.
+
+## TODO:

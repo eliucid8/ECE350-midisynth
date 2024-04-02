@@ -43,7 +43,7 @@ module Wrapper_tb #(parameter FILE = "sort");
 	localparam DEFAULT_CYCLES = 16383;
 
 	// Inputs to the processor
-	reg clock = 0, reset = 0;
+	reg clock = 0, reset = 0, downclock = 0;
 
 	// I/O for the processor
 	wire rwe, mwe;
@@ -117,6 +117,13 @@ module Wrapper_tb #(parameter FILE = "sort");
 	// Create the clock
 	always
 		#10 clock = ~clock; 
+	always
+		#80 downclock = ~downclock; 
+
+	// ====7seg debug====
+	wire[7:0] sevenseg, AN;
+	sevenseg_controller sevenseg_ctrl(.downclock(clock), .word(instData), .segments(sevenseg), .enables(AN));
+
 
 	//////////////////
 	// Test Harness //
