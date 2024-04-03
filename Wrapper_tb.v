@@ -33,7 +33,7 @@
  *
  **/
 
-module Wrapper_tb #(parameter FILE = "disp_test");
+module Wrapper_tb #(parameter FILE = "rand");
 
 	// FileData
 	localparam DIR = "Test Files/";
@@ -46,11 +46,11 @@ module Wrapper_tb #(parameter FILE = "disp_test");
 	reg clock = 0, reset = 0, downclock = 0;
 
 	// I/O for the processor
-	wire rwe, mwe;
+	wire rwe, mwe, mem_read_enable;
 	wire[4:0] rd, rs1, rs2;
 	wire[31:0] instAddr, instData, 
 		rData, regA, regB,
-		memAddr, memDataIn, memDataOut;
+		memAddr, memDataIn, memDataOut, memDataResult;
 	wire sevenseg_writeEnable;
 	wire[31:0] sevenseg_data;
 
@@ -95,7 +95,7 @@ module Wrapper_tb #(parameter FILE = "disp_test");
 									
 		// RAM
 		.wren(mwe), .address_dmem(memAddr), 
-		.data(memDataIn), .q_dmem(memDataOut),
+		.data(memDataIn), .q_dmem(memDataResult), .mem_ren(mem_read_enable),
 		
 		// IO
 		.sevenseg_writeEnable(sevenseg_writeEnable), .sevenseg_data(sevenseg_data)); 
@@ -126,9 +126,19 @@ module Wrapper_tb #(parameter FILE = "disp_test");
 	always
 		#80 downclock = ~downclock; 
 
-	// ====7seg debug====
-	wire[7:0] sevenseg, AN;
-	sevenseg_controller sevenseg_ctrl(.downclock(clock), .word(instData), .segments(sevenseg), .enables(AN));
+	// ====Memory-Mapped I/O (like a real computer)====
+	wire do_mmio = mem_read_enable && (memAddr > 32'hfff);
+	wire [31:0] mmio_result;
+	assign memDataResult = do_mmio ? mmio_result : memDataOut;
+
+	localparam 
+		MMIO_XORSHIFT = 32'd5000; // 0x1388
+
+	// xorshift
+	wire[31:0] rng_result;
+	wire next_rng = mem_read_enable && memAddr == MMIO_XORSHIFT; // hex address 1388
+	xorshift #(.SEED(32'hdeadbeef)) xorshift_rng(.rand(rng_result), .next(next_rng), .clock(clock));
+	assign mmio_result = next_rng ? rng_result : 32'hfbadc0de; // FIX: will get ugly pretty soon. behavioral base/bounds? CAM?
 
 	//////////////////
 	// Test Harness //

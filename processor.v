@@ -31,6 +31,7 @@ module processor(
     address_dmem,                   // O: The address of the data to get or put from/to dmem
     data,                           // O: The data to write to dmem
     wren,                           // O: Write enable for dmem
+    mem_ren,                        // O: Indicates a read from memory
     q_dmem,                         // I: The data from dmem
 
     // Regfile
@@ -56,7 +57,7 @@ module processor(
 
 	// Dmem
 	output [31:0] address_dmem, data;
-	output wren;
+	output wren, mem_ren;
 	input [31:0] q_dmem;
 
 	// Regfile
@@ -302,6 +303,7 @@ module processor(
     wire[31:0] Mwritedata;
     assign data = Mwritedata;
     wire[31:0] Minsn = XMIR[31:0];
+    assign mem_ren = Mctrlbus[lw];
 
     wire[31:0] Mresult;
     assign Mresult = Mctrlbus[3] ? q_dmem : address_dmem; // decide between memory result and alu result

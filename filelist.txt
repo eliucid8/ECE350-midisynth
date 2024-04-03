@@ -20,3 +20,4 @@ multdiv/div.v
 multdiv/mult.v
 multdiv/multdiv.v
 io/sevenseg.v
+io/random.v

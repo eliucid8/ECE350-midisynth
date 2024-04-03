@@ -31,6 +31,14 @@ A reference for aspiring Liupercomputer programmers!
 | JI type: | opcode [31:27] | target [26:0] |
 | JII type: | opcode [31:27] | rd [26:22] | zeroes [21:0] |
 
+## I/O:
+The simplest form of I/O is to the 7-segment display, which can be done using the `disp` instruction.
+We also implement memory-mapped I/O: since the RAM block has only a 12-bit address space, loads/stores to any address above that will be intercepted and executed as I/O operations instead.
+
+|Device|Address|Behavior|
+|------|-------|--------|
+|Pseudorandom Number Generator|`5000 (0x1388)`|**Load:** Loads a pseudorandom 32-bit value into the specified register (0 is not possible)|
+
 ## Clarifications
 #### disp:
 If `$rd` != 0, writes the data in that register to the buffer that the 7-segment display reads from.
