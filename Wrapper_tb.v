@@ -33,7 +33,7 @@
  *
  **/
 
-module Wrapper_tb #(parameter FILE = "sort");
+module Wrapper_tb #(parameter FILE = "disp_test");
 
 	// FileData
 	localparam DIR = "Test Files/";
@@ -43,7 +43,7 @@ module Wrapper_tb #(parameter FILE = "sort");
 	localparam DEFAULT_CYCLES = 16383;
 
 	// Inputs to the processor
-	reg clock = 0, reset = 0;
+	reg clock = 0, reset = 0, downclock = 0;
 
 	// I/O for the processor
 	wire rwe, mwe;
@@ -51,6 +51,9 @@ module Wrapper_tb #(parameter FILE = "sort");
 	wire[31:0] instAddr, instData, 
 		rData, regA, regB,
 		memAddr, memDataIn, memDataOut;
+	wire sevenseg_writeEnable;
+	wire[31:0] sevenseg_data;
+
 
 	// Wires for Test Harness
 	wire[4:0] rs1_test, rs1_in;
@@ -92,7 +95,10 @@ module Wrapper_tb #(parameter FILE = "sort");
 									
 		// RAM
 		.wren(mwe), .address_dmem(memAddr), 
-		.data(memDataIn), .q_dmem(memDataOut)); 
+		.data(memDataIn), .q_dmem(memDataOut),
+		
+		// IO
+		.sevenseg_writeEnable(sevenseg_writeEnable), .sevenseg_data(sevenseg_data)); 
 	
 	// Instruction Memory (ROM)
 	ROM #(.MEMFILE({DIR, MEM_DIR, FILE, ".mem"}))
@@ -117,6 +123,12 @@ module Wrapper_tb #(parameter FILE = "sort");
 	// Create the clock
 	always
 		#10 clock = ~clock; 
+	always
+		#80 downclock = ~downclock; 
+
+	// ====7seg debug====
+	wire[7:0] sevenseg, AN;
+	sevenseg_controller sevenseg_ctrl(.downclock(clock), .word(instData), .segments(sevenseg), .enables(AN));
 
 	//////////////////
 	// Test Harness //
@@ -179,6 +191,9 @@ module Wrapper_tb #(parameter FILE = "sort");
 			@(posedge clock);
 			if (rwe && rd != 0) begin
 				$fdisplay(actFile, "Cycle %3d: Wrote %0d into register %0d", cycles, rData, rd);
+			end
+			if(sevenseg_writeEnable) begin
+				$display("sevenseg: 0x%h (%d)", sevenseg_data, sevenseg_data);
 			end
 		end
 

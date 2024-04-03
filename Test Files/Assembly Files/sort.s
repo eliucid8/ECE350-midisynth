@@ -85,8 +85,10 @@ _main:      jal buildlist
             j _procguard
 _proclist:  lw $t2, 0($t1)
             add $t5, $t5, $t2
+            disp $t5
             sll $t6, $t6, 3
             add $t6, $t6, $t5
+            disp $t6
             lw $t1, 2($t1)
 _procguard: bne $t1, $zero, _proclist
 _stop:      nop

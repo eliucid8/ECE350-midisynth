@@ -24,39 +24,47 @@
  *
  **/
 
-module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW);
+module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED);
 	input CLK100MHZ, CPU_RESETN;
+	output [15:0] LED;
+	output[7:0] sevenseg, AN;
 	wire reset = ~CPU_RESETN;
 	
 	reg clock50mhz, clk1khz;
 	reg clk50_divider;
-	reg[15:0] clock_div16_counter;
-	localparam clock_div16_limit = 16'd50001;
+	reg[27:0] clock_div16_counter;
+	localparam clock_div16_limit = 28'd100000;
 	always @(posedge CLK100MHZ) begin
 		clock50mhz <= ~clock50mhz;
 		if(clock_div16_counter < clock_div16_limit) begin
-			clock_div16_counter <= ~clock_div16_counter;
+			clock_div16_counter <= clock_div16_counter + 1;
 		end else begin
-			clock_div16_counter <= 16'd0;
+			clock_div16_counter <= 28'd0;
 			clk1khz <= ~clk1khz;
 		end
 	end
 
-	input manual_clock, SW;
-	wire clock = SW ? manual_clock : clock50mhz;
-	
+	assign LED[0] = clk1khz;
 
-	output[7:0] sevenseg, AN;
+	input manual_clock, SW;
+
+	wire debounced_man_clock;
+	debouncer clock_debouncer(.debounced(debounced_man_clock), .sig(manual_clock), .clock(clock50mhz));
+	assign LED[1] = debounced_man_clock;
+
+	wire clock = SW ? debounced_man_clock : clock50mhz;
 
 	wire rwe, mwe;
 	wire[4:0] rd, rs1, rs2;
 	wire[31:0] instAddr, instData, 
 		rData, regA, regB,
 		memAddr, memDataIn, memDataOut;
+	wire sevenseg_writeEnable;
+	wire[31:0] sevenseg_data;
 
 
 	// ADD YOUR MEMORY FILE HERE
-	localparam INSTR_FILE = "sort";
+	localparam INSTR_FILE = "disp_test";
 	
 	// Main Processing Unit
 	processor CPU(.clock(clock), .reset(reset), 
@@ -71,7 +79,9 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW);
 									
 		// RAM
 		.wren(mwe), .address_dmem(memAddr), 
-		.data(memDataIn), .q_dmem(memDataOut)); 
+		.data(memDataIn), .q_dmem(memDataOut),
+		
+		.sevenseg_writeEnable(sevenseg_writeEnable), .sevenseg_data(sevenseg_data)); 
 	
 	// Instruction Memory (ROM)
 	ROM #(.MEMFILE({INSTR_FILE, ".mem"}))
@@ -94,8 +104,21 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW);
 		.dataOut(memDataOut));
 
 	// ====io====
-	
+	reg[31:0] sevenseg_latch;
+	initial begin
+		sevenseg_latch = 32'd0;
+	end
 
-	sevenseg_controller sevenseg_ctrl(.downclock(clk1khz), .word(instData), .segments(sevenseg), .enables(AN));
+	sevenseg_controller sevenseg_ctrl(.downclock(clk1khz), .word(sevenseg_latch), .segments(sevenseg), .enables(AN));
+
+	always @(posedge clock or posedge reset) begin
+		if(reset) begin
+			sevenseg_latch <= 32'd0;
+		end else if(sevenseg_writeEnable) begin
+			sevenseg_latch <= sevenseg_data;
+		end
+	end
+
+	// assign LED[15:8] = AN;
 
 endmodule

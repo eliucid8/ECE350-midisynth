@@ -41,6 +41,10 @@ module processor(
     data_writeReg,                  // O: Data to write to for RegFile
     data_readRegA,                  // I: Data from port A of RegFile
     data_readRegB,                  // I: Data from port B of RegFile
+
+    // I/O
+    sevenseg_writeEnable,
+    sevenseg_data,
 	);
 
 	// Control signals
@@ -61,9 +65,13 @@ module processor(
 	output [31:0] data_writeReg;
 	input [31:0] data_readRegA, data_readRegB;
 
+    // I/O
+    output sevenseg_writeEnable;
+    output[31:0] sevenseg_data;
+
 	/* YOUR CODE STARTS HERE */
     // TODO: Change this when modifying Control!
-    localparam NUM_CTRL = 25;
+    localparam NUM_CTRL = 26;
     localparam
         wb_dst =            1,
         reg_WE =            2,
@@ -84,7 +92,8 @@ module processor(
         addi =              21,
         bypassA =           22,
         bypassB =           23,
-        lw =                24;
+        lw =                24,
+        disp =              25;
 
     // ========Fetch========
     wire[31:0] pcp1, next_pc, addr_imem_out; // pc plus 1
@@ -105,7 +114,7 @@ module processor(
         .clk(!clock), .writeEnable(!stall_decode), .reset(reset), .dataIn(FDIRin), .dataOut(FDIR)
     );
 
-    // ========Decode========
+    // ========Decode======== 
     wire[31:0] Dinsn =         FDIR[31:0];
     wire[4:0] Dopcode =         Dinsn[31:27];
     wire[4:0] Drd =             Dinsn[26:22];
@@ -196,6 +205,9 @@ module processor(
         .isNotEqual(ALU_ne), .isLessThan(ALU_lt), .overflow(ALU_ovf),
         .clock(clock), .result_rdy(alu_result_ready)
     );
+
+    assign sevenseg_writeEnable = Xctrlbus[disp];
+    assign sevenseg_data = (Xinsn[26:22] == 0) ? Xinsn : alu_inB;
 
     // ====Stalls====
     wire div_stall;

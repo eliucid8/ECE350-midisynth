@@ -12,8 +12,8 @@ if($args[0] -eq $null) {
     $tb_content = Get-Content "Wrapper_tb.v"
     $tb_content | ForEach-Object {$_ -replace $tb_pattern, $replace_tb} | Set-Content "Wrapper_tb.v"
 
-    & '.\Test Files\asm.exe' ".\Test Files\Assembly Files\$($filename).s"
-    mv -Force ".\Test Files\Assembly Files\$($filename).mem" '.\Test Files\Memory Files\'
+    & '.\Test Files\asm.exe' -i ".\Test Files\custom_insn.csv" ".\Test Files\Assembly Files\$($filename).s"
+    mv -Force ".\Test Files\Assembly Files\$($filename).mem" '.\Test Files\Memory Files\' 
     iverilog -c filelist.txt -o proc.vvp -Wimplicit -s Wrapper_tb
     vvp proc.vvp
 }
