@@ -1,3 +1,8 @@
+if [-z "$1"]
+then
+echo "Please specify a filename"
+exit 1
+else
 filename=$1
 circ_pattern='INSTR_FILE = ".+?";'
 replace_circ="INSTR_FILE = \"$filename\";"
@@ -7,7 +12,8 @@ tb_pattern='parameter FILE = ".+?"'
 replace_tb="parameter FILE = \"$filename\";"
 sed -i -r "s/$tb_pattern/$replace_tb/g" Wrapper_tb.v
 
-'./Test Files/asm.exe' "./Test Files/Assembly Files/$filename.s"
+'./Test Files/asm.exe' -i ".\Test Files\custom_insn.csv" "./Test Files/Assembly Files/$filename.s"
 mv -f "./Test Files/Assembly Files/$filename.mem" './Test Files/Memory Files/'
 iverilog -c filelist.txt -o proc.vvp -Wimplicit -s Wrapper_tb
 vvp proc.vvp
+fi

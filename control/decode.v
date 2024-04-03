@@ -1,5 +1,5 @@
 module insn_decode #(
-    parameter NUM_CTRL = 12
+    parameter NUM_CTRL = 26
 ) 
 (
     opcode, ctrlbus
@@ -16,7 +16,8 @@ module insn_decode #(
         SW = 7,
         LW = 8,
         SETX = 21,
-        BEX = 22;
+        BEX = 22,
+        DISP = 24;
 
     input [4:0] opcode;
     /** Ideally, we order these so that the last ctrl signals used are the smallest just to avoid awkward shifts in the IR regs.
@@ -40,8 +41,8 @@ module insn_decode #(
     decoder32 insn_decoder (.out(insns), .select(opcode), .enable(1'b1));
 
     // writeback destination
-    assign ctrlbus[0] = |{insns[1], insns[2], insns[3], insns[4], insns[6], insns[22]};
-    assign ctrlbus[1] = |{insns[3], insns[21]};
+    assign ctrlbus[0] = |{insns[J], insns[BNE], insns[JAL], insns[JR], insns[BLT], insns[BEX]};
+    assign ctrlbus[1] = |{insns[JAL], insns[SETX]};
     
     // reg_WE: 
     assign ctrlbus[2] = |{insns[0], insns[3], insns[5], insns[8], insns[21]};
@@ -53,7 +54,7 @@ module insn_decode #(
     assign ctrlbus[4] = insns[SW];
 
     // alu_imm (use something other than rt for alu input b)
-    assign ctrlbus[5] = |{insns[5], insns[7], insns[8]};
+    assign ctrlbus[5] = |{insns[ADDI], insns[SW], insns[LW]};
 
     // ALU_op
     assign ctrlbus[6] = |{insns[2], insns[6]};
@@ -63,7 +64,7 @@ module insn_decode #(
     assign ctrlbus[11] = |{insns[5], insns[7], insns[8], insns[2], insns[6]};
 
     // rtin:
-    assign ctrlbus[12] = |{insns[SW], insns[JR], insns[BLT], insns[BNE]};
+    assign ctrlbus[12] = |{insns[SW], insns[JR], insns[BLT], insns[BNE], insns[DISP]};
 
     // jr:
     assign ctrlbus[13] = insns[JR];
@@ -96,10 +97,12 @@ module insn_decode #(
     assign ctrlbus[22] = ~|{insns[J], insns[JAL], insns[JR], insns[SETX]};
     
     // bypassB
-    assign ctrlbus[23] = |{insns[ADD], insns[ADDI], insns[BNE], insns[JR], insns[BLT], insns[SW]};
+    assign ctrlbus[23] = |{insns[ADD], insns[ADDI], insns[BNE], insns[JR], insns[BLT], insns[SW], insns[DISP]};
 
     // lw
     assign ctrlbus[24] = insns[LW];
+
+    assign ctrlbus[25] = insns[DISP];
 endmodule
 
 // TODO: Is it bad to have these unecessary wires hardwired to 0???

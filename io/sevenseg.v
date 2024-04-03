@@ -13,9 +13,9 @@ module sevenseg_logic(num, segments);
 
     assign segments[3] = |{digit[1], digit[4], digit[7], digit[10], digit[15]};
 
-    assign segments[4] = |{digit[1], digit[3], digit[4], digit[7], digit[9]};
+    assign segments[4] = |{digit[1], digit[3], digit[4], digit[5], digit[7], digit[9]};
 
-    assign segments[5] = |{digit[1], digit[2], digit[3], digit[7]};
+    assign segments[5] = |{digit[1], digit[2], digit[3], digit[7], digit[13]};
 
     assign segments[6] = |{digit[0], digit[1], digit[7], digit[12]};
 

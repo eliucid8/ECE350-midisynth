@@ -5,6 +5,7 @@
 
 ## Combinational loop? (I'm scared)
 set_property ALLOW_COMBINATORIAL_LOOPS true [get_nets {CPU/DXIRlatch/genblk1[0].r_dff/alu_inB[0]}]
+set_property ALLOW_COMBINATORIAL_LOOPS true [get_nets {CPU/DXIRlatch/genblk1[0].r_dff/q_reg_0}]
 
 ## Clock signal
 set_property -dict {PACKAGE_PIN E3 IOSTANDARD LVCMOS33} [get_ports CLK100MHZ]

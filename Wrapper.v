@@ -59,10 +59,12 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED);
 	wire[31:0] instAddr, instData, 
 		rData, regA, regB,
 		memAddr, memDataIn, memDataOut;
+	wire sevenseg_writeEnable;
+	wire[31:0] sevenseg_data;
 
 
 	// ADD YOUR MEMORY FILE HERE
-	localparam INSTR_FILE = "sort";
+	localparam INSTR_FILE = "disp_test";
 	
 	// Main Processing Unit
 	processor CPU(.clock(clock), .reset(reset), 
@@ -77,7 +79,9 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED);
 									
 		// RAM
 		.wren(mwe), .address_dmem(memAddr), 
-		.data(memDataIn), .q_dmem(memDataOut)); 
+		.data(memDataIn), .q_dmem(memDataOut),
+		
+		.sevenseg_writeEnable(sevenseg_writeEnable), .sevenseg_data(sevenseg_data)); 
 	
 	// Instruction Memory (ROM)
 	ROM #(.MEMFILE({INSTR_FILE, ".mem"}))
@@ -100,10 +104,21 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED);
 		.dataOut(memDataOut));
 
 	// ====io====
-	
+	reg[31:0] sevenseg_latch;
+	initial begin
+		sevenseg_latch = 32'd0;
+	end
 
-	sevenseg_controller sevenseg_ctrl(.downclock(clk1khz), .word(instData), .segments(sevenseg), .enables(AN));
+	sevenseg_controller sevenseg_ctrl(.downclock(clk1khz), .word(sevenseg_latch), .segments(sevenseg), .enables(AN));
 
-	assign LED[15:8] = AN;
+	always @(posedge clock or posedge reset) begin
+		if(reset) begin
+			sevenseg_latch <= 32'd0;
+		end else if(sevenseg_writeEnable) begin
+			sevenseg_latch <= sevenseg_data;
+		end
+	end
+
+	// assign LED[15:8] = AN;
 
 endmodule

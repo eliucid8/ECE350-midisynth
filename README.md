@@ -1,54 +1,29 @@
 # MIDI Synth
 ## Authors: Annabel Lee & Eric Liu
 
+For ISA specifications and other technical information, see [REFERENCE.md](REFERENCE.md). The rest of this document is scheduled for rennovation.
+
 ## Description of Design
-This is a 5-stage pipelined processor that implements a reduced version of the MIPS ISA. 
+This is a 5-stage pipelined processor that implements a reduced version of the MIPS ISA, with custom instructions for audio processing.
 
-| insn | Opcode | Type | Operation |
-|------|--------|------|-----------|
-|add $rd, $rs, $rt|00000 (00000)|R|$rd = $rs + $rt|
-|addi $rd, $rs, N|00101|I|$rd = $rs + N|
-|sub $rd, $rs, $rt|00000 (00001)|R|$rd = $rs - $rt|
-|and $rd, $rs, $rt|00000 (00010)|R|$rd = $rs & $rt|
-|or $rd, $rs, $rt|00000 (00011)|R|$rd = $rs \| $rt|
-|sll $rd, $rs, shamt|00000 (00100)|R|$rd = $rs << $rt|
-|sra $rd, $rs, shamt|00000 (00101)|R|$rd = $rs >>> $rt|
-|mul $rd, $rs, $rt|00000 (00110)|R|$rd = $rs * $rt|
-|div $rd, $rs, $rt|00000 (00111)|R|$rd = $rs / $rt|
-|sw \$rd, N(\$rs)|00111|I|MEM[$rs + N] = $rd|
-|lw \$rd, N(\$rs)|01000|I|\$rd = MEM[\$rs + N]|
-|j T|00111|JI|PC = T|
-|bne $rd, $rs, N|00010|I|if($rd != $rs), PC = PC + 1 + N|
-|jal T|00011|JI|$r31 = PC + 1, PC = T|
-|jr $rd|00100|JII|PC = $rd|
-|blt $rd, $rs, N|00110|I|if($rd < $rs), PC = PC + 1 + N|
-|bex T|10110|JI|if($rstatus != 0), PC = T|
-|setx T|10101|JI|$rstatus = T|
-
-R type:     | opcode [31:27] | rd [26:22] | rs [21:17] | rt [16:12] | shamt [11:7] | aluop [6:2] | zero [1:0] |
-
-I type:     | opcode [31:27] | rd [26:22] | rs [21:17] | immed [16:0] |
-
-JI type:    | opcode [31:27] | target [26:0] |
-
-JII type:   | opcode [31:27] | rd [26:22] | zeroes [21:0] |
+I/O wise, it's designed to work on the Nexys A7.
 
 ## Pipelining:
 This processor follows the Patterson and Hennessey convention of splitting the datapath into Fetch, Decode, Execute, Memory, and Writeback. The IR latches in between each stage latch in the stage's results on the falling edge of the clock.
 
-### Fetch:
+#### Fetch:
 The instruction is fetched from data memory on the rising edge. Data hazard stall is also checked in this location.
 
-### Decode:
+#### Decode:
 The instruction's control signals are mostly calculated here. The register file is read here, which means that the results of any instruction in the Execute or Memory stage will not be present (the register file is clocked on the rising edge before the falling edge IR latches are clocked on). In the case of a data hazard stall, a bubble in inserted here.
 
-### Execute:
+#### Execute:
 The majority of calculation takes place here. ALU calculations are made, branches are resolved, etc. This and all previous stages stall in the case of a divide. Results are also bypassed into this stage for both read registers A and B. 
 
-### Memory:
+#### Memory:
 The RAM is accessed here. Since we aren't dealing with a real computer, there is no need to stall in order to wait on memory results. Results from Writeback may be bypassed into this stage as write data.
 
-### Writeback:
+#### Writeback:
 The results of calculation are written back to the register file on the rising edge of the clock. This means there is a 4 cycle latency for instructions that don't stall.
 
 ## Stalling:
@@ -76,3 +51,4 @@ If you will be modifying the assembly a lot, you you can modify `update_and_run.
 **UPDATE** I updated update_and_run to automatically replace the arguments in Wrapper.v and Wrapper_tb.v as well. I asked copilot to write the bash version of that, idk if it actually works.
 
 ## TODO:
+rennovate document
