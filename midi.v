@@ -32,7 +32,7 @@ module midi_monitor(input midi_data, clock, output reg busy_reading, output [23:
     assign midi_bytes = midi_bytes_reg;
 endmodule
 
-module sys_counter #(parameter COUNT = 4)(input clock, clr, output down_clock);
+module sys_counter #(parameter COUNT = 69)(input clock, clr, output down_clock);
     reg [31:0] up_clock;
     reg [31:0] down_reg;
     assign down_clock = down_reg;
