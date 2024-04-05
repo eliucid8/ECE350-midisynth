@@ -24,22 +24,23 @@
  *
  **/
 
-module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED);
+module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA);
 	input CLK100MHZ, CPU_RESETN;
+	input[11:0] JA;
 	output [15:0] LED;
 	output[7:0] sevenseg, AN;
 	wire reset = ~CPU_RESETN;
 	
 	reg clock50mhz, clk1khz;
 	reg clk50_divider;
-	reg[27:0] clock_div16_counter;
-	localparam clock_div16_limit = 28'd100000;
+	reg[16:0] clock_div16_counter;
+	localparam clock_div16_limit = 17'd100000;
 	always @(posedge CLK100MHZ) begin
 		clock50mhz <= ~clock50mhz;
 		if(clock_div16_counter < clock_div16_limit) begin
 			clock_div16_counter <= clock_div16_counter + 1;
 		end else begin
-			clock_div16_counter <= 28'd0;
+			clock_div16_counter <= 17'd0;
 			clk1khz <= ~clk1khz;
 		end
 	end
@@ -64,7 +65,7 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED);
 
 
 	// ADD YOUR MEMORY FILE HERE
-	localparam INSTR_FILE = "rand";
+	localparam INSTR_FILE = "matmul";
 	
 	// Main Processing Unit
 	processor CPU(.clock(clock), .reset(reset), 
@@ -120,12 +121,12 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED);
 	end
 
 	// ====Memory-Mapped I/O (like a real computer)====
-	wire do_mmio = mem_read_enable && (memAddr > 32'hfff);
+	wire do_mmio = mem_read_enable && (memAddr > 32'h1fff);
 	wire [31:0] mmio_result;
 	assign memDataResult = do_mmio ? mmio_result : memDataOut;
 
 	localparam 
-		MMIO_XORSHIFT = 32'd5000; // 0x1388
+		MMIO_XORSHIFT = 32'h2328; // 9000
 
 	// xorshift
 	wire[31:0] rng_result;

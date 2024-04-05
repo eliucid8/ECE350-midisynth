@@ -116,5 +116,5 @@ module exceptionmap(rstatus, ALUop, addi, allow_except);
     assign rstatus[0] = (!(ALUop[2]) || (ALUop[1] && ALUop[0])) && !addi;
     assign rstatus[1] = (!(ALUop[1]) && ALUop[0]) || addi;
     assign rstatus[2] = ALUop[1];
-    assign allow_except = (!ALUop[1] || ALUop[2]) && (ALUop[0] || ALUop[1] || !ALUop[2]);
+    assign allow_except = 1'b0;/* (!ALUop[1] || ALUop[2]) && (ALUop[0] || ALUop[1] || !ALUop[2]); */
 endmodule

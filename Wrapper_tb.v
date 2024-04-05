@@ -33,7 +33,7 @@
  *
  **/
 
-module Wrapper_tb #(parameter FILE = "rand");
+module Wrapper_tb #(parameter FILE = "matmul");
 
 	// FileData
 	localparam DIR = "Test Files/";
@@ -127,12 +127,12 @@ module Wrapper_tb #(parameter FILE = "rand");
 		#80 downclock = ~downclock; 
 
 	// ====Memory-Mapped I/O (like a real computer)====
-	wire do_mmio = mem_read_enable && (memAddr > 32'hfff);
+	wire do_mmio = mem_read_enable && (memAddr > 32'h1fff);
 	wire [31:0] mmio_result;
 	assign memDataResult = do_mmio ? mmio_result : memDataOut;
 
 	localparam 
-		MMIO_XORSHIFT = 32'd5000; // 0x1388
+		MMIO_XORSHIFT = 32'h2328; // 9000
 
 	// xorshift
 	wire[31:0] rng_result;

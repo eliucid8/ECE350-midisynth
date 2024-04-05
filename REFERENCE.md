@@ -1,14 +1,15 @@
 # ISA Reference
 A reference for aspiring Liupercomputer programmers!
 
+### Instructions
 | Insn | Opcode | Type | Operation |
 |------|--------|------|-----------|
 |`add $rd, $rs, $rt`|00000 (00000)|R|$rd = $rs + $rt|
 |`sub $rd, $rs, $rt`|00000 (00001)|R|$rd = $rs - $rt|
 |`and $rd, $rs, $rt`|00000 (00010)|R|$rd = $rs & $rt|
 |`or $rd, $rs, $rt`|00000 (00011)|R|$rd = $rs \| $rt|
-|`sll $rd, $rs, shamt`|00000 (00100)|R|$rd = $rs << $rt|
-|`sra $rd, $rs, shamt`|00000 (00101)|R|$rd = $rs >>> $rt|
+|`sll $rd, $rs, shamt`|00000 (00100)|R|$rd = $rs << shamt|
+|`sra $rd, $rs, shamt`|00000 (00101)|R|$rd = $rs >>> shamt|
 |`mul $rd, $rs, $rt`|00000 (00110)|R|$rd = $rs * $rt|
 |`div $rd, $rs, $rt`|00000 (00111)|R|$rd = $rs / $rt|
 |`addi $rd, $rs, N`|00101|I|$rd = $rs + N|
@@ -24,6 +25,7 @@ A reference for aspiring Liupercomputer programmers!
 |**CUSTOM INSNS**||||
 |`disp $rd`|11000|JII|push $rd to 7 seg disp\*|
 
+### Instruction Structure
 | Insn Type | | | | | | | |
 |-----------|-|-|-|-|-|-|-|
 | R type: | opcode [31:27] | rd [26:22] | rs [21:17] | rt [16:12] | shamt [11:7] | aluop [6:2] | zero [1:0] |
@@ -31,13 +33,31 @@ A reference for aspiring Liupercomputer programmers!
 | JI type: | opcode [31:27] | target [26:0] |
 | JII type: | opcode [31:27] | rd [26:22] | zeroes [21:0] |
 
+### (MIPS) Register Conventions 
+|Name|Reg #|Convention|
+|----|-----|----------|
+|$zero, $0|0|**Constant** 0|
+|$at|1|Use for pseudoinstructions|
+|$v0-$v1|2-3|**Results**|
+|$a0-$a3|4-7|**Arguments**|
+|$t0-$t7|8-15|(Callee-Saved) temps|
+|$s0-$s7|16-23|**Caller-Saved**|
+|$t8-$t9|24-25|(Callee-Saved) temps|
+|$k0-$k1|26-27|reserved for OS (Use for I/O?)|
+|$gp|28|global pointer|
+|$sp|29|**Stack Pointer**|
+|$fp, $rstatus|30|**Status Register** (also frame pointer)|
+|$ra|31|**Return Address**|
+
+
+
 ## I/O:
 The simplest form of I/O is to the 7-segment display, which can be done using the `disp` instruction.
 We also implement memory-mapped I/O: since the RAM block has only a 12-bit address space, loads/stores to any address above that will be intercepted and executed as I/O operations instead.
 
 |Device|Address|Behavior|
 |------|-------|--------|
-|Pseudorandom Number Generator|`5000 (0x1388)`|**Load:** Loads a pseudorandom 32-bit value into the specified register (0 is not possible)|
+|Pseudorandom Number Generator|`9000 (0x2328)`|**Load:** Loads a pseudorandom 32-bit value into the specified register (0 is not possible)|
 
 ## Clarifications
 #### disp:
