@@ -7,26 +7,26 @@ module midi_monitor(input midi_data, clock, output reg busy_reading, output [23:
     sys_counter #(16000) midi_down(clock, clr, midi_clock);
 
     initial begin
-        busy_reading = 0;
-        midi_message = 0;
-        bit_num = 29;
-        midi_bytes_reg = 0;
+        busy_reading <= 0;
+        midi_message <= 0;
+        bit_num <= 29;
+        midi_bytes_reg <= 0;
     end
 
     always @(negedge midi_data) begin
-        if(!busy_reading) begin bit_num = 29; busy_reading = ~busy_reading; end
+        if(!busy_reading) begin bit_num <= 29; busy_reading <= ~busy_reading; end
     end
 
     always @(posedge midi_clock)begin
         if(busy_reading)begin
-        midi_message[bit_num] = midi_data;
+        midi_message[bit_num] <= midi_data;
         busy_reading = (bit_num == 0);
-        bit_num = bit_num-1;
+        bit_num <= bit_num-1;
         end
     end
 
     always @(negedge busy_reading)begin
-       midi_bytes_reg = {midi_message[28:21],midi_message[18:11],midi_message[8:1]};
+       midi_bytes_reg <= {midi_message[28:21],midi_message[18:11],midi_message[8:1]};
     end
 
     assign midi_bytes = midi_bytes_reg;
