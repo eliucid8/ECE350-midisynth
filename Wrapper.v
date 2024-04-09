@@ -45,13 +45,12 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA);
 		end
 	end
 
-	assign LED[0] = clk1khz;
 
-	input manual_clock, SW;
+	input manual_clock; 
+	input[1:0] SW;
 
 	wire debounced_man_clock;
 	debouncer clock_debouncer(.debounced(debounced_man_clock), .sig(manual_clock), .clock(clock50mhz));
-	assign LED[1] = debounced_man_clock;
 
 	wire clock = SW ? debounced_man_clock : clock50mhz;
 
@@ -65,7 +64,7 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA);
 
 
 	// ADD YOUR MEMORY FILE HERE
-	localparam INSTR_FILE = "matmul";
+	localparam INSTR_FILE = "basic_midi";
 	
 	// Main Processing Unit
 	processor CPU(.clock(clock), .reset(reset), 
@@ -126,12 +125,33 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA);
 	assign memDataResult = do_mmio ? mmio_result : memDataOut;
 
 	localparam 
-		MMIO_XORSHIFT = 32'h2328; // 9000
+		MMIO_XORSHIFT = 	32'h2001, // 8193
+		MMIO_MIDIIN = 		32'h2002; // 8194
 
 	// xorshift
 	wire[31:0] rng_result;
 	wire next_rng = mem_read_enable && memAddr == MMIO_XORSHIFT; // hex address 1388
 	xorshift #(.SEED(32'hdeadbeef)) xorshift_rng(.rand(rng_result), .next(next_rng), .clock(clock));
-	assign mmio_result = next_rng ? rng_result : 32'hfbadc0de; // FIX: will get ugly pretty soon. behavioral base/bounds? CAM?
+
+	wire midi_busy_reading;
+	wire[23:0] midi_bytes;
+	reg[31:0] midi_result;
+	midi_monitor midi_bitty(.midi_data(JA[1]), .clock(clock), .busy_reading(midi_busy_reading), .midi_bytes(midi_bytes));
+	always @(negedge midi_busy_reading) begin
+		midi_result <= {8'b0, midi_bytes};
+	end
+
+	// DEBUG
+	wire jadeb;
+	debouncer #(25000000) jadebounce(.debounced(jadeb), .clock(clock), .sig(JA[1]));
+
+	assign LED[13:0] = midi_result[13:0];
+	assign LED[14] = jadeb;
+	assign LED[15] = JA[1];
+
+	// FIX: make this expandable.
+	mux4 #(32) iomux(
+		.out(mmio_result), .sel(memAddr[1:0]), 
+		.in0(32'hfbadc0de), .in1(rng_result), .in2(midi_result), .in3(32'hdeadbeef));
 
 endmodule

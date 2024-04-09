@@ -21,4 +21,4 @@ multdiv/mult.v
 multdiv/multdiv.v
 io/sevenseg.v
 io/random.v
-io/midibuffer.v
+io/midi.v
