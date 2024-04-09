@@ -1,0 +1,29 @@
+# compile verilog/system verilog design source files
+verilog xil_defaultlib  \
+"../../../../RAM.v" \
+"../../../../ROM.v" \
+"../../../../alu/alu.v" \
+"../../../../alu/barrel_shifters.v" \
+"../../../../alu/big_gates.v" \
+"../../../../control/bypass.v" \
+"../../../../alu/cla.v" \
+"../../../../multdiv/dadda_mult.v" \
+"../../../../control/decode.v" \
+"../../../../components/dffe_ref.v" \
+"../../../../multdiv/div.v" \
+"../../../../multdiv/mult.v" \
+"../../../../multdiv/multdiv.v" \
+"../../../../processor.v" \
+"../../../../io/random.v" \
+"../../../../regfile/regfile.v" \
+"../../../../regfile/register.v" \
+"../../../../components/sequential.v" \
+"../../../../components/shifts.v" \
+"../../../../components/wiring.v" \
+"../../../../Wrapper_tb.v" \
+
+# compile glbl module
+verilog xil_defaultlib "glbl.v"
+
+# Do not sort compile order
+nosort

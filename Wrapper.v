@@ -24,14 +24,14 @@
  *
  **/
 
-module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA);
-	input CLK100MHZ, CPU_RESETN;
+module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, AUDIO_CLOCK);
+	input CLK100MHZ, CPU_RESETN, AUDIO_CLOCK;
 	input[11:0] JA;
 	output [15:0] LED;
 	output[7:0] sevenseg, AN;
 	wire reset = ~CPU_RESETN;
 	
-	reg clock50mhz, clk1khz;
+	reg clock50mhz, clk1khz, clock_audio;
 	reg clk50_divider;
 	reg[16:0] clock_div16_counter;
 	localparam clock_div16_limit = 17'd100000;

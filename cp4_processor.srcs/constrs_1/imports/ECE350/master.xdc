@@ -12,6 +12,9 @@ set_property ALLOW_COMBINATORIAL_LOOPS true [get_nets {CPU/DXIRlatch/genblk1[104
 ## Clock signal
 set_property -dict {PACKAGE_PIN E3 IOSTANDARD LVCMOS33} [get_ports CLK100MHZ]
 create_clock -period 10.000 -name sys_clk_pin -waveform {0.000 5.000} -add [get_ports CLK100MHZ]
+create_generated_clock -name {LED_OBUF[0]} -source [get_ports CLK100MHZ] -divide_by 100000 [get_pins clk1khz_reg/Q]
+#create_generated_clock -name clock50mhz -source [get_ports CLK100MHZ] -divide_by 2 [get_pins clock50mhz_reg/Q]
+create_generated_clock -name audio_clock -source [get_ports CLK100MHZ] -multiply_by 3 -divide_by 3125 [get_ports AUDIO_CLOCK]
 
 ##Switches
 #set_property -dict { PACKAGE_PIN L16   IOSTANDARD LVCMOS33 } [get_ports { SW[1] }]; #IO_L3N_T0_DQS_EMCCLK_14 Sch=sw[1]
@@ -213,6 +216,3 @@ set_property -dict {PACKAGE_PIN P17 IOSTANDARD LVCMOS33} [get_ports manual_clock
 #set_property -dict { PACKAGE_PIN L14   IOSTANDARD LVCMOS33 } [get_ports { QSPI_DQ[2] }]; #IO_L2P_T0_D02_14 Sch=qspi_dq[2]
 #set_property -dict { PACKAGE_PIN M14   IOSTANDARD LVCMOS33 } [get_ports { QSPI_DQ[3] }]; #IO_L2N_T0_D03_14 Sch=qspi_dq[3]
 #set_property -dict { PACKAGE_PIN L13   IOSTANDARD LVCMOS33 } [get_ports { QSPI_CSN }]; #IO_L6P_T0_FCS_B_14 Sch=qspi_csn
-
-
-

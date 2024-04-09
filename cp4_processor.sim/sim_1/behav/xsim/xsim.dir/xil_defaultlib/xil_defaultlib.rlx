@@ -1,0 +1,26 @@
+0.7
+2020.2
+Jun 10 2021
+20:04:57
+C:/Users/nml29/Desktop/ECE350-midisynth/RAM.v,1712691369,verilog,,C:/Users/nml29/Desktop/ECE350-midisynth/ROM.v,,RAM,,,,,,,,
+C:/Users/nml29/Desktop/ECE350-midisynth/ROM.v,1712691369,verilog,,C:/Users/nml29/Desktop/ECE350-midisynth/alu/alu.v,,ROM,,,,,,,,
+C:/Users/nml29/Desktop/ECE350-midisynth/Wrapper_tb.v,1712691369,verilog,,,,Wrapper_tb,,,,,,,,
+C:/Users/nml29/Desktop/ECE350-midisynth/alu/alu.v,1712691369,verilog,,C:/Users/nml29/Desktop/ECE350-midisynth/alu/barrel_shifters.v,,alu,,,,,,,,
+C:/Users/nml29/Desktop/ECE350-midisynth/alu/barrel_shifters.v,1712691369,verilog,,C:/Users/nml29/Desktop/ECE350-midisynth/alu/big_gates.v,,left_barrel_shifter;right_barrel_shifter,,,,,,,,
+C:/Users/nml29/Desktop/ECE350-midisynth/alu/big_gates.v,1712691369,verilog,,C:/Users/nml29/Desktop/ECE350-midisynth/control/bypass.v,,bitwise_not;or_32,,,,,,,,
+C:/Users/nml29/Desktop/ECE350-midisynth/alu/cla.v,1712691369,verilog,,C:/Users/nml29/Desktop/ECE350-midisynth/multdiv/dadda_mult.v,,cla_32;cla_64;cla_8;full_adder;half_adder;negator,,,,,,,,
+C:/Users/nml29/Desktop/ECE350-midisynth/components/dffe_ref.v,1712691369,verilog,,C:/Users/nml29/Desktop/ECE350-midisynth/multdiv/div.v,,dffe_init;dffe_ref;tffe,,,,,,,,
+C:/Users/nml29/Desktop/ECE350-midisynth/components/sequential.v,1712691369,verilog,,C:/Users/nml29/Desktop/ECE350-midisynth/components/shifts.v,,counter;debouncer;edgedetector;lShiftReg;rShiftReg,,,,,,,,
+C:/Users/nml29/Desktop/ECE350-midisynth/components/shifts.v,1712691369,verilog,,C:/Users/nml29/Desktop/ECE350-midisynth/components/wiring.v,,lshift;rshift,,,,,,,,
+C:/Users/nml29/Desktop/ECE350-midisynth/components/wiring.v,1712691369,verilog,,C:/Users/nml29/Desktop/ECE350-midisynth/Wrapper_tb.v,,decoder32;decoder_8;mux2;mux4;mux8;mux_2;mux_4;mux_8,,,,,,,,
+C:/Users/nml29/Desktop/ECE350-midisynth/control/bypass.v,1712691369,verilog,,C:/Users/nml29/Desktop/ECE350-midisynth/alu/cla.v,,bypass_controller,,,,,,,,
+C:/Users/nml29/Desktop/ECE350-midisynth/control/decode.v,1712691369,verilog,,C:/Users/nml29/Desktop/ECE350-midisynth/components/dffe_ref.v,,exceptionmap;insn_decode,,,,,,,,
+C:/Users/nml29/Desktop/ECE350-midisynth/cp4_processor.sim/sim_1/behav/xsim/glbl.v,1623370582,verilog,,,,glbl,,,,,,,,
+C:/Users/nml29/Desktop/ECE350-midisynth/io/random.v,1712691369,verilog,,C:/Users/nml29/Desktop/ECE350-midisynth/regfile/regfile.v,,xorshift,,,,,,,,
+C:/Users/nml29/Desktop/ECE350-midisynth/multdiv/dadda_mult.v,1712691369,verilog,,C:/Users/nml29/Desktop/ECE350-midisynth/control/decode.v,,dadda_mult,,,,,,,,
+C:/Users/nml29/Desktop/ECE350-midisynth/multdiv/div.v,1712691369,verilog,,C:/Users/nml29/Desktop/ECE350-midisynth/multdiv/mult.v,,div,,,,,,,,
+C:/Users/nml29/Desktop/ECE350-midisynth/multdiv/mult.v,1712691369,verilog,,C:/Users/nml29/Desktop/ECE350-midisynth/multdiv/multdiv.v,,mult,,,,,,,,
+C:/Users/nml29/Desktop/ECE350-midisynth/multdiv/multdiv.v,1712691369,verilog,,C:/Users/nml29/Desktop/ECE350-midisynth/processor.v,,multdiv,,,,,,,,
+C:/Users/nml29/Desktop/ECE350-midisynth/processor.v,1712691369,verilog,,C:/Users/nml29/Desktop/ECE350-midisynth/io/random.v,,processor,,,,,,,,
+C:/Users/nml29/Desktop/ECE350-midisynth/regfile/regfile.v,1712691369,verilog,,C:/Users/nml29/Desktop/ECE350-midisynth/regfile/register.v,,regfile,,,,,,,,
+C:/Users/nml29/Desktop/ECE350-midisynth/regfile/register.v,1712691369,verilog,,C:/Users/nml29/Desktop/ECE350-midisynth/components/sequential.v,,initRegister;register,,,,,,,,
