@@ -34,16 +34,17 @@ endmodule
 
 module sys_counter #(parameter COUNT = 69)(input clock, clr, output down_clock);
     reg [31:0] up_clock;
-    reg [31:0] down_reg;
+    reg down_reg;
     assign down_clock = down_reg;
-    initial begin up_clock = 0; down_reg = 0; end
+    initial begin up_clock <= 0; down_reg <= 1'b0; end
     always @(posedge clock) begin
-        up_clock = up_clock + 1;
-        down_reg = 1'b0;
+        up_clock <= up_clock + 1;
+        down_reg <= 1'b0;
         if (up_clock == COUNT) begin
-            down_reg = 1'b1;
-            up_clock = 0;
+            down_reg <= 1'b1;
+            up_clock <= 0;
         end
     end
-    always @(clr) begin up_clock = 0; down_reg = 0; end
+    always @(clr) begin up_clock <= 0; down_reg <= 0; end
 endmodule
+
