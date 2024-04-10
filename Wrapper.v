@@ -24,9 +24,10 @@
  *
  **/
 
-module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA);
+module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, JB, JC);
 	input CLK100MHZ, CPU_RESETN;
-	input[11:0] JA;
+	input[7:0] JA;
+	output[7:0] JB, JC;
 	output [15:0] LED;
 	output[7:0] sevenseg, AN;
 	wire reset = ~CPU_RESETN;
@@ -136,18 +137,19 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA);
 	wire midi_busy_reading;
 	wire[23:0] midi_bytes;
 	reg[31:0] midi_result;
-	midi_monitor midi_bitty(.midi_data(JA[1]), .clock(clock), .busy_reading(midi_busy_reading), .midi_bytes(midi_bytes));
+	wire[31:0] midi_raw;
+	midi_monitor midi_bitty(.midi_data(JA[0]), .clock(clock), .busy_reading(midi_busy_reading), .midi_bytes(midi_bytes), .midi_raw(midi_raw));
 	always @(negedge midi_busy_reading) begin
 		midi_result <= {8'b0, midi_bytes};
+		// DEBUG
+		// midi_result <= midi_raw;
 	end
+	assign LED[15:0] = midi_result[15:0];
 
-	// DEBUG
-	wire jadeb;
-	debouncer #(25000000) jadebounce(.debounced(jadeb), .clock(clock), .sig(JA[1]));
+	assign JB = midi_result[7:0];
+	assign JC[0] = JA[0];
+	assign JC[1] = midi_busy_reading;
 
-	assign LED[13:0] = midi_result[13:0];
-	assign LED[14] = jadeb;
-	assign LED[15] = JA[1];
 
 	// FIX: make this expandable.
 	mux4 #(32) iomux(
