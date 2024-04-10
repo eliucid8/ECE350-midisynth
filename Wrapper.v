@@ -24,8 +24,8 @@
  *
  **/
 
-module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, JB, JC);
-	input CLK100MHZ, CPU_RESETN;
+module Wrapper (CLK100MHZ, CPU_RESETN, AUDIO_CLOCK, sevenseg, AN, manual_clock, SW, LED, JA, JB, JC);
+	input CLK100MHZ, CPU_RESETN, AUDIO_CLOCK;
 	input[7:0] JA;
 	output[7:0] JB, JC;
 	output [15:0] LED;
