@@ -7,258 +7,259 @@
 :vpi_module "C:\iverilog\lib\ivl\vhdl_textio.vpi";
 :vpi_module "C:\iverilog\lib\ivl\v2005_math.vpi";
 :vpi_module "C:\iverilog\lib\ivl\va_math.vpi";
-S_000002219b48b380 .scope module, "freq_counter_tb" "freq_counter_tb" 2 1;
+S_000001ddbebcb380 .scope module, "freq_counter_tb" "freq_counter_tb" 2 1;
  .timescale 0 0;
-v000002219b4527f0_0 .var "clock", 0 0;
-v000002219b452890_0 .net "down_clock", 0 0, v000002219b494b00_0;  1 drivers
-v000002219b483cc0_0 .var/i "i", 31 0;
-v000002219b484260_0 .var/i "j", 31 0;
-v000002219b483720_0 .var/i "limit", 31 0;
-L_000002219b4839a0 .part v000002219b483cc0_0, 0, 7;
-S_000002219b494830 .scope module, "test_freq_counter" "sys_counter_freq" 2 24, 3 61 0, S_000002219b48b380;
+v000001ddbebd4ba0_0 .var "clock", 0 0;
+v000001ddbeb927f0_0 .net "down_clock", 0 0, v000001ddbebd4a60_0;  1 drivers
+v000001ddbeb92890_0 .var/i "i", 31 0;
+v000001ddbeb92930_0 .var/i "j", 31 0;
+v000001ddbebc3860_0 .var/i "limit", 31 0;
+L_000001ddbebc3c20 .part v000001ddbeb92890_0, 0, 7;
+S_000001ddbebd4830 .scope module, "test_freq_counter" "sys_counter_freq" 2 24, 3 61 0, S_000001ddbebcb380;
  .timescale 0 0;
     .port_info 0 /INPUT 1 "clock";
     .port_info 1 /INPUT 1 "clr";
     .port_info 2 /INPUT 7 "div";
     .port_info 3 /OUTPUT 1 "down_clock";
-P_000002219b48ad70 .param/l "SYS_CLOCK_FREQ" 0 3 62, +C4<00000000000000000000000000111100>;
-L_000002219b4e8038 .functor BUFT 1, C4<0000001>, C4<0>, C4<0>, C4<0>;
-v000002219b4533b0_0 .net/2u *"_ivl_0", 6 0, L_000002219b4e8038;  1 drivers
-v000002219b48cd40_0 .net "clock", 0 0, v000002219b4527f0_0;  1 drivers
-L_000002219b4e8080 .functor BUFT 1, C4<0>, C4<0>, C4<0>, C4<0>;
-v000002219b48cde0_0 .net "clr", 0 0, L_000002219b4e8080;  1 drivers
-v000002219b4949c0_0 .net "counter_limit", 6 0, L_000002219b483900;  1 drivers
-v000002219b494a60_0 .net "div", 6 0, L_000002219b4839a0;  1 drivers
-v000002219b494b00_0 .var "down_clock", 0 0;
-v000002219b494ba0_0 .var "up_clock", 6 0;
-E_000002219b48abb0 .event anyedge, v000002219b48cd40_0;
-L_000002219b483900 .arith/sum 7, L_000002219b4839a0, L_000002219b4e8038;
-S_000002219b48b510 .scope module, "sys_counter" "sys_counter" 3 1;
+P_000001ddbebcb130 .param/l "SYS_CLOCK_FREQ" 0 3 62, +C4<00000000000000000000000000111100>;
+L_000001ddbebd08e0 .functor BUFZ 7, L_000001ddbebc3c20, C4<0000000>, C4<0000000>, C4<0000000>;
+v000001ddbeb933b0_0 .net "clock", 0 0, v000001ddbebd4ba0_0;  1 drivers
+L_000001ddbec28038 .functor BUFT 1, C4<0>, C4<0>, C4<0>, C4<0>;
+v000001ddbebccd40_0 .net "clr", 0 0, L_000001ddbec28038;  1 drivers
+v000001ddbebccde0_0 .net "counter_limit", 6 0, L_000001ddbebd08e0;  1 drivers
+v000001ddbebd49c0_0 .net "div", 6 0, L_000001ddbebc3c20;  1 drivers
+v000001ddbebd4a60_0 .var "down_clock", 0 0;
+v000001ddbebd4b00_0 .var "up_clock", 6 0;
+E_000001ddbebcafb0 .event anyedge, v000001ddbeb933b0_0;
+S_000001ddbebcb510 .scope module, "sys_counter" "sys_counter" 3 1;
  .timescale 0 0;
     .port_info 0 /INPUT 1 "clock";
     .port_info 1 /INPUT 1 "clr";
     .port_info 2 /OUTPUT 1 "down_clock";
-P_000002219b48a470 .param/l "COUNT" 0 3 1, +C4<00000000000000000000000001000101>;
-L_000002219b530870 .functor BUFZ 1, v000002219b483d60_0, C4<0>, C4<0>, C4<0>;
-o000002219b497248 .functor BUFZ 1, C4<z>; HiZ drive
-v000002219b483400_0 .net "clock", 0 0, o000002219b497248;  0 drivers
-o000002219b497278 .functor BUFZ 1, C4<z>; HiZ drive
-v000002219b4834a0_0 .net "clr", 0 0, o000002219b497278;  0 drivers
-v000002219b484300_0 .net "down_clock", 0 0, L_000002219b530870;  1 drivers
-v000002219b483d60_0 .var "down_reg", 0 0;
-v000002219b483680_0 .var "up_clock", 7 0;
-E_000002219b48a530 .event posedge, v000002219b4834a0_0, v000002219b483400_0;
-S_000002219b48ca20 .scope module, "sys_counter_pwm" "sys_counter_pwm" 3 36;
+P_000001ddbebcac70 .param/l "COUNT" 0 3 1, +C4<00000000000000000000000001000101>;
+L_000001ddbec70090 .functor BUFZ 1, v000001ddbebc34a0_0, C4<0>, C4<0>, C4<0>;
+o000001ddbebd7218 .functor BUFZ 1, C4<z>; HiZ drive
+v000001ddbebc41c0_0 .net "clock", 0 0, o000001ddbebd7218;  0 drivers
+o000001ddbebd7248 .functor BUFZ 1, C4<z>; HiZ drive
+v000001ddbebc3e00_0 .net "clr", 0 0, o000001ddbebd7248;  0 drivers
+v000001ddbebc3ea0_0 .net "down_clock", 0 0, L_000001ddbec70090;  1 drivers
+v000001ddbebc34a0_0 .var "down_reg", 0 0;
+v000001ddbebc35e0_0 .var "up_clock", 7 0;
+E_000001ddbebca330 .event posedge, v000001ddbebc3e00_0, v000001ddbebc41c0_0;
+S_000001ddbebcca20 .scope module, "sys_counter_pwm" "sys_counter_pwm" 3 36;
  .timescale 0 0;
     .port_info 0 /INPUT 1 "clock";
     .port_info 1 /INPUT 1 "clr";
     .port_info 2 /INPUT 8 "var";
     .port_info 3 /OUTPUT 1 "down_clock";
-P_000002219b48a2f0 .param/l "COUNT" 0 3 37, +C4<00000000000000000000000001000101>;
-o000002219b4973c8 .functor BUFZ 1, C4<z>; HiZ drive
-v000002219b483ea0_0 .net "clock", 0 0, o000002219b4973c8;  0 drivers
-o000002219b4973f8 .functor BUFZ 1, C4<z>; HiZ drive
-v000002219b483540_0 .net "clr", 0 0, o000002219b4973f8;  0 drivers
-v000002219b4841c0_0 .net "down_clock", 0 0, L_000002219b483fe0;  1 drivers
-v000002219b4835e0_0 .var "up_clock", 7 0;
-o000002219b497488 .functor BUFZ 8, C4<zzzzzzzz>; HiZ drive
-v000002219b483c20_0 .net "var", 7 0, o000002219b497488;  0 drivers
-E_000002219b48afb0 .event posedge, v000002219b483ea0_0;
-L_000002219b483fe0 .cmp/gt 8, o000002219b497488, v000002219b4835e0_0;
-S_000002219b48cbb0 .scope module, "sys_counter_wide" "sys_counter_wide" 3 21;
+P_000001ddbebcaf70 .param/l "COUNT" 0 3 37, +C4<00000000000000000000000001000101>;
+o000001ddbebd7398 .functor BUFZ 1, C4<z>; HiZ drive
+v000001ddbebc3400_0 .net "clock", 0 0, o000001ddbebd7398;  0 drivers
+o000001ddbebd73c8 .functor BUFZ 1, C4<z>; HiZ drive
+v000001ddbebc4260_0 .net "clr", 0 0, o000001ddbebd73c8;  0 drivers
+v000001ddbebc4080_0 .net "down_clock", 0 0, L_000001ddbebc3fe0;  1 drivers
+v000001ddbebc3540_0 .var "up_clock", 7 0;
+o000001ddbebd7458 .functor BUFZ 8, C4<zzzzzzzz>; HiZ drive
+v000001ddbebc3680_0 .net "var", 7 0, o000001ddbebd7458;  0 drivers
+E_000001ddbebca370 .event posedge, v000001ddbebc3400_0;
+L_000001ddbebc3fe0 .cmp/gt 8, o000001ddbebd7458, v000001ddbebc3540_0;
+S_000001ddbebccbb0 .scope module, "sys_counter_wide" "sys_counter_wide" 3 21;
  .timescale 0 0;
     .port_info 0 /INPUT 1 "clock";
     .port_info 1 /INPUT 1 "clr";
     .port_info 2 /OUTPUT 1 "down_clock";
-P_000002219b48a4f0 .param/l "COUNT" 0 3 21, +C4<00000000000000000000000001000101>;
-L_000002219b5308e0 .functor BUFZ 1, v000002219b483860_0, C4<0>, C4<0>, C4<0>;
-o000002219b497578 .functor BUFZ 1, C4<z>; HiZ drive
-v000002219b483e00_0 .net "clock", 0 0, o000002219b497578;  0 drivers
-o000002219b4975a8 .functor BUFZ 1, C4<z>; HiZ drive
-v000002219b4837c0_0 .net "clr", 0 0, o000002219b4975a8;  0 drivers
-v000002219b483f40_0 .net "down_clock", 0 0, L_000002219b5308e0;  1 drivers
-v000002219b483860_0 .var "down_reg", 0 0;
-v000002219b484120_0 .var "up_clock", 31 0;
-E_000002219b48aeb0 .event posedge, v000002219b483e00_0;
-    .scope S_000002219b494830;
+P_000001ddbebca630 .param/l "COUNT" 0 3 21, +C4<00000000000000000000000001000101>;
+L_000001ddbec70db0 .functor BUFZ 1, v000001ddbebc3f40_0, C4<0>, C4<0>, C4<0>;
+o000001ddbebd7548 .functor BUFZ 1, C4<z>; HiZ drive
+v000001ddbebc3360_0 .net "clock", 0 0, o000001ddbebd7548;  0 drivers
+o000001ddbebd7578 .functor BUFZ 1, C4<z>; HiZ drive
+v000001ddbebc3720_0 .net "clr", 0 0, o000001ddbebd7578;  0 drivers
+v000001ddbebc37c0_0 .net "down_clock", 0 0, L_000001ddbec70db0;  1 drivers
+v000001ddbebc3f40_0 .var "down_reg", 0 0;
+v000001ddbebc3900_0 .var "up_clock", 31 0;
+E_000001ddbebca930 .event posedge, v000001ddbebc3360_0;
+    .scope S_000001ddbebd4830;
 T_0 ;
     %pushi/vec4 0, 0, 7;
-    %assign/vec4 v000002219b494ba0_0, 0;
+    %assign/vec4 v000001ddbebd4b00_0, 0;
     %pushi/vec4 0, 0, 1;
-    %assign/vec4 v000002219b494b00_0, 0;
+    %assign/vec4 v000001ddbebd4a60_0, 0;
     %end;
     .thread T_0;
-    .scope S_000002219b494830;
+    .scope S_000001ddbebd4830;
 T_1 ;
-    %wait E_000002219b48abb0;
-    %load/vec4 v000002219b48cde0_0;
+    %wait E_000001ddbebcafb0;
+    %load/vec4 v000001ddbebccd40_0;
     %flag_set/vec4 8;
     %jmp/0xz  T_1.0, 8;
     %pushi/vec4 0, 0, 7;
-    %assign/vec4 v000002219b494ba0_0, 0;
+    %assign/vec4 v000001ddbebd4b00_0, 0;
     %pushi/vec4 0, 0, 1;
-    %assign/vec4 v000002219b494b00_0, 0;
+    %assign/vec4 v000001ddbebd4a60_0, 0;
     %jmp T_1.1;
 T_1.0 ;
-    %load/vec4 v000002219b494ba0_0;
+    %load/vec4 v000001ddbebd4b00_0;
     %pad/u 32;
-    %cmpi/u 60, 0, 32;
+    %load/vec4 v000001ddbebccde0_0;
+    %pad/u 32;
+    %subi 1, 0, 32;
+    %cmp/u;
     %jmp/0xz  T_1.2, 5;
-    %load/vec4 v000002219b494ba0_0;
+    %load/vec4 v000001ddbebd4b00_0;
     %addi 1, 0, 7;
-    %assign/vec4 v000002219b494ba0_0, 0;
+    %assign/vec4 v000001ddbebd4b00_0, 0;
     %jmp T_1.3;
 T_1.2 ;
     %pushi/vec4 0, 0, 7;
-    %assign/vec4 v000002219b494ba0_0, 0;
-    %load/vec4 v000002219b494b00_0;
+    %assign/vec4 v000001ddbebd4b00_0, 0;
+    %load/vec4 v000001ddbebd4a60_0;
     %inv;
-    %assign/vec4 v000002219b494b00_0, 0;
+    %assign/vec4 v000001ddbebd4a60_0, 0;
 T_1.3 ;
 T_1.1 ;
     %jmp T_1;
     .thread T_1, $push;
-    .scope S_000002219b48b380;
+    .scope S_000001ddbebcb380;
 T_2 ;
     %vpi_call 2 6 "$dumpfile", "freq_counter.vcd" {0 0 0};
-    %vpi_call 2 7 "$dumpvars", 32'sb00000000000000000000000000000000, S_000002219b48b380 {0 0 0};
+    %vpi_call 2 7 "$dumpvars", 32'sb00000000000000000000000000000000, S_000001ddbebcb380 {0 0 0};
     %end;
     .thread T_2;
-    .scope S_000002219b48b380;
+    .scope S_000001ddbebcb380;
 T_3 ;
     %pushi/vec4 0, 0, 1;
-    %assign/vec4 v000002219b4527f0_0, 0;
+    %assign/vec4 v000001ddbebd4ba0_0, 0;
     %pushi/vec4 0, 0, 32;
-    %assign/vec4 v000002219b483720_0, 0;
+    %assign/vec4 v000001ddbebc3860_0, 0;
     %pushi/vec4 0, 0, 32;
-    %assign/vec4 v000002219b483cc0_0, 0;
+    %assign/vec4 v000001ddbeb92890_0, 0;
     %pushi/vec4 0, 0, 32;
-    %store/vec4 v000002219b483cc0_0, 0, 32;
+    %store/vec4 v000001ddbeb92890_0, 0, 32;
 T_3.0 ;
-    %load/vec4 v000002219b483cc0_0;
+    %load/vec4 v000001ddbeb92890_0;
     %cmpi/s 16, 0, 32;
     %jmp/0xz T_3.1, 5;
     %pushi/vec4 0, 0, 32;
-    %store/vec4 v000002219b484260_0, 0, 32;
+    %store/vec4 v000001ddbeb92930_0, 0, 32;
 T_3.2 ;
-    %load/vec4 v000002219b484260_0;
+    %load/vec4 v000001ddbeb92930_0;
     %cmpi/s 60, 0, 32;
     %jmp/0xz T_3.3, 5;
     %delay 10, 0;
-    %load/vec4 v000002219b4527f0_0;
+    %load/vec4 v000001ddbebd4ba0_0;
     %inv;
-    %assign/vec4 v000002219b4527f0_0, 0;
-    %vpi_call 2 18 "$display", "div %d: %b", v000002219b483cc0_0, v000002219b452890_0 {0 0 0};
-    %load/vec4 v000002219b484260_0;
+    %assign/vec4 v000001ddbebd4ba0_0, 0;
+    %vpi_call 2 18 "$display", "div %d: %b", v000001ddbeb92890_0, v000001ddbeb927f0_0 {0 0 0};
+    %load/vec4 v000001ddbeb92930_0;
     %addi 1, 0, 32;
-    %store/vec4 v000002219b484260_0, 0, 32;
+    %store/vec4 v000001ddbeb92930_0, 0, 32;
     %jmp T_3.2;
 T_3.3 ;
-    %load/vec4 v000002219b483cc0_0;
+    %load/vec4 v000001ddbeb92890_0;
     %addi 1, 0, 32;
-    %store/vec4 v000002219b483cc0_0, 0, 32;
+    %store/vec4 v000001ddbeb92890_0, 0, 32;
     %jmp T_3.0;
 T_3.1 ;
     %end;
     .thread T_3;
-    .scope S_000002219b48b510;
+    .scope S_000001ddbebcb510;
 T_4 ;
     %pushi/vec4 0, 0, 8;
-    %store/vec4 v000002219b483680_0, 0, 8;
+    %store/vec4 v000001ddbebc35e0_0, 0, 8;
     %pushi/vec4 0, 0, 1;
-    %store/vec4 v000002219b483d60_0, 0, 1;
+    %store/vec4 v000001ddbebc34a0_0, 0, 1;
     %end;
     .thread T_4;
-    .scope S_000002219b48b510;
+    .scope S_000001ddbebcb510;
 T_5 ;
-    %wait E_000002219b48a530;
-    %load/vec4 v000002219b483680_0;
+    %wait E_000001ddbebca330;
+    %load/vec4 v000001ddbebc35e0_0;
     %pad/u 32;
     %cmpi/u 69, 0, 32;
     %jmp/0xz  T_5.0, 5;
-    %load/vec4 v000002219b483680_0;
+    %load/vec4 v000001ddbebc35e0_0;
     %addi 1, 0, 8;
-    %assign/vec4 v000002219b483680_0, 0;
+    %assign/vec4 v000001ddbebc35e0_0, 0;
     %pushi/vec4 0, 0, 1;
-    %assign/vec4 v000002219b483d60_0, 0;
+    %assign/vec4 v000001ddbebc34a0_0, 0;
     %jmp T_5.1;
 T_5.0 ;
     %pushi/vec4 1, 0, 1;
-    %assign/vec4 v000002219b483d60_0, 0;
+    %assign/vec4 v000001ddbebc34a0_0, 0;
     %pushi/vec4 0, 0, 8;
-    %assign/vec4 v000002219b483680_0, 0;
+    %assign/vec4 v000001ddbebc35e0_0, 0;
 T_5.1 ;
-    %load/vec4 v000002219b4834a0_0;
+    %load/vec4 v000001ddbebc3e00_0;
     %flag_set/vec4 8;
     %jmp/0xz  T_5.2, 8;
     %pushi/vec4 0, 0, 8;
-    %assign/vec4 v000002219b483680_0, 0;
+    %assign/vec4 v000001ddbebc35e0_0, 0;
     %pushi/vec4 0, 0, 1;
-    %assign/vec4 v000002219b483d60_0, 0;
+    %assign/vec4 v000001ddbebc34a0_0, 0;
 T_5.2 ;
     %jmp T_5;
     .thread T_5;
-    .scope S_000002219b48ca20;
+    .scope S_000001ddbebcca20;
 T_6 ;
     %pushi/vec4 0, 0, 8;
-    %assign/vec4 v000002219b4835e0_0, 0;
+    %assign/vec4 v000001ddbebc3540_0, 0;
     %end;
     .thread T_6;
-    .scope S_000002219b48ca20;
+    .scope S_000001ddbebcca20;
 T_7 ;
-    %wait E_000002219b48afb0;
-    %load/vec4 v000002219b483540_0;
+    %wait E_000001ddbebca370;
+    %load/vec4 v000001ddbebc4260_0;
     %flag_set/vec4 8;
     %jmp/0xz  T_7.0, 8;
     %pushi/vec4 0, 0, 8;
-    %assign/vec4 v000002219b4835e0_0, 0;
+    %assign/vec4 v000001ddbebc3540_0, 0;
     %jmp T_7.1;
 T_7.0 ;
-    %load/vec4 v000002219b4835e0_0;
+    %load/vec4 v000001ddbebc3540_0;
     %pad/u 32;
     %cmpi/e 68, 0, 32;
     %jmp/0xz  T_7.2, 4;
     %pushi/vec4 0, 0, 8;
-    %assign/vec4 v000002219b4835e0_0, 0;
+    %assign/vec4 v000001ddbebc3540_0, 0;
     %jmp T_7.3;
 T_7.2 ;
-    %load/vec4 v000002219b4835e0_0;
+    %load/vec4 v000001ddbebc3540_0;
     %addi 1, 0, 8;
-    %assign/vec4 v000002219b4835e0_0, 0;
+    %assign/vec4 v000001ddbebc3540_0, 0;
 T_7.3 ;
 T_7.1 ;
     %jmp T_7;
     .thread T_7;
-    .scope S_000002219b48cbb0;
+    .scope S_000001ddbebccbb0;
 T_8 ;
     %pushi/vec4 0, 0, 32;
-    %assign/vec4 v000002219b484120_0, 0;
+    %assign/vec4 v000001ddbebc3900_0, 0;
     %pushi/vec4 0, 0, 1;
-    %assign/vec4 v000002219b483860_0, 0;
+    %assign/vec4 v000001ddbebc3f40_0, 0;
     %end;
     .thread T_8;
-    .scope S_000002219b48cbb0;
+    .scope S_000001ddbebccbb0;
 T_9 ;
-    %wait E_000002219b48aeb0;
-    %load/vec4 v000002219b484120_0;
+    %wait E_000001ddbebca930;
+    %load/vec4 v000001ddbebc3900_0;
     %addi 1, 0, 32;
-    %assign/vec4 v000002219b484120_0, 0;
-    %load/vec4 v000002219b484120_0;
+    %assign/vec4 v000001ddbebc3900_0, 0;
+    %load/vec4 v000001ddbebc3900_0;
     %cmpi/e 69, 0, 32;
     %jmp/0xz  T_9.0, 4;
-    %load/vec4 v000002219b483860_0;
+    %load/vec4 v000001ddbebc3f40_0;
     %inv;
-    %assign/vec4 v000002219b483860_0, 0;
+    %assign/vec4 v000001ddbebc3f40_0, 0;
     %pushi/vec4 0, 0, 32;
-    %assign/vec4 v000002219b484120_0, 0;
+    %assign/vec4 v000001ddbebc3900_0, 0;
 T_9.0 ;
-    %load/vec4 v000002219b4837c0_0;
+    %load/vec4 v000001ddbebc3720_0;
     %flag_set/vec4 8;
     %jmp/0xz  T_9.2, 8;
     %pushi/vec4 0, 0, 32;
-    %assign/vec4 v000002219b484120_0, 0;
+    %assign/vec4 v000001ddbebc3900_0, 0;
     %pushi/vec4 0, 0, 1;
-    %assign/vec4 v000002219b483860_0, 0;
+    %assign/vec4 v000001ddbebc3f40_0, 0;
 T_9.2 ;
     %jmp T_9;
     .thread T_9;

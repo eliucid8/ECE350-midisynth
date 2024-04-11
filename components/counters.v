@@ -71,14 +71,14 @@ module sys_counter_freq # (
         up_clock <= 0;
         down_clock <= 0;
     end
-    wire[$clog2(SYS_CLOCK_FREQ):0] counter_limit = div + 1;
+    wire[$clog2(SYS_CLOCK_FREQ):0] counter_limit = div;
 
     always @(clock) begin
         if(clr) begin
             up_clock <= 0;
             down_clock <= 0;
         end else begin
-            if(up_clock < SYS_CLOCK_FREQ) begin
+            if(up_clock < counter_limit - 1) begin
                 up_clock <= up_clock + 1;
             end else begin
                 up_clock <= 0;
