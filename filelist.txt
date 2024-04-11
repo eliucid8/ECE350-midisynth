@@ -3,6 +3,7 @@ Wrapper_tb.v
 processor.v
 RAM.v
 ROM.v
+components/counters.v
 components/dffe_ref.v
 components/sequential.v
 components/shifts.v
