@@ -57,3 +57,34 @@ module sys_counter_pwm #(
         end
     end
 endmodule
+
+module sys_counter_freq # (
+    parameter SYS_CLOCK_FREQ = 50000000
+) (
+    input clock,
+    input clr,
+    input [$clog2(SYS_CLOCK_FREQ):0] div,
+    output reg down_clock
+);
+    reg[$clog2(SYS_CLOCK_FREQ):0] up_clock;
+    initial begin
+        up_clock <= 0;
+        down_clock <= 0;
+    end
+    wire[$clog2(SYS_CLOCK_FREQ):0] counter_limit = div + 1;
+
+    always @(clock) begin
+        if(clr) begin
+            up_clock <= 0;
+            down_clock <= 0;
+        end else begin
+            if(up_clock < SYS_CLOCK_FREQ) begin
+                up_clock <= up_clock + 1;
+            end else begin
+                up_clock <= 0;
+                down_clock <= ~down_clock;
+            end
+        end
+    end
+
+endmodule
