@@ -12,7 +12,8 @@ set_property ALLOW_COMBINATORIAL_LOOPS true [get_nets {CPU/DXIRlatch/genblk1[104
 ## Clock signal
 set_property -dict {PACKAGE_PIN E3 IOSTANDARD LVCMOS33} [get_ports CLK100MHZ]
 create_clock -period 10.000 -name sys_clk_pin -waveform {0.000 5.000} -add [get_ports CLK100MHZ]
-create_generated_clock -name audio_clock -source [get_ports CLK100MHZ] -multiply_by 3 -divide_by 3125 [get_ports AUDIO_CLOCK]
+#set_property -dict {PACKAGE_PIN H4 IOSTANDARD LVCMOS33} [get_ports AUDIO_CLOCK]
+#create_generated_clock -name AUDIO_CLOCK -source [get_ports CLK100MHZ] -multiply_by 3 -divide_by 3125 [get_ports AUDIO_CLOCK]
 
 
 ##Switches

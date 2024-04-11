@@ -22,3 +22,4 @@ multdiv/multdiv.v
 io/sevenseg.v
 io/random.v
 io/midi.v
+io/i2s.v

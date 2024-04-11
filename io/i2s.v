@@ -35,7 +35,7 @@ module i2s(
     assign data_bit = data_reg[16];
 endmodule
 
-module sys_counter_wide #(parameter COUNT = 69)(input clock, clr, output down_clock);
+module sys_counter_wide #(parameter COUNT = 69)(input clock, input clr, output down_clock);
     reg [31:0] up_clock;
     reg down_reg;
     assign down_clock = down_reg;
@@ -46,6 +46,6 @@ module sys_counter_wide #(parameter COUNT = 69)(input clock, clr, output down_cl
             down_reg <= ~down_reg;
             up_clock <= 0;
         end
-        if(clear) begin up_clock <= 0; down_reg <= 1'b0; end
+        if(clr) begin up_clock <= 0; down_reg <= 1'b0; end
     end
 endmodule

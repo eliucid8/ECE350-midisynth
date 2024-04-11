@@ -24,8 +24,8 @@
  *
  **/
 
-module Wrapper (CLK100MHZ, CPU_RESETN, AUDIO_CLOCK, sevenseg, AN, manual_clock, SW, LED, JA, JB, JC);
-	input CLK100MHZ, CPU_RESETN, AUDIO_CLOCK;
+module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, JB, JC);
+	input CLK100MHZ, CPU_RESETN;
 	input[7:0] JA;
 	output[7:0] JB, JC;
 	output [15:0] LED;
@@ -45,7 +45,11 @@ module Wrapper (CLK100MHZ, CPU_RESETN, AUDIO_CLOCK, sevenseg, AN, manual_clock, 
 			clk1khz <= ~clk1khz;
 		end
 	end
-
+	
+	wire audio_clock, CLK_9600KHZ;
+	AUDIO_CLOCK PLEASEPLEASEPLL(.audio_clock(CLK_9600KHZ), .reset(1'b0), .clk_in1(CLK100MHZ));
+	// The frequency is divided by an extra factor of 2 when using sys_counter wide.
+    sys_counter_wide #(99) downaudio(.clock(CLK_9600KHZ), .clr(1'b0), .down_clock(audio_clock));
 
 	input manual_clock; 
 	input[1:0] SW;
@@ -149,6 +153,7 @@ module Wrapper (CLK100MHZ, CPU_RESETN, AUDIO_CLOCK, sevenseg, AN, manual_clock, 
 	assign JB = midi_result[7:0];
 	assign JC[0] = JA[0];
 	assign JC[1] = midi_busy_reading;
+	assign JC[2] = audio_clock;
 
 
 	// FIX: make this expandable.
