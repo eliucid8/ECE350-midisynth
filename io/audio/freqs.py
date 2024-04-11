@@ -6,5 +6,6 @@ for j in range(8):
         freq = base_freq * 2**(i/12)
         divider = int(sys_clock / (freq))
         # print(f"freq: {freq:.2f} Hz, divider: {divider}")
-        print(f"{divider:#0{8}x}")
+        print(f"freq: {freq:.2f} Hz, divider: {divider:#0{8}x}")
+        # print(f"{divider:#0{8}x}")
     base_freq *= 2

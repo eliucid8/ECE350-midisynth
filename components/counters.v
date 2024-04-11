@@ -63,17 +63,17 @@ module sys_counter_freq # (
 ) (
     input clock,
     input clr,
-    input [$clog2(SYS_CLOCK_FREQ):0] div,
+    input [31:0] div,
     output reg down_clock
 );
-    reg[$clog2(SYS_CLOCK_FREQ):0] up_clock;
+    reg[31:0] up_clock;
     initial begin
         up_clock <= 0;
         down_clock <= 0;
     end
-    wire[$clog2(SYS_CLOCK_FREQ):0] counter_limit = div;
+    wire[31:0] counter_limit = div;
 
-    always @(clock) begin
+    always @(posedge clock) begin
         if(clr) begin
             up_clock <= 0;
             down_clock <= 0;

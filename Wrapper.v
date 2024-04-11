@@ -117,7 +117,7 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 
 	sevenseg_controller sevenseg_ctrl(.downclock(clk1khz), .word(sevenseg_latch), .segments(sevenseg), .enables(AN));
 
-	always @(posedge clock or posedge reset) begin
+	always @(posedge clock/*  or posedge reset */) begin
 		if(reset) begin
 			sevenseg_latch <= 32'd0;
 		end else if(sevenseg_writeEnable) begin
@@ -146,21 +146,29 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 	midi_monitor midi_bitty(.midi_data(JA[0]), .clock(clock), .busy_reading(midi_busy_reading), .midi_bytes(midi_bytes), .midi_raw(midi_raw));
 	always @(negedge midi_busy_reading) begin
 		midi_result <= {8'b0, midi_bytes};
-		// DEBUG
-		// midi_result <= midi_raw;
 	end
-	assign LED[15:0] = midi_result[15:0];
 
-	wire[15:0] audio_data_test = 16'hbeef;
+	wire[15:0] audio_data_test;
 	wire word_clock_monitor;
 	wire data_audio_out;
+	wire wrise, wfall;
+
+	wire bodge_square;
+	// sys_counter_freq #(48000) bodge_freq(audio_clock, 1'b0, 4800, bodge_square);
+	// sys_counter_wide #(49) bodge_freq(audio_clock, 1'b0, bodge_square);
 
 	i2s eyetwo(.sys_clock(clock), .bit_clock(audio_clock),
     .audio_data(audio_data_test),
-    .word_clock(word_clock_monitor), .data_bit(data_audio_out)
+    .word_clock(word_clock_monitor), .data_bit(data_audio_out),
+	.wrise(wrise), .wfall(wfall)
     );
 
-	assign JB = midi_result[7:0];
+	wire square_wave;
+
+	assign JB[0] = wrise;
+	assign JB[1] = wfall;
+	assign JB[2] = square_wave;
+	assign JB[3] = bodge_square;
 
 	assign JC[0] = audio_clock;
 	assign JC[1] = audio_clock;
@@ -172,15 +180,45 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 	assign JC[7] = word_clock_monitor;
 
 	// FIX: AUDIO BODGE
+	wire[3:0] midi_status, midi_channel;
+	wire[7:0] midi_note, midi_velocity;
+	assign midi_status = midi_bytes[23:20];
+	assign midi_note = midi_bytes[15:8];
+	assign midi_velocity = midi_bytes[7:0];
+
+
 	assign AUD_SD = 1'b1;
-	wire[31:0] duty_cyc;
+	reg[20:0] FREQs[95:0];
+	initial begin
+		$readmemh("freq_divs.mem", FREQs);
+	end
+
+	reg[20:0] freq_div;
+	reg[7:0] cur_midi_note;
+	reg signed [15:0] wave_hi, wave_lo;
+	
+
 	always @(negedge midi_busy_reading) begin
-		if(midi_result[23:20] == 4'h9) begin // \note on
-			
-		end else if (midi_result[23:20] == 4'h8) begin // \note off
-			
+		if(midi_status == 4'h8) begin // \note on
+			freq_div <= FREQs[midi_note - 8'h15];
+			cur_midi_note <= midi_note;
+			wave_hi <= (midi_velocity << 8);
+			wave_lo <= -(midi_velocity << 8);
+		end else if (midi_status == 4'h9) begin // \note off
+			if(midi_note == cur_midi_note) begin
+				freq_div <= 0;
+			end
 		end
 	end
+
+	assign LED = freq_div[15:0];
+
+	sys_counter_freq #(50000000) freq_counter(CLK100MHZ, 1'b0, freq_div, square_wave);
+
+	wire square_pwm = square_wave ? 8'h7f: 8'h0;
+	sys_counter_pwm #(256) bodge_pwm(clock, 1'b0, square_pwm, bodge_pwm_out);
+	assign AUD_PWM = bodge_pwm_out;
+	assign audio_data_test = bodge_square ? wave_hi : wave_lo;
 
 	// FIX: make this expandable.
 	mux4 #(32) iomux(
