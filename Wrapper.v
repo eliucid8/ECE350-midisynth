@@ -161,11 +161,15 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
     );
 
 	assign JB = midi_result[7:0];
-	// assign JC[0] = JA[0];
-	// assign JC[1] = midi_busy_reading;
-	assign JC[2] = audio_clock;
+
+	assign JC[0] = audio_clock;
+	assign JC[1] = audio_clock;
+	assign JC[2] = data_audio_out;
 	assign JC[3] = word_clock_monitor;
-	assign JC[4] = data_audio_out;
+	assign JC[4] = audio_clock;
+	assign JC[5] = audio_clock;
+	assign JC[6] = data_audio_out;
+	assign JC[7] = word_clock_monitor;
 
 	// FIX: AUDIO BODGE
 	assign AUD_SD = 1'b1;
