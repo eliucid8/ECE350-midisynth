@@ -171,7 +171,9 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 	assign AUD_SD = 1'b1;
 	wire[31:0] duty_cyc;
 	always @(negedge midi_busy_reading) begin
-		if(midi_result[23:20] == 4'h9) begin
+		if(midi_result[23:20] == 4'h9) begin // \note on
+			
+		end else if (midi_result[23:20] == 4'h8) begin // \note off
 			
 		end
 	end
