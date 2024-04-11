@@ -33,7 +33,7 @@ module sys_counter_wide #(parameter COUNT = 69)(input clock, input clr, output d
     end
 endmodule
 
-module sys_counter_var #(
+module sys_counter_pwm #(
     parameter COUNT = 69
 ) (
     input clock,

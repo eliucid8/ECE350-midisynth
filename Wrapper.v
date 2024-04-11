@@ -24,12 +24,13 @@
  *
  **/
 
-module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, JB, JC);
+module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, JB, JC, AUD_PWM, AUD_SD);
 	input CLK100MHZ, CPU_RESETN;
 	input[7:0] JA;
 	output[7:0] JB, JC;
 	output [15:0] LED;
 	output[7:0] sevenseg, AN;
+	output AUD_PWM, AUD_SD;
 	wire reset = ~CPU_RESETN;
 	
 	reg clock50mhz, clk1khz;
@@ -150,7 +151,7 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 	end
 	assign LED[15:0] = midi_result[15:0];
 
-	assign wire [15:0] audio_data_test = 16'hbeef;
+	wire[15:0] audio_data_test = 16'hbeef;
 	wire word_clock_monitor;
 	wire data_audio_out;
 
@@ -160,13 +161,20 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
     );
 
 	assign JB = midi_result[7:0];
-	assign JC[0] = JA[0];
-	assign JC[1] = midi_busy_reading;
+	// assign JC[0] = JA[0];
+	// assign JC[1] = midi_busy_reading;
 	assign JC[2] = audio_clock;
 	assign JC[3] = word_clock_monitor;
 	assign JC[4] = data_audio_out;
 
-
+	// FIX: AUDIO BODGE
+	assign AUD_SD = 1'b1;
+	wire[31:0] duty_cyc;
+	always @(negedge midi_busy_reading) begin
+		if(midi_result[23:20] == 4'h9) begin
+			
+		end
+	end
 
 	// FIX: make this expandable.
 	mux4 #(32) iomux(
