@@ -70,7 +70,7 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 
 
 	// ADD YOUR MEMORY FILE HERE
-	localparam INSTR_FILE = "basic_midi";
+	localparam INSTR_FILE = "sort";
 	
 	// Main Processing Unit
 	processor CPU(.clock(clock), .reset(reset), 
@@ -163,7 +163,7 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 	.wrise(wrise), .wfall(wfall)
     );
 
-	wire square_wave;
+	wire square_wave, bodge_pwm_out;
 
 	assign JB[0] = wrise;
 	assign JB[1] = wfall;

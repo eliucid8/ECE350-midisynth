@@ -73,7 +73,7 @@ module insn_decode #(
     assign ctrlbus[14] = |{insns[BNE], insns[BLT]};
 
     // use_non_PC:
-    assign ctrlbus[15] = |{insns[J], insns[BNE], insns[JAL], insns[JR], insns[BLT], insns[BEX]};
+    assign ctrlbus[15] = |{/* insns[J], */ insns[BNE], /* insns[JAL], */ insns[JR], insns[BLT], insns[BEX]};
 
     // jal:
     assign ctrlbus[16] = insns[JAL];

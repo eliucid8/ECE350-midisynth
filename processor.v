@@ -97,20 +97,28 @@ module processor(
         disp =              25;
 
     // ========Fetch========
-    wire[31:0] pcp1, next_pc, addr_imem_out; // pc plus 1
+    wire[31:0] pcp1, next_pc, addr_imem_out, pc_out;
     wire stall_fetch, stall_decode, stall_execute;
 
+    // hacky: jump and jal don't require a flush.
+    wire fast_jump = ~|{q_imem[31:29]} && q_imem[27]; // if opcode is j or jal
+    wire[31:0] fast_jump_addr = {5'b0, q_imem[26:0]};
+    wire cflow_flush;
+
     assign address_imem = addr_imem_out;
+
 
     cla_32 pc_increment(.A(addr_imem_out), .B(32'b1), .Cin(1'b0), .Sum(pcp1));
 
     register #(32) pc(
-        .clk(clock), .writeEnable(!stall_fetch), .reset(reset), .dataIn(next_pc), .dataOut(addr_imem_out)
+        .clk(clock), .writeEnable(!stall_fetch), .reset(reset), .dataIn(next_pc), .dataOut(pc_out)
     );
+    assign addr_imem_out = (fast_jump && !cflow_flush) ? fast_jump_addr : pc_out;
+
 
     wire[63:0] FDIR, FDIRin;
     wire flush_FD;
-    assign FDIRin = flush_FD ? 64'b0 : {addr_imem_out, q_imem}; // We don't use pc+1 here bc idk, non blocking assignments.
+    assign FDIRin = flush_FD ? 64'b0 : {pc_out, q_imem}; // We don't use pc+1 here bc idk, non blocking assignments.
     register #(64) FDIRlatch(
         .clk(!clock), .writeEnable(!stall_decode), .reset(reset), .dataIn(FDIRin), .dataOut(FDIR)
     );
@@ -270,7 +278,7 @@ module processor(
     assign cflow_addr = Xctrlbus[branch] ? branch_addr : jump_addr;
 
     wire[31:0] next_no_stall;
-    wire cflow_flush;
+    
     assign cflow_flush = Xctrlbus[use_non_PC] && !(Xctrlbus[branch] && !do_branch) && !(Xctrlbus[bex] && no_bex_jump); // Flush if we change control flow. don't flush if branch not taken, however.
 
     assign next_no_stall = Xctrlbus[use_non_PC] ? cflow_addr : pcp1; // is next_no_stall necessary???
