@@ -33,7 +33,7 @@
  *
  **/
 
-module Wrapper_tb #(parameter FILE = "sort");
+module Wrapper_tb #(parameter FILE = "basic_midi");
 
 	// FileData
 	localparam DIR = "Test Files/";

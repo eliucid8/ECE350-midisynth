@@ -21,61 +21,61 @@ module counter #(
     end
 endmodule
 
-module rShiftReg #(
-    parameter WIDTH = 32 ) (
-    output[WIDTH-1:0] q,
-    input[WIDTH-1:0] init,
-    input shin, // shift in
-    input clk,
-    input clr,
-    input en );
+// module rShiftReg #(
+//     parameter WIDTH = 32 ) (
+//     output[WIDTH-1:0] q,
+//     input[WIDTH-1:0] init,
+//     input shin, // shift in
+//     input clk,
+//     input clr,
+//     input en );
     
-    wire[WIDTH-1:0] d;
-    assign d[WIDTH-1] = shin;
-    assign d[WIDTH-2:0] = q[WIDTH-1:1];
+//     wire[WIDTH-1:0] d;
+//     assign d[WIDTH-1] = shin;
+//     assign d[WIDTH-2:0] = q[WIDTH-1:1];
 
-    genvar i;
-    generate
-        for(i = 0; i < WIDTH; i = i + 1) begin
-            dffe_init dff(
-                .q(q[i]), .d(d[i]), 
-                .clk(clk), .en(en), 
-                .clr(clr), .init(init[i])
-            );
-        end    
-    endgenerate
-endmodule
+//     genvar i;
+//     generate
+//         for(i = 0; i < WIDTH; i = i + 1) begin
+//             dffe_init dff(
+//                 .q(q[i]), .d(d[i]), 
+//                 .clk(clk), .en(en), 
+//                 .clr(clr), .init(init[i])
+//             );
+//         end    
+//     endgenerate
+// endmodule
 
-module lShiftReg #(
-    parameter WIDTH = 32) (
-    output[WIDTH-1:0] q,
-    input[WIDTH-1:0] init,
-    input shin, // shift in
-    input clk,
-    input clr,
-    input en );
+// module lShiftReg #(
+//     parameter WIDTH = 32) (
+//     output[WIDTH-1:0] q,
+//     input[WIDTH-1:0] init,
+//     input shin, // shift in
+//     input clk,
+//     input clr,
+//     input en );
     
-    wire[WIDTH-1:0] d;
-    assign d[0] = shin;
-    assign d[WIDTH-1:1] = q[WIDTH-2:0];
+//     wire[WIDTH-1:0] d;
+//     assign d[0] = shin;
+//     assign d[WIDTH-1:1] = q[WIDTH-2:0];
 
-    genvar i;
-    generate
-        for(i = 0; i < WIDTH; i = i + 1) begin
-            dffe_init dff(
-                .q(q[i]), .d(d[i]), 
-                .clk(clk), .en(en), 
-                .clr(clr), .init(init[i])
-            );
-        end    
-    endgenerate
-endmodule
+//     genvar i;
+//     generate
+//         for(i = 0; i < WIDTH; i = i + 1) begin
+//             dffe_init dff(
+//                 .q(q[i]), .d(d[i]), 
+//                 .clk(clk), .en(en), 
+//                 .clr(clr), .init(init[i])
+//             );
+//         end    
+//     endgenerate
+// endmodule
 
-module edgedetector(output out, input clock, input sig);
-    wire prev_sig;
-    dffe_ref prev(.q(prev_sig), .d(sig), .clk(clock), .en(1'b1));
-    assign out = !prev_sig && sig;
-endmodule
+// module edgedetector(output out, input clock, input sig);
+//     wire prev_sig;
+//     dffe_ref prev(.q(prev_sig), .d(sig), .clk(clock), .en(1'b1));
+//     assign out = !prev_sig && sig;
+// endmodule
 
 module debouncer #(
     parameter DELAY_CYCLES = 100000 

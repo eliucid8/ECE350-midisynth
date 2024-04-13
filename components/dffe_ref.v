@@ -61,13 +61,13 @@ module dffe_init(q, d, clk, en, clr, init);
     end
 endmodule
 
-module tffe(q, t, clk, en, clr);
-    input t, clk, en, clr;
-    output q;
+// module tffe(q, t, clk, en, clr);
+//     input t, clk, en, clr;
+//     output q;
 
-    // t acts like another enable signal
-    wire en2, d;
-    and(en2, t, en);
-    not(d, q);
-    dffe_ref dff(.q(q), .d(d), .clk(clk), .en(en2), .clr(clr));
-endmodule
+//     // t acts like another enable signal
+//     wire en2, d;
+//     and(en2, t, en);
+//     not(d, q);
+//     dffe_ref dff(.q(q), .d(d), .clk(clk), .en(en2), .clr(clr));
+// endmodule

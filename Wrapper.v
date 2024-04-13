@@ -50,7 +50,7 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 	wire audio_clock, CLK_9600KHZ;
 	AUDIO_CLOCK PLEASEPLEASEPLL(.audio_clock(CLK_9600KHZ), .reset(1'b0), .clk_in1(CLK100MHZ));
 	// The frequency is divided by an extra factor of 2 when using sys_counter wide.
-    sys_counter_wide #(99) downaudio(.clock(CLK_9600KHZ), .clr(1'b0), .down_clock(audio_clock));
+    sys_counter_wide #(3) downaudio(.clock(CLK_9600KHZ), .clr(1'b0), .down_clock(audio_clock));
 
 	input manual_clock; 
 	input[1:0] SW;
@@ -70,7 +70,7 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 
 
 	// ADD YOUR MEMORY FILE HERE
-	localparam INSTR_FILE = "sort";
+	localparam INSTR_FILE = "basic_midi";
 	
 	// Main Processing Unit
 	processor CPU(.clock(clock), .reset(reset), 
@@ -130,23 +130,32 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 	wire [31:0] mmio_result;
 	assign memDataResult = do_mmio ? mmio_result : memDataOut;
 
-	localparam 
-		MMIO_XORSHIFT = 	32'h2001, // 8193
-		MMIO_MIDIIN = 		32'h2002; // 8194
-
-	// xorshift
-	wire[31:0] rng_result;
-	wire next_rng = mem_read_enable && memAddr == MMIO_XORSHIFT; // hex address 1388
-	xorshift #(.SEED(32'hdeadbeef)) xorshift_rng(.rand(rng_result), .next(next_rng), .clock(clock));
-
+	wire[31:0] midi_result;
 	wire midi_busy_reading;
-	wire[23:0] midi_bytes;
-	reg[31:0] midi_result;
-	wire[31:0] midi_raw;
-	midi_monitor midi_bitty(.midi_data(JA[0]), .clock(clock), .busy_reading(midi_busy_reading), .midi_bytes(midi_bytes), .midi_raw(midi_raw));
-	always @(negedge midi_busy_reading) begin
-		midi_result <= {8'b0, midi_bytes};
-	end
+	mmio mamma_mmio(.mmio_result(mmio_result), .midi_result(midi_result), .midi_busy_reading(midi_busy_reading),
+		.clock(clock), .memAddr(memAddr), .mem_read_enable(mem_read_enable), .midi_data(JA[3])
+	);
+	// wire do_mmio = mem_read_enable && (memAddr > 32'h1fff);
+	// wire [31:0] mmio_result;
+	// assign memDataResult = do_mmio ? mmio_result : memDataOut;
+
+	// localparam 
+	// 	MMIO_XORSHIFT = 	32'h2001, // 8193
+	// 	MMIO_MIDIIN = 		32'h2002; // 8194
+
+	// // xorshift
+	// wire[31:0] rng_result;
+	// wire next_rng = mem_read_enable && memAddr == MMIO_XORSHIFT; // hex address 1388
+	// xorshift #(.SEED(32'hdeadbeef)) xorshift_rng(.rand(rng_result), .next(next_rng), .clock(clock));
+
+	// wire midi_busy_reading;
+	// wire[23:0] midi_bytes;
+	// reg[31:0] midi_result;
+	// wire[31:0] midi_raw;
+	// midi_monitor midi_bitty(.midi_data(JA[0]), .clock(clock), .busy_reading(midi_busy_reading), .midi_bytes(midi_bytes), .midi_raw(midi_raw));
+	// always @(negedge midi_busy_reading) begin
+	// 	midi_result <= {8'b0, midi_bytes};
+	// end
 
 	wire[15:0] audio_data_test;
 	wire word_clock_monitor;
@@ -182,9 +191,9 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 	// FIX: AUDIO BODGE
 	wire[3:0] midi_status, midi_channel;
 	wire[7:0] midi_note, midi_velocity;
-	assign midi_status = midi_bytes[23:20];
-	assign midi_note = midi_bytes[15:8];
-	assign midi_velocity = midi_bytes[7:0];
+	assign midi_status = midi_result[23:20];
+	assign midi_note = midi_result[15:8];
+	assign midi_velocity = midi_result[7:0];
 
 
 	assign AUD_SD = 1'b1;
@@ -198,12 +207,12 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 	reg signed [15:0] wave_hi, wave_lo;
 	
 
-	always @(negedge midi_busy_reading) begin
+	always @(posedge clock) begin
 		if(midi_status == 4'h8) begin // \note on
 			freq_div <= FREQs[midi_note - 8'h15];
 			cur_midi_note <= midi_note;
-			wave_hi <= (midi_velocity << 8);
-			wave_lo <= -(midi_velocity << 8);
+			wave_hi <= 16'32767;
+			wave_lo <= 16'-(32767);
 		end else if (midi_status == 4'h9) begin // \note off
 			if(midi_note == cur_midi_note) begin
 				freq_div <= 0;
@@ -220,9 +229,9 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 	assign AUD_PWM = bodge_pwm_out;
 	assign audio_data_test = bodge_square ? wave_hi : wave_lo;
 
-	// FIX: make this expandable.
-	mux4 #(32) iomux(
-		.out(mmio_result), .sel(memAddr[1:0]), 
-		.in0(32'hfbadc0de), .in1(rng_result), .in2(midi_result), .in3(32'hdeadbeef));
+	// // FIX: make this expandable.
+	// mux4 #(32) iomux(
+	// 	.out(mmio_result), .sel(memAddr[1:0]), 
+	// 	.in0(32'hfbadc0de), .in1(rng_result), .in2(midi_result), .in3(32'hdeadbeef));
 
 endmodule
