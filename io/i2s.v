@@ -18,7 +18,7 @@ module i2s(
     //but can give R(t) while L(t), or R(t+1) while R(t)
     //and likewise can give L(t+1) while outputting L(t).
 
-    sys_counter_wide #(31) wordclock(~bit_clock, reset, word_clock); //weird but its on the not, i know right
+    sys_counter_wide #(15) wordclock(~bit_clock, reset, word_clock); //weird but its on the not, i know right
 
     initial begin
         data_reg = 16'hc0de;
