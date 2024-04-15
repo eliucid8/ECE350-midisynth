@@ -162,7 +162,6 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 	wire data_audio_out;
 	wire wrise, wfall;
 
-	wire bodge_square;
 	// sys_counter_freq #(48000) bodge_freq(audio_clock, 1'b0, 4800, bodge_square);
 	// sys_counter_wide #(49) bodge_freq(audio_clock, 1'b0, bodge_square);
 
@@ -177,7 +176,8 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 	assign JB[0] = wrise;
 	assign JB[1] = wfall;
 	assign JB[2] = square_wave;
-	assign JB[3] = bodge_square;
+	assign LED = audio_data_test;
+	assign JB[7:4] audio_data_test[15:12];
 
 	assign JC[0] = audio_clock;
 	assign JC[1] = audio_clock;
@@ -204,30 +204,28 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 
 	reg[20:0] freq_div;
 	reg[7:0] cur_midi_note;
-	reg signed [15:0] wave_hi, wave_lo;
+	reg [15:0] wave_hi, wave_lo;
 	
 
 	always @(posedge clock) begin
-		if(midi_status == 4'h8) begin // \note on
+		if(midi_status == 4'h9) begin // \note on
 			freq_div <= FREQs[midi_note - 8'h15];
 			cur_midi_note <= midi_note;
-			wave_hi <= 16'32767;
-			wave_lo <= 16'-(32767);
-		end else if (midi_status == 4'h9) begin // \note off
+			wave_hi <= 16'h7fff;
+			wave_lo <= 16'h8000;
+		end else if (midi_status == 4'h8) begin // \note off
 			if(midi_note == cur_midi_note) begin
 				freq_div <= 0;
 			end
 		end
 	end
 
-	assign LED = freq_div[15:0];
-
 	sys_counter_freq #(50000000) freq_counter(CLK100MHZ, 1'b0, freq_div, square_wave);
 
 	wire square_pwm = square_wave ? 8'h7f: 8'h0;
 	sys_counter_pwm #(256) bodge_pwm(clock, 1'b0, square_pwm, bodge_pwm_out);
 	assign AUD_PWM = bodge_pwm_out;
-	assign audio_data_test = bodge_square ? wave_hi : wave_lo;
+	assign audio_data_test = square_wave ? 16'h3fff : 16'hc001;
 
 	// // FIX: make this expandable.
 	// mux4 #(32) iomux(
