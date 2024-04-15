@@ -58,7 +58,7 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 	wire debounced_man_clock;
 	debouncer clock_debouncer(.debounced(debounced_man_clock), .sig(manual_clock), .clock(clock50mhz));
 
-	wire clock = SW ? debounced_man_clock : clock50mhz;
+	wire clock = SW[0] ? debounced_man_clock : clock50mhz;
 
 	wire rwe, mwe, mem_read_enable;
 	wire[4:0] rd, rs1, rs2;
@@ -135,37 +135,13 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 	mmio mamma_mmio(.mmio_result(mmio_result), .midi_result(midi_result), .midi_busy_reading(midi_busy_reading),
 		.clock(clock), .memAddr(memAddr), .mem_read_enable(mem_read_enable), .midi_data(JA[3])
 	);
-	// wire do_mmio = mem_read_enable && (memAddr > 32'h1fff);
-	// wire [31:0] mmio_result;
-	// assign memDataResult = do_mmio ? mmio_result : memDataOut;
-
-	// localparam 
-	// 	MMIO_XORSHIFT = 	32'h2001, // 8193
-	// 	MMIO_MIDIIN = 		32'h2002; // 8194
-
-	// // xorshift
-	// wire[31:0] rng_result;
-	// wire next_rng = mem_read_enable && memAddr == MMIO_XORSHIFT; // hex address 1388
-	// xorshift #(.SEED(32'hdeadbeef)) xorshift_rng(.rand(rng_result), .next(next_rng), .clock(clock));
-
-	// wire midi_busy_reading;
-	// wire[23:0] midi_bytes;
-	// reg[31:0] midi_result;
-	// wire[31:0] midi_raw;
-	// midi_monitor midi_bitty(.midi_data(JA[0]), .clock(clock), .busy_reading(midi_busy_reading), .midi_bytes(midi_bytes), .midi_raw(midi_raw));
-	// always @(negedge midi_busy_reading) begin
-	// 	midi_result <= {8'b0, midi_bytes};
-	// end
 
 	wire[15:0] audio_data_test;
 	wire word_clock_monitor;
 	wire data_audio_out;
 	wire wrise, wfall;
 
-	// sys_counter_freq #(48000) bodge_freq(audio_clock, 1'b0, 4800, bodge_square);
-	// sys_counter_wide #(49) bodge_freq(audio_clock, 1'b0, bodge_square);
-
-	i2s eyetwo(.sys_clock(clock), .bit_clock(audio_clock),
+	i2s eyetwo(.sys_clock(clock), .reset(1'b0), .bit_clock(audio_clock),
     .audio_data(audio_data_test),
     .word_clock(word_clock_monitor), .data_bit(data_audio_out),
 	.wrise(wrise), .wfall(wfall)
@@ -177,7 +153,7 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 	assign JB[1] = wfall;
 	assign JB[2] = square_wave;
 	assign LED = audio_data_test;
-	assign JB[7:4] audio_data_test[15:12];
+	assign JB[7:4] = audio_data_test[15:12];
 
 	assign JC[0] = audio_clock;
 	assign JC[1] = audio_clock;
@@ -202,34 +178,52 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 		$readmemh("freq_divs.mem", FREQs);
 	end
 
+	reg[12:0] inc_rates[95:0];
+	initial begin
+		$readmemh("inc_rates.mem", inc_rates);
+	end
+
+	// Lookup table bodge
+	wire[15:0] square_val, saw_val;
+	reg[15:0] square_index, saw_index;
+	squarelut be_there_or_be_square(.value(square_val), .index(square_index));
+	sawlut see_what_you_saw(.value(saw_val), .index(saw_index));
+	reg[12:0] inc_rate;
+	reg[15:0] wave_val;
+	wire wave_select = 1'b1;
+	wire double_word_clock;
+
+	sys_counter_wide #(7) double_word_clock(~bit_clock, reset, double_word_clock); //weird but its on the not, i know right
+	always @(posedge double_word_clock) begin
+		square_index <= square_index + {3'b0, inc_rate};
+		saw_index <= saw_index + {3'b0, inc_rate};
+		wave_val <= wave_select ? saw_val : square_val;
+	end
+	assign audio_data_test = wave_val;
+
 	reg[20:0] freq_div;
 	reg[7:0] cur_midi_note;
 	reg [15:0] wave_hi, wave_lo;
-	
 
 	always @(posedge clock) begin
 		if(midi_status == 4'h9) begin // \note on
 			freq_div <= FREQs[midi_note - 8'h15];
+			inc_rate <= inc_rates[midi_note - 8'h15];
 			cur_midi_note <= midi_note;
-			wave_hi <= 16'h7fff;
-			wave_lo <= 16'h8000;
+			wave_hi <= (midi_velocity[6:0] << 8);
+			wave_lo <= 16'hffff - (midi_velocity[6:0] << 8);
 		end else if (midi_status == 4'h8) begin // \note off
 			if(midi_note == cur_midi_note) begin
 				freq_div <= 0;
+				inc_rate <= 0;
 			end
 		end
 	end
 
 	sys_counter_freq #(50000000) freq_counter(CLK100MHZ, 1'b0, freq_div, square_wave);
 
-	wire square_pwm = square_wave ? 8'h7f: 8'h0;
+	wire[7:0] square_pwm = square_wave ? 8'h6f: 8'h10;
 	sys_counter_pwm #(256) bodge_pwm(clock, 1'b0, square_pwm, bodge_pwm_out);
 	assign AUD_PWM = bodge_pwm_out;
-	assign audio_data_test = square_wave ? 16'h3fff : 16'hc001;
-
-	// // FIX: make this expandable.
-	// mux4 #(32) iomux(
-	// 	.out(mmio_result), .sel(memAddr[1:0]), 
-	// 	.in0(32'hfbadc0de), .in1(rng_result), .in2(midi_result), .in3(32'hdeadbeef));
-
+	// assign audio_data_test = square_wave ? wave_hi : wave_lo;
 endmodule
