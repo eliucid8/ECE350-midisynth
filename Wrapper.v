@@ -171,13 +171,13 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 	end
 
 	// Lookup table bodge
-	reg[15:0] wave_val;
-	wire[15:0] square_val, saw_val, sin_val;
-	reg[31:0] lut_index;
-	reg[28:0] inc_rate;
+	wire[15:0] square_val, saw_val, sin_val, tri_val;
+	reg[31:0] lut_index, bent_inc_rate;
+	reg[28:0] inc_rate, inc_rate_delta;
 	square_lut be_there_or_be_square(.value(square_val), .index(lut_index[31:16]));
 	saw_lut see_what_you_saw(.value(saw_val), .index(lut_index[31:16]));
-	sin_lut derogatory_slur(.value(sin_val), .index(lut_index[31:16]));
+	sin_lut fine_heres_a_sine(.value(sin_val), .index(lut_index[31:16]));
+	tri_lut oh_shit_i_need_to_do_graphics(.value(tri_val), .index(lut_index[31:16]));
 	
 	wire wave_select = SW[15];
 	wire double_word_clock;
@@ -185,42 +185,52 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 	initial begin
 		lut_index <= 32'b0;
 		inc_rate <= 0;
-		wave_val <= 0;
 	end
 
 	sys_counter_wide #(7) double_word_clock(~audio_clock, 1'b0, double_word_clock); //weird but its on the not, i know right
 	always @(negedge double_word_clock) begin
-		lut_index <= lut_index + inc_rate;
-		wave_val <= wave_select ? saw_val : square_val;
+		lut_index <= lut_index + bent_inc_rate;
 	end
 	
 
 	reg[20:0] freq_div;
 	reg[7:0] cur_midi_note;
-	reg [15:0] wave_hi, wave_lo;
 
 	always @(posedge clock) begin
-		if(midi_status == 4'h9) begin // \note on
+		if(reset) begin
+			lut_index <= 32'b0;
+			inc_rate <= 0;
+			bent_inc_rate <= 0;
+		end else if(midi_status == 4'h9) begin // \note on
 			freq_div <= FREQs[midi_note - 8'h15];
-			inc_rate <= inc_rates[midi_note - 8'h15];
+			inc_rate_delta <= inc_rates[midi_note - 8'h14] - inc_rates[midi_note - 8'h15];
 			cur_midi_note <= midi_note;
-			wave_hi <= (midi_velocity[6:0] << 8);
-			wave_lo <= 16'hffff - (midi_velocity[6:0] << 8);
+			inc_rate = inc_rates[midi_note - 8'h15];
+			bent_inc_rate = inc_rate;
+			// wave_hi <= (midi_velocity[6:0] << 8);
+			// wave_lo <= 16'hffff - (midi_velocity[6:0] << 8);
 		end else if (midi_status == 4'h8) begin // \note off
 			if(midi_note == cur_midi_note) begin
 				freq_div <= 0;
 				inc_rate <= 0;
+				bent_inc_rate <= 0;
 			end
+		end else if (midi_status == 4'he)begin
+
+			bent_inc_rate <= inc_rate + ((midi_velocity * inc_rate_delta) >> 5);
 		end
 	end
 
 	sys_counter_freq #(50000000) freq_counter(CLK100MHZ, 1'b0, freq_div, square_wave);
 
-	wire[7:0] square_pwm = square_wave ? 8'h6f: 8'h10;
-	sys_counter_pwm #(256) bodge_pwm(clock, 1'b0, square_pwm, bodge_pwm_out);
+
+	wire [11:0] pwm_val_out = 12'h800 + audio_data_test[15:4]; 
+	sys_counter_pwm #(4096) bodge_pwm(clock, 1'b0, pwm_val_out, bodge_pwm_out);
 	assign AUD_PWM = bodge_pwm_out;
-	assign audio_data_test = SW[14] ? wave_val[15:0] : sin_val;
-	// assign audio_data_test = square_wave ? wave_hi : wave_lo;
+
+	mux4 #(16) waveform_mux(
+		.out(audio_data_test), .sel(SW[15:14]), 
+		.in0(square_val), .in1(saw_val), .in2(sin_val), .in3(tri_val));;
 
 	assign JB[0] = wrise;
 	assign JB[1] = wfall;

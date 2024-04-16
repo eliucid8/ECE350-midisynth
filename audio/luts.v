@@ -32,3 +32,12 @@ module sin_lut(
     assign value = index[15] ? -unflipped_vals : unflipped_vals;
 
 endmodule
+
+module tri_lut(
+    output signed [15:0] value, 
+    input [15:0] index);
+
+    wire [15:0] flipped_index = index[14] ? {15'h4000 - {1'b0, index[13:0]}, 1'b0} : {1'b0, index[13:0], 1'b0};
+    assign value = index[15] ? -flipped_index : flipped_index;
+
+endmodule
