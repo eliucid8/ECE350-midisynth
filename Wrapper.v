@@ -53,7 +53,7 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
     sys_counter_wide #(3) downaudio(.clock(CLK_9600KHZ), .clr(1'b0), .down_clock(audio_clock));
 
 	input manual_clock; 
-	input[1:0] SW;
+	input[15:0] SW;
 
 	wire debounced_man_clock;
 	debouncer clock_debouncer(.debounced(debounced_man_clock), .sig(manual_clock), .clock(clock50mhz));
@@ -115,13 +115,15 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 		sevenseg_latch = 32'd0;
 	end
 
+
+	// ====seven-segment====
 	sevenseg_controller sevenseg_ctrl(.downclock(clk1khz), .word(sevenseg_latch), .segments(sevenseg), .enables(AN));
 
 	always @(posedge clock/*  or posedge reset */) begin
 		if(reset) begin
 			sevenseg_latch <= 32'd0;
 		end else if(sevenseg_writeEnable) begin
-			sevenseg_latch <= sevenseg_data;
+			sevenseg_latch <= sevenseg_data; // FIX: temp debug values: wave_val
 		end
 	end
 
@@ -149,21 +151,6 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 
 	wire square_wave, bodge_pwm_out;
 
-	assign JB[0] = wrise;
-	assign JB[1] = wfall;
-	assign JB[2] = square_wave;
-	assign LED = audio_data_test;
-	assign JB[7:4] = audio_data_test[15:12];
-
-	assign JC[0] = audio_clock;
-	assign JC[1] = audio_clock;
-	assign JC[2] = data_audio_out;
-	assign JC[3] = word_clock_monitor;
-	assign JC[4] = audio_clock;
-	assign JC[5] = audio_clock;
-	assign JC[6] = data_audio_out;
-	assign JC[7] = word_clock_monitor;
-
 	// FIX: AUDIO BODGE
 	wire[3:0] midi_status, midi_channel;
 	wire[7:0] midi_note, midi_velocity;
@@ -178,28 +165,35 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 		$readmemh("freq_divs.mem", FREQs);
 	end
 
-	reg[12:0] inc_rates[95:0];
+	reg[28:0] inc_rates[95:0];
 	initial begin
 		$readmemh("inc_rates.mem", inc_rates);
 	end
 
 	// Lookup table bodge
-	wire[15:0] square_val, saw_val;
-	reg[15:0] square_index, saw_index;
-	squarelut be_there_or_be_square(.value(square_val), .index(square_index));
-	sawlut see_what_you_saw(.value(saw_val), .index(saw_index));
-	reg[12:0] inc_rate;
 	reg[15:0] wave_val;
-	wire wave_select = 1'b1;
+	wire[15:0] square_val, saw_val, sin_val;
+	reg[31:0] lut_index;
+	reg[28:0] inc_rate;
+	square_lut be_there_or_be_square(.value(square_val), .index(lut_index[31:16]));
+	saw_lut see_what_you_saw(.value(saw_val), .index(lut_index[31:16]));
+	sin_lut derogatory_slur(.value(sin_val), .index(lut_index[31:16]));
+	
+	wire wave_select = SW[15];
 	wire double_word_clock;
 
-	sys_counter_wide #(7) double_word_clock(~bit_clock, reset, double_word_clock); //weird but its on the not, i know right
-	always @(posedge double_word_clock) begin
-		square_index <= square_index + {3'b0, inc_rate};
-		saw_index <= saw_index + {3'b0, inc_rate};
+	initial begin
+		lut_index <= 32'b0;
+		inc_rate <= 0;
+		wave_val <= 0;
+	end
+
+	sys_counter_wide #(7) double_word_clock(~audio_clock, 1'b0, double_word_clock); //weird but its on the not, i know right
+	always @(negedge double_word_clock) begin
+		lut_index <= lut_index + inc_rate;
 		wave_val <= wave_select ? saw_val : square_val;
 	end
-	assign audio_data_test = wave_val;
+	
 
 	reg[20:0] freq_div;
 	reg[7:0] cur_midi_note;
@@ -225,5 +219,20 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 	wire[7:0] square_pwm = square_wave ? 8'h6f: 8'h10;
 	sys_counter_pwm #(256) bodge_pwm(clock, 1'b0, square_pwm, bodge_pwm_out);
 	assign AUD_PWM = bodge_pwm_out;
+	assign audio_data_test = SW[14] ? wave_val[15:0] : sin_val;
 	// assign audio_data_test = square_wave ? wave_hi : wave_lo;
+
+	assign JB[0] = wrise;
+	assign JB[1] = wfall;
+	assign JB[2] = square_wave;
+	assign JB[3] = double_word_clock;
+
+	assign JC[0] = audio_clock;
+	assign JC[1] = audio_clock;
+	assign JC[2] = data_audio_out;
+	assign JC[3] = word_clock_monitor;
+	assign JC[4] = audio_clock;
+	assign JC[5] = audio_clock;
+	assign JC[6] = data_audio_out;
+	assign JC[7] = word_clock_monitor;
 endmodule
