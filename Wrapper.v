@@ -174,6 +174,11 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 	wire[15:0] square_val, saw_val, sin_val, tri_val;
 	reg[31:0] lut_index, bent_inc_rate;
 	reg[28:0] inc_rate, inc_rate_delta;
+	initial begin
+		lut_index <= 32'b0;
+		inc_rate <= 0;
+	end
+
 	square_lut be_there_or_be_square(.value(square_val), .index(lut_index[31:16]));
 	saw_lut see_what_you_saw(.value(saw_val), .index(lut_index[31:16]));
 	sin_lut fine_heres_a_sine(.value(sin_val), .index(lut_index[31:16]));
@@ -182,23 +187,21 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 	wire wave_select = SW[15];
 	wire double_word_clock;
 
-	initial begin
-		lut_index <= 32'b0;
-		inc_rate <= 0;
-	end
 
 	sys_counter_wide #(7) double_word_clock(~audio_clock, 1'b0, double_word_clock); //weird but its on the not, i know right
 	always @(negedge double_word_clock) begin
+		if(reset) begin
+			lut_index <= 32'b0;
+		end else begin
 		lut_index <= lut_index + bent_inc_rate;
+		end
 	end
-	
 
 	reg[20:0] freq_div;
 	reg[7:0] cur_midi_note;
 
 	always @(posedge clock) begin
 		if(reset) begin
-			lut_index <= 32'b0;
 			inc_rate <= 0;
 			bent_inc_rate <= 0;
 		end else if(midi_status == 4'h9) begin // \note on
@@ -216,15 +219,18 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 				bent_inc_rate <= 0;
 			end
 		end else if (midi_status == 4'he)begin
-
-			bent_inc_rate <= inc_rate + ((midi_velocity * inc_rate_delta) >> 5);
+			if(midi_velocity >= 8'h40) begin
+				bent_inc_rate <= inc_rate + (((midi_velocity - 8'h40) * inc_rate_delta) >> 4);
+			end else begin
+				bent_inc_rate <= inc_rate - (((8'h40 - midi_velocity) * inc_rate_delta) >> 4);
+			end
 		end
 	end
 
 	sys_counter_freq #(50000000) freq_counter(CLK100MHZ, 1'b0, freq_div, square_wave);
 
 
-	wire [11:0] pwm_val_out = 12'h800 + audio_data_test[15:4]; 
+	// wire [11:0] pwm_val_out = {~audio_data_test[15], audio_data_test[14:4]}; 
 	sys_counter_pwm #(4096) bodge_pwm(clock, 1'b0, pwm_val_out, bodge_pwm_out);
 	assign AUD_PWM = bodge_pwm_out;
 
@@ -234,7 +240,7 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 
 	assign JB[0] = wrise;
 	assign JB[1] = wfall;
-	assign JB[2] = square_wave;
+	assign JB[2] = bodge_pwm_out;
 	assign JB[3] = double_word_clock;
 
 	assign JC[0] = audio_clock;
