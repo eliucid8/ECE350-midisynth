@@ -23,7 +23,8 @@ module sin_lut(
 
     reg signed [15:0] sin_lut_vals [128:0];
     initial begin
-        $readmemh("sin_lut.mem", sin_lut_vals);
+        // FIX: remove the directories when you go to flash this to hardware
+        $readmemh(/* Test Files/Memory Files/ */ "sin_lut.mem", sin_lut_vals);
     end
 
     // flip the order of indexing if in 2nd or 4th quadrant of range

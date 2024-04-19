@@ -64,13 +64,13 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 	wire[4:0] rd, rs1, rs2;
 	wire[31:0] instAddr, instData, 
 		rData, regA, regB,
-		memAddr, memDataIn, memDataOut, memDataResult;
+		mem_addr, memDataIn, memDataOut, memDataResult;
 	wire sevenseg_writeEnable;
 	wire[31:0] sevenseg_data;
 
 
 	// ADD YOUR MEMORY FILE HERE
-	localparam INSTR_FILE = "basic_midi";
+	localparam INSTR_FILE = "dct";
 	
 	// Main Processing Unit
 	processor CPU(.clock(clock), .reset(reset), 
@@ -84,7 +84,7 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 		.data_writeReg(rData), .data_readRegA(regA), .data_readRegB(regB),
 									
 		// RAM
-		.wren(mwe), .address_dmem(memAddr), .mem_ren(mem_read_enable),
+		.wren(mwe), .address_dmem(mem_addr), .mem_ren(mem_read_enable),
 		.data(memDataIn), .q_dmem(/* memDataOut */memDataResult),
 		
 		.sevenseg_writeEnable(sevenseg_writeEnable), .sevenseg_data(sevenseg_data)); 
@@ -105,7 +105,7 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 	// Processor Memory (RAM)
 	RAM ProcMem(.clk(clock), 
 		.wEn(mwe), 
-		.addr(memAddr[11:0]), 
+		.addr(mem_addr[11:0]), 
 		.dataIn(memDataIn), 
 		.dataOut(memDataOut));
 
@@ -128,14 +128,14 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 	end
 
 	// ====Memory-Mapped I/O (like a real computer)====
-	wire do_mmio = mem_read_enable && (memAddr > 32'h1fff);
+	wire do_mmio = mem_read_enable && (mem_addr > 32'h1fff);
 	wire [31:0] mmio_result;
 	assign memDataResult = do_mmio ? mmio_result : memDataOut;
 
 	wire[31:0] midi_result;
 	wire midi_busy_reading;
 	mmio mamma_mmio(.mmio_result(mmio_result), .midi_result(midi_result), .midi_busy_reading(midi_busy_reading),
-		.clock(clock), .memAddr(memAddr), .mem_read_enable(mem_read_enable), .midi_data(JA[3])
+		.clock(clock), .mem_addr(mem_addr), .mem_read_enable(mem_read_enable), .midi_data(JA[3])
 	);
 
 	wire[15:0] audio_data_test;
@@ -179,16 +179,16 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 		inc_rate <= 0;
 	end
 
-	square_lut be_there_or_be_square(.value(square_val), .index(lut_index[31:16]));
-	saw_lut see_what_you_saw(.value(saw_val), .index(lut_index[31:16]));
-	sin_lut fine_heres_a_sine(.value(sin_val), .index(lut_index[31:16]));
-	tri_lut oh_shit_i_need_to_do_graphics(.value(tri_val), .index(lut_index[31:16]));
+	square_lut square_lutty(.value(square_val), .index(lut_index[31:16]));
+	saw_lut saw_lutty(.value(saw_val), .index(lut_index[31:16]));
+	sin_lut sin_lutty(.value(sin_val), .index(lut_index[31:16]));
+	tri_lut tri_lutty(.value(tri_val), .index(lut_index[31:16]));
 	
 	wire wave_select = SW[15];
 	wire double_word_clock;
 
 
-	sys_counter_wide #(7) double_word_clock(~audio_clock, 1'b0, double_word_clock); //weird but its on the not, i know right
+	sys_counter_wide #(7) dble_word_clock(~audio_clock, 1'b0, double_word_clock); //weird but its on the not, i know right
 	always @(negedge double_word_clock) begin
 		if(reset) begin
 			lut_index <= 32'b0;
@@ -230,7 +230,7 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 	sys_counter_freq #(50000000) freq_counter(CLK100MHZ, 1'b0, freq_div, square_wave);
 
 
-	// wire [11:0] pwm_val_out = {~audio_data_test[15], audio_data_test[14:4]}; 
+	wire [11:0] pwm_val_out = {~audio_data_test[15], audio_data_test[14:4]}; 
 	sys_counter_pwm #(4096) bodge_pwm(clock, 1'b0, pwm_val_out, bodge_pwm_out);
 	assign AUD_PWM = bodge_pwm_out;
 

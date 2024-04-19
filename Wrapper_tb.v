@@ -33,7 +33,7 @@
  *
  **/
 
-module Wrapper_tb #(parameter FILE = "basic_midi");
+module Wrapper_tb #(parameter FILE = "dct");
 
 	// FileData
 	localparam DIR = "Test Files/";
@@ -50,7 +50,7 @@ module Wrapper_tb #(parameter FILE = "basic_midi");
 	wire[4:0] rd, rs1, rs2;
 	wire[31:0] instAddr, instData, 
 		rData, regA, regB,
-		memAddr, memDataIn, memDataOut, memDataResult;
+		mem_addr, memDataIn, memDataOut, memDataResult;
 	wire sevenseg_writeEnable;
 	wire[31:0] sevenseg_data;
 
@@ -94,7 +94,7 @@ module Wrapper_tb #(parameter FILE = "basic_midi");
 		.data_writeReg(rData), .data_readRegA(regA), .data_readRegB(regB),
 									
 		// RAM
-		.wren(mwe), .address_dmem(memAddr), 
+		.wren(mwe), .address_dmem(mem_addr), 
 		.data(memDataIn), .q_dmem(memDataResult), .mem_ren(mem_read_enable),
 		
 		// IO
@@ -116,7 +116,7 @@ module Wrapper_tb #(parameter FILE = "basic_midi");
 	// Processor Memory (RAM)
 	RAM ProcMem(.clk(clock), 
 		.wEn(mwe), 
-		.addr(memAddr[11:0]), 
+		.addr(mem_addr[11:0]), 
 		.dataIn(memDataIn), 
 		.dataOut(memDataOut));
 
@@ -127,18 +127,28 @@ module Wrapper_tb #(parameter FILE = "basic_midi");
 		#80 downclock = ~downclock; 
 
 	// ====Memory-Mapped I/O (like a real computer)====
-	wire do_mmio = mem_read_enable && (memAddr > 32'h1fff);
+	// wire do_mmio = mem_read_enable && (mem_addr > 32'h1fff);
+	// wire [31:0] mmio_result;
+	// assign memDataResult = do_mmio ? mmio_result : memDataOut;
+
+	// localparam 
+	// 	MMIO_XORSHIFT = 32'h2001; // 8193
+
+	// // xorshift
+	// wire[31:0] rng_result;
+	// wire next_rng = mem_read_enable && mem_addr == MMIO_XORSHIFT; // hex address 1388
+	// xorshift #(.SEED(32'hdeadbeef)) xorshift_rng(.rand(rng_result), .next(next_rng), .clock(clock));
+	// assign mmio_result = next_rng ? rng_result : 32'hfbadc0de; // FIX: will get ugly pretty soon. behavioral base/bounds? CAM?
+
+	wire do_mmio = mem_read_enable && (mem_addr > 32'h1fff);
 	wire [31:0] mmio_result;
 	assign memDataResult = do_mmio ? mmio_result : memDataOut;
 
-	localparam 
-		MMIO_XORSHIFT = 32'h2001; // 8193
-
-	// xorshift
-	wire[31:0] rng_result;
-	wire next_rng = mem_read_enable && memAddr == MMIO_XORSHIFT; // hex address 1388
-	xorshift #(.SEED(32'hdeadbeef)) xorshift_rng(.rand(rng_result), .next(next_rng), .clock(clock));
-	assign mmio_result = next_rng ? rng_result : 32'hfbadc0de; // FIX: will get ugly pretty soon. behavioral base/bounds? CAM?
+	wire[31:0] midi_result;
+	wire midi_busy_reading;
+	mmio mamma_mmio(.mmio_result(mmio_result), .midi_result(midi_result), .midi_busy_reading(midi_busy_reading),
+		.clock(clock), .mem_addr(mem_addr), .mem_read_enable(mem_read_enable), .midi_data(1'b1)
+	);
 
 	//////////////////
 	// Test Harness //
