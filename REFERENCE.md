@@ -57,7 +57,10 @@ We also implement memory-mapped I/O: since the RAM block has only a 12-bit addre
 
 |Device|Address|Behavior|
 |------|-------|--------|
-|Pseudorandom Number Generator|`9000 (0x2328)`|**Load:** Loads a pseudorandom 32-bit value into the specified register (0 is not possible)|
+|Pseudorandom Number Generator|`8193 (0x2001)`|**Load:** Loads a pseudorandom 32-bit value into the specified register (0 is not possible)|
+|MIDI in|`8194 (0x2002)`|**Load:** Loads the last MIDI command into the specified register|
+|DCT LUT|`[16384:16895] (0x4000:0x41ff)`|**Load:** Loads a Discrete Cosine Transform look-up table value|
+|Sine LUT|`[131072(-65536):196607(-1)] (0x10000:0x1ffff)`|**Load:** Loads a Sine look-up table value|
 
 ## Clarifications
 #### disp:

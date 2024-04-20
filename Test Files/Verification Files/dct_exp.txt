@@ -1,4 +1,4 @@
-num cycles:4096
+num cycles:16383
 r0=0
 r1=0
 r2=0

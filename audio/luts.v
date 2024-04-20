@@ -24,11 +24,11 @@ module sin_lut(
     reg signed [15:0] sin_lut_vals [128:0];
     initial begin
         // FIX: remove the directories when you go to flash this to hardware
-        $readmemh(/* Test Files/Memory Files/ */ "sin_lut.mem", sin_lut_vals);
+        $readmemh("sin_lut.mem", sin_lut_vals, 0, 128);
     end
 
     // flip the order of indexing if in 2nd or 4th quadrant of range
-    wire [6:0] flipped_index = index[14] ? 8'h80 - index[13:7] : index[13:7];
+    wire [7:0] flipped_index = index[14] ? 8'h80 - index[13:7] : index[13:7];
     wire signed [15:0] unflipped_vals = sin_lut_vals[flipped_index];
     assign value = index[15] ? -unflipped_vals : unflipped_vals;
 

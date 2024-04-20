@@ -33,7 +33,7 @@
  *
  **/
 
-module Wrapper_tb #(parameter FILE = "dct");
+module Wrapper_tb #(parameter FILE = "basic_midi");
 
 	// FileData
 	localparam DIR = "Test Files/";
@@ -213,7 +213,7 @@ module Wrapper_tb #(parameter FILE = "dct");
 				$fdisplay(actFile, "Cycle %3d: Wrote %0d into register %0d", cycles, rData, rd);
 			end
 			if(sevenseg_writeEnable) begin
-				$display("sevenseg: 0x%h (%d)", sevenseg_data, sevenseg_data);
+				$display("sevenseg: 0x%h (%d)", sevenseg_data, $signed(sevenseg_data));
 			end
 		end
 

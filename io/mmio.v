@@ -10,7 +10,8 @@ module mmio (
 	localparam 
 		MMIO_XORSHIFT = 	32'h2001, // 8193
 		MMIO_MIDIIN = 		32'h2002, // 8194
-		MMIO_SIN_LUT_REGION = 32'h10000;
+		MMIO_DCTLUTS = 		32'h4000, // 16384
+		MMIO_SIN_LUT_REGION = 32'h10000; // -65536
 
 	// xorshift
 	wire[31:0] rng_result;
@@ -27,6 +28,15 @@ module mmio (
 		midi_result <= {8'b0, midi_bytes};
 	end
     assign mmio_result = (mem_addr == MMIO_MIDIIN) ? midi_result : 32'bz;
+
+	wire[31:0] dct_lut_val;
+	reg [23:0] sin_lut_vals [511:0];
+	initial begin
+        // FIX: remove the directories when you go to flash this to hardware
+        $readmemh("dct_lut.mem", sin_lut_vals, 0, 511);
+    end
+	assign dct_lut_val = {8'b0, sin_lut_vals[mem_addr[8:0]]};
+	assign mmio_result = (mem_addr >= MMIO_DCTLUTS && mem_addr < MMIO_DCTLUTS + 512) ? dct_lut_val : 32'bz;
 
 	wire[15:0] sin_val;
 	sin_lut sin_lutty(.value(sin_val), .index(mem_addr[15:0]));

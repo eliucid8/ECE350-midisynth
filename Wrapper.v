@@ -24,10 +24,11 @@
  *
  **/
 
-module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, JB, JC, AUD_PWM, AUD_SD);
+module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, JB, JC, JD, AUD_PWM, AUD_SD);
 	input CLK100MHZ, CPU_RESETN;
 	input[7:0] JA;
-	output[7:0] JB, JC;
+	inout[7:0] JC;
+	output[7:0] JB, JD;
 	output [15:0] LED;
 	output[7:0] sevenseg, AN;
 	output AUD_PWM, AUD_SD;
@@ -70,7 +71,7 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 
 
 	// ADD YOUR MEMORY FILE HERE
-	localparam INSTR_FILE = "dct";
+	localparam INSTR_FILE = "basic_midi";
 	
 	// Main Processing Unit
 	processor CPU(.clock(clock), .reset(reset), 
@@ -133,9 +134,10 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 	assign memDataResult = do_mmio ? mmio_result : memDataOut;
 
 	wire[31:0] midi_result;
+	wire midi_in_port;
 	wire midi_busy_reading;
 	mmio mamma_mmio(.mmio_result(mmio_result), .midi_result(midi_result), .midi_busy_reading(midi_busy_reading),
-		.clock(clock), .mem_addr(mem_addr), .mem_read_enable(mem_read_enable), .midi_data(JA[3])
+		.clock(clock), .mem_addr(mem_addr), .mem_read_enable(mem_read_enable), .midi_data(midi_in_port)
 	);
 
 	wire[15:0] audio_data_test;
@@ -243,12 +245,17 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 	assign JB[2] = bodge_pwm_out;
 	assign JB[3] = double_word_clock;
 
-	assign JC[0] = audio_clock;
-	assign JC[1] = audio_clock;
-	assign JC[2] = data_audio_out;
-	assign JC[3] = word_clock_monitor;
-	assign JC[4] = audio_clock;
-	assign JC[5] = audio_clock;
-	assign JC[6] = data_audio_out;
-	assign JC[7] = word_clock_monitor;
+	assign midi_in_port = JC[0];
+	// assign JC[1] = audio_clock;
+	// assign JC[2] = data_audio_out;
+	// assign JC[3] = word_clock_monitor;
+	// assign JC[4] = audio_clock;
+	// assign JC[5] = audio_clock;
+	// assign JC[6] = data_audio_out;
+	// assign JC[7] = word_clock_monitor;
+
+	assign JD[1] = word_clock_monitor;
+	assign JD[2] = audio_clock;
+	assign JD[5] = data_audio_out;
+
 endmodule
