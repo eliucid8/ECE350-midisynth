@@ -39,7 +39,7 @@ module mmio (
 	assign mmio_result = (mem_addr >= MMIO_DCTLUTS && mem_addr < MMIO_DCTLUTS + 512) ? dct_lut_val : 32'bz;
 
 	wire[15:0] sin_val;
-	sin_lut sin_lutty(.value(sin_val), .index(mem_addr[15:0]));
+	tri_lut tri_lutty(.value(sin_val), .index(mem_addr[15:0]));
 	assign mmio_result = (mem_addr >= MMIO_SIN_LUT_REGION) ? {16'b0, sin_val} : 32'bz;
 
     // mux4 #(32) iomux(

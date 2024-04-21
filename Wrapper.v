@@ -71,7 +71,7 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 
 
 	// ADD YOUR MEMORY FILE HERE
-	localparam INSTR_FILE = "dct";
+	localparam INSTR_FILE = "basic_midi";
 	
 	// Main Processing Unit
 	processor CPU(.clock(clock), .reset(reset), 

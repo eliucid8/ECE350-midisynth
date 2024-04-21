@@ -33,7 +33,7 @@
  *
  **/
 
-module Wrapper_tb #(parameter FILE = "dct");
+module Wrapper_tb #(parameter FILE = "basic_midi");
 
 	// FileData
 	localparam DIR = "Test Files/";

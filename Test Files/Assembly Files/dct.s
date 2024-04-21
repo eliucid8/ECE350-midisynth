@@ -343,52 +343,6 @@ zip_array:
     # # disp    $a0
     # # disp    $a1
 
-    # addi    $t0,    $0,     1       # i = 1
-    # addi    $t5,    $a0,    0       # t5 = &vec[0]
-    # addi    $t1,    $a1,    0       # half, iteration bounds, also saving a1
-    # _zip_array_outer_loop:
-    #     blt     $t1,    $t0,    _zip_array_done     # if half < i, return.
-    #     addi    $t2,    $t0,    0       # j = i
-    #     # disp    $t0
-    #     # addi    $at,    $0,    -1
-    #     # disp    $at
-    #     lw      $t3,    0($t2)          # cur = arr[j]
-    #     _zip_array_inner_loop:
-    #         # disp    $t1
-    #         # disp    $t2
-    #         addi    $t1,    $t1,    -1
-    #         blt     $t1,    $t2,    _zip_array_go_backwards # if half < j, go backwards
-    #         addi    $t1,    $t1,    1
-    #         # j < half
-    #             sll     $t2,    $t2,    1   # j *= 2
-    #             add     $t6,    $t5,    $t2
-                
-    #             lw      $t4,    0($t6)      # new_cur = arr[j]
-    #             sw      $t3,    0($t6)      # arr[j] = cur
-    #             addi    $t3,    $t4,    0   # cur = new_cur
-    #             j       _zip_array_decide_break
-
-    #         _zip_array_go_backwards:
-    #             addi    $t1     $t1,    1
-    #             sub     $t2,    $t2,    $t1 # j -= half
-    #             sll     $t2,    $t2,    1   # j *= 2
-    #             addi    $t2,    $t2,    1   # j += 1
-    #             add     $t6,    $t5,    $t2
-
-    #             lw      $t4,    0($t6)      # new_cur = arr[j]
-    #             sw      $t3,    0($t6)      # arr[j] = cur
-    #             addi    $t3,    $t4,    0   # cur = new_cur
-    #             # j       _zip_array_decide_break
-
-    #         _zip_array_decide_break:
-    #         bne     $t2,    $t0,    _zip_array_inner_loop   # break if i == j
-    #     nop
-    #     addi    $t0,    $t0,    2   # i += 2
-    #     j _zip_array_outer_loop
-
-    # _zip_array_done:
-    #     jr  $ra
-
 
 # ====print array====
 # a0 = array start index
