@@ -1,11 +1,11 @@
 module multdiv(
 	data_operandA, data_operandB, 
-	ctrl_MULT, ctrl_DIV, 
+	ctrl_MULT, ctrl_DIV, shift16,
 	clock, 
 	data_result, data_exception, data_resultRDY);
 
     input [31:0] data_operandA, data_operandB;
-    input ctrl_MULT, ctrl_DIV, clock;
+    input ctrl_MULT, ctrl_DIV, clock, shift16;
 
     output [31:0] data_result;
     output data_exception, data_resultRDY;
@@ -22,7 +22,7 @@ module multdiv(
 
     mult mult(
         .multiplicand(data_operandA), .multiplier(data_operandB),
-        .reset(ctrl_MULT), .clk(clock),
+        .shift16(shift16), .reset(ctrl_MULT), .clk(clock),
         .prod(mult_res), .ovf(mult_ovf), .ready(mult_ready)
     );
 

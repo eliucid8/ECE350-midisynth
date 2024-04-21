@@ -247,6 +247,13 @@ module negator(dataOut, dataIn);
     cla_32 cla(.A(~dataIn), .B(32'b0), .Cin(1'b1), .Sum(dataOut));
 endmodule
 
+module negator64(dataOut, dataIn);
+    output[63:0] dataOut;
+    input[63:0] dataIn;
+
+    cla_64 cla(.A(~dataIn), .B(64'b0), .Cin(1'b1), .Sum(dataOut));
+endmodule
+
 module full_adder(S, Cout, A, B, Cin);
     input A, B, Cin;
     output S, Cout;

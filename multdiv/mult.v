@@ -1,11 +1,11 @@
 module mult(
     multiplicand, multiplier,
-    reset, clk,
+    shift16, reset, clk,
     prod, ovf, ready
 );
     // mpc = multiplicand, mpl = multiplier
     input[31:0] multiplicand, multiplier;
-    input reset, clk;
+    input shift16, reset, clk;
     output[31:0] prod;
     output ovf;
     output ready;
@@ -14,7 +14,7 @@ module mult(
 
     wire do_neg_mpc, do_neg_mpl;
     wire[31:0] neg_prod, neg_mpc, neg_mpl, mult_mpc_in, mult_mpl_in;
-    wire[63:0] mult_out;
+    wire[63:0] mult_out, full_neg_prod, full_prod;
 
     register #(32) mpcReg(.clk(clk), .writeEnable(reset), .reset(1'b0), .dataIn(multiplicand), .dataOut(mpc)); // enable write only on ctrl_MULT
     register #(32) multiplierReg(.clk(clk), .writeEnable(reset), .reset(1'b0), .dataIn(multiplier), .dataOut(mpl));
@@ -30,8 +30,10 @@ module mult(
 
     dadda_mult luigi(.Product(mult_out), .A(mult_mpc_in), .B(mult_mpl_in));
 
-    negator negprod(neg_prod, mult_out[31:0]);
-    assign prod = do_neg_mpc^do_neg_mpl ? neg_prod: mult_out[31:0];
+    negator64 negprod(full_neg_prod, mult_out);
+    assign full_prod = do_neg_mpc^do_neg_mpl ? full_neg_prod: mult_out;
+    assign prod = shift16 ? full_prod[47:16] : full_prod[31:0];
+
 
     wire[5:0] count;
     counter #(6) multCounter(.count(count), .clr(reset), .clk(clk));

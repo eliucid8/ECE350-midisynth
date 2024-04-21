@@ -49,7 +49,7 @@ module alu(
 
     multdiv multdiv(
         .data_operandA(data_operandA), .data_operandB(data_operandB),
-        .ctrl_MULT(alu_ctrl[6]), .ctrl_DIV(ctrl_div),
+        .ctrl_MULT(alu_ctrl[6]), .ctrl_DIV(ctrl_div), .shift16(ctrl_ALUopcode[3]),
         .clock(clock),
         .data_result(md_result), .data_exception(md_except), .data_resultRDY(md_ready)
     );
