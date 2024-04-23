@@ -59,7 +59,7 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 	wire debounced_man_clock;
 	debouncer clock_debouncer(.debounced(debounced_man_clock), .sig(manual_clock), .clock(clock50mhz));
 
-	wire clock = SW[0] ? debounced_man_clock : clock50mhz;
+	wire clock = /* SW[0] ? debounced_man_clock : */ clock50mhz;
 
 	wire rwe, mwe, mem_read_enable;
 	wire[4:0] rd, rs1, rs2;
@@ -123,8 +123,8 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 	always @(posedge clock/*  or posedge reset */) begin
 		if(reset) begin
 			sevenseg_latch <= 32'd0;
-		end else if(sevenseg_writeEnable) begin
-			sevenseg_latch <= /* sevenseg_data */ sevenseg_override ; // FIX: temp debug values
+		end else if(/* sevenseg_writeEnable */ 0 == 0) begin
+			sevenseg_latch <= sevenseg_data /* sevenseg_override  */; // FIX: temp debug values
 		end
 	end
 
@@ -158,7 +158,7 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 		dct_result_counter <= dct_result_counter + 1;
 	end
 
-	assign sevenseg_override = SW[2] ? {dct_result_array[15], dct_result_array[14], dct_result_array[13], dct_result_array[12], dct_result_array[11], dct_result_array[10], dct_result_array[9], dct_result_array[8]} : {dct_result_array[7], dct_result_array[6], dct_result_array[5], dct_result_array[4], dct_result_array[3], dct_result_array[2], dct_result_array[1], dct_result_array[0]};
+	// assign sevenseg_override = SW[2] ? {dct_result_array[15], dct_result_array[14], dct_result_array[13], dct_result_array[12], dct_result_array[11], dct_result_array[10], dct_result_array[9], dct_result_array[8]} : {dct_result_array[7], dct_result_array[6], dct_result_array[5], dct_result_array[4], dct_result_array[3], dct_result_array[2], dct_result_array[1], dct_result_array[0]};
 
 	wire[15:0] audio_data_test;
 	wire [15:0] poly_audio_value;
@@ -168,7 +168,7 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 
 
 	i2s eyetwo(.sys_clock(clock), .reset(1'b0), .bit_clock(audio_clock),
-    .audio_data(SW[0] ? poly_audio_value : audio_data_test),
+    .audio_data(SW[1] ? poly_audio_value : audio_data_test),
     .word_clock(word_clock_monitor), .data_bit(data_audio_out),
 	.wrise(wrise), .wfall(wfall)
     );
@@ -208,15 +208,18 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 	sin_lut sin_lutty(.value(sin_val), .index(lut_index[31:16]));
 	tri_lut tri_lutty(.value(tri_val), .index(lut_index[31:16]));
 	
-	wire wave_select = SW[15];
 	wire double_word_clock;
 
+	wire[15:0] inc_display;
+	wire[7:0] pitch_display;
+	wire[31:0] amplitude_display;
 	polyphonizer soundinator(
 		.clock(clock), .double_word_clock(double_word_clock), .midi_busy(midi_busy_reading), 
-		.midi_result(midi_result), .audio_value(poly_audio_value)
+		.midi_result(midi_result), .audio_value(poly_audio_value), .SW(SW), .inc_display(inc_display), .pitch_display(pitch_display),
+		.running_dword(JB[4]), .running_midi(JB[5]), .amplitude_display(amplitude_display), .reset(reset)
 	);
 
-
+	assign sevenseg_override = SW[13] ? amplitude_display : {midi_note, pitch_display, inc_display};
 
 	sys_counter_wide #(7) dble_word_clock(~audio_clock, 1'b0, double_word_clock); //weird but its on the not, i know right
 	always @(negedge double_word_clock) begin
@@ -259,7 +262,7 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 
 	sys_counter_freq #(50000000) freq_counter(CLK100MHZ, 1'b0, freq_div, square_wave);
 
-	wire [15:0] big_pwm_out = SW[0] ? poly_audio_value : audio_data_test;
+	wire [15:0] big_pwm_out = SW[1] ? poly_audio_value : audio_data_test;
 	wire [11:0] pwm_val_out = {~big_pwm_out[15], big_pwm_out[14:4]}; 
 	sys_counter_pwm #(4096) bodge_pwm(clock, 1'b0, pwm_val_out, bodge_pwm_out);
 	assign AUD_PWM = bodge_pwm_out;
@@ -268,7 +271,7 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 		.out(audio_data_test), .sel(SW[15:14]), 
 		.in0(square_val), .in1(saw_val), .in2(sin_val), .in3(tri_val));
 
-	assign audio_buffer_write_val = audio_data_test;
+	assign audio_buffer_write_val = poly_audio_value;
 	reg prev_word_clock, word_clock_edge;
 	always @(posedge clock) begin
 		prev_word_clock <= word_clock_monitor;
@@ -284,8 +287,8 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 	assign midi_in_port = JC[0];
 	assign JC[2] = write_audio_buffer;
 
-	assign JD[1] = word_clock_monitor;
+	assign JD[5] = word_clock_monitor;
 	assign JD[2] = audio_clock;
-	assign JD[5] = data_audio_out;
+	assign JD[1] = data_audio_out;
 
 endmodule

@@ -4,7 +4,7 @@ module square_lut(
     output[15:0] value, 
     input [15:0] index);
     
-    assign value = index[15] ? 16'h8001 : 16'h7fff;
+    assign value = index[15] ? 16'hc001 : 16'h3fff;
 
 endmodule
 

@@ -19,9 +19,9 @@ module midi_monitor(input midi_data, input clock, output reg busy_reading, outpu
 
     always @(posedge midi_clock) begin
         if(busy_reading) begin
-            midi_message[bit_num] = midi_data;
-            busy_reading = !(bit_num == BIT_NUM_MAX);
-            bit_num = bit_num+1;
+            midi_message[bit_num] <= midi_data;
+            busy_reading <= !(bit_num == BIT_NUM_MAX);
+            bit_num <= bit_num+1;
         end else if(!midi_data) begin
             bit_num <= 5'b0; 
             busy_reading <= 1'b1; 
