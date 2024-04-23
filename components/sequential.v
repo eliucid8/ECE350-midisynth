@@ -77,6 +77,30 @@ endmodule
 //     assign out = !prev_sig && sig;
 // endmodule
 
+module negedgedetector (
+    output out,
+    input clock,
+    input sig
+);
+    reg last_sig;
+    always @(posedge clock) begin
+        last_sig <= sig;
+    end
+    assign out = last_sig && !sig;
+endmodule
+
+module posedgedetector (
+    output out,
+    input clock,
+    input sig
+);
+    reg last_sig;
+    always @(posedge clock) begin
+        last_sig <= sig;
+    end
+    assign out = !last_sig && sig;
+endmodule
+
 module debouncer #(
     parameter DELAY_CYCLES = 100000 
 ) (

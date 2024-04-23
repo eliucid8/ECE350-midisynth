@@ -13,6 +13,7 @@ alu/barrel_shifters.v
 alu/big_gates.v
 alu/cla.v
 audio/luts.v
+audio/polyphonizer.v
 control/decode.v
 control/bypass.v
 regfile/regfile.v

@@ -74,41 +74,41 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 	localparam INSTR_FILE = "dct";
 	
 	// Main Processing Unit
-	processor CPU(.clock(clock), .reset(reset), 
+	// processor CPU(.clock(clock), .reset(reset), 
 								
-		// ROM
-		.address_imem(instAddr), .q_imem(instData),
+	// 	// ROM
+	// 	.address_imem(instAddr), .q_imem(instData),
 									
-		// Regfile
-		.ctrl_writeEnable(rwe),     .ctrl_writeReg(rd),
-		.ctrl_readRegA(rs1),     .ctrl_readRegB(rs2), 
-		.data_writeReg(rData), .data_readRegA(regA), .data_readRegB(regB),
+	// 	// Regfile
+	// 	.ctrl_writeEnable(rwe),     .ctrl_writeReg(rd),
+	// 	.ctrl_readRegA(rs1),     .ctrl_readRegB(rs2), 
+	// 	.data_writeReg(rData), .data_readRegA(regA), .data_readRegB(regB),
 									
-		// RAM
-		.wren(mwe), .address_dmem(mem_addr), .mem_ren(mem_read_enable),
-		.data(memDataIn), .q_dmem(/* memDataOut */memDataResult),
+	// 	// RAM
+	// 	.wren(mwe), .address_dmem(mem_addr), .mem_ren(mem_read_enable),
+	// 	.data(memDataIn), .q_dmem(/* memDataOut */memDataResult),
 		
-		.sevenseg_writeEnable(sevenseg_writeEnable), .sevenseg_data(sevenseg_data)); 
+	// 	.sevenseg_writeEnable(sevenseg_writeEnable), .sevenseg_data(sevenseg_data)); 
 	
-	// Instruction Memory (ROM)
-	ROM #(.MEMFILE({INSTR_FILE, ".mem"}))
-	InstMem(.clk(clock), 
-		.addr(instAddr[11:0]), 
-		.dataOut(instData));
+	// // Instruction Memory (ROM)
+	// ROM #(.MEMFILE({INSTR_FILE, ".mem"}))
+	// InstMem(.clk(clock), 
+	// 	.addr(instAddr[11:0]), 
+	// 	.dataOut(instData));
 	
-	// Register File
-	regfile RegisterFile(.clock(clock), 
-		.ctrl_writeEnable(rwe), .ctrl_reset(reset), 
-		.ctrl_writeReg(rd),
-		.ctrl_readRegA(rs1), .ctrl_readRegB(rs2), 
-		.data_writeReg(rData), .data_readRegA(regA), .data_readRegB(regB));
+	// // Register File
+	// regfile RegisterFile(.clock(clock), 
+	// 	.ctrl_writeEnable(rwe), .ctrl_reset(reset), 
+	// 	.ctrl_writeReg(rd),
+	// 	.ctrl_readRegA(rs1), .ctrl_readRegB(rs2), 
+	// 	.data_writeReg(rData), .data_readRegA(regA), .data_readRegB(regB));
 						
-	// Processor Memory (RAM)
-	RAM ProcMem(.clk(clock), 
-		.wEn(mwe), 
-		.addr(mem_addr[11:0]), 
-		.dataIn(memDataIn), 
-		.dataOut(memDataOut));
+	// // Processor Memory (RAM)
+	// RAM ProcMem(.clk(clock), 
+	// 	.wEn(mwe), 
+	// 	.addr(mem_addr[11:0]), 
+	// 	.dataIn(memDataIn), 
+	// 	.dataOut(memDataOut));
 
 	// ====io====
 	reg[31:0] sevenseg_latch;
@@ -119,12 +119,12 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 
 	// ====seven-segment====
 	sevenseg_controller sevenseg_ctrl(.downclock(clk1khz), .word(sevenseg_latch), .segments(sevenseg), .enables(AN));
-
+	wire[31:0] sevenseg_override;
 	always @(posedge clock/*  or posedge reset */) begin
 		if(reset) begin
 			sevenseg_latch <= 32'd0;
 		end else if(sevenseg_writeEnable) begin
-			sevenseg_latch <= /* sevenseg_data */ {midi_result[15:0], dct_result}; // FIX: temp debug values
+			sevenseg_latch <= /* sevenseg_data */ sevenseg_override ; // FIX: temp debug values
 		end
 	end
 
@@ -145,19 +145,30 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 		.audio_buff_ready(JA[4])
 	);
 
+	reg[3:0] dct_result_counter;
 	wire[15:0] dct_result;
+	reg[3:0] dct_result_array[15:0];
 	dct_result_regs dct_regs(
-		.dct_result(dct_result), .clock(clock), .read_index(SW[5:2]), 
+		.dct_result(dct_result), .clock(clock), .read_index(dct_result_counter), 
 		.mem_write_enable(mwe), .mem_addr(mem_addr), .mem_write_data(memDataIn)
 	);
+	
+	always @(posedge clock) begin
+		dct_result_array[dct_result_counter] <= dct_result[14:11];
+		dct_result_counter <= dct_result_counter + 1;
+	end
+
+	assign sevenseg_override = SW[2] ? {dct_result_array[15], dct_result_array[14], dct_result_array[13], dct_result_array[12], dct_result_array[11], dct_result_array[10], dct_result_array[9], dct_result_array[8]} : {dct_result_array[7], dct_result_array[6], dct_result_array[5], dct_result_array[4], dct_result_array[3], dct_result_array[2], dct_result_array[1], dct_result_array[0]};
 
 	wire[15:0] audio_data_test;
+	wire [15:0] poly_audio_value;
 	wire word_clock_monitor;
 	wire data_audio_out;
 	wire wrise, wfall;
 
+
 	i2s eyetwo(.sys_clock(clock), .reset(1'b0), .bit_clock(audio_clock),
-    .audio_data(audio_data_test),
+    .audio_data(SW[0] ? poly_audio_value : audio_data_test),
     .word_clock(word_clock_monitor), .data_bit(data_audio_out),
 	.wrise(wrise), .wfall(wfall)
     );
@@ -199,6 +210,12 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 	
 	wire wave_select = SW[15];
 	wire double_word_clock;
+
+	polyphonizer soundinator(
+		.clock(clock), .double_word_clock(double_word_clock), .midi_busy(midi_busy_reading), 
+		.midi_result(midi_result), .audio_value(poly_audio_value)
+	);
+
 
 
 	sys_counter_wide #(7) dble_word_clock(~audio_clock, 1'b0, double_word_clock); //weird but its on the not, i know right
@@ -242,8 +259,8 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 
 	sys_counter_freq #(50000000) freq_counter(CLK100MHZ, 1'b0, freq_div, square_wave);
 
-
-	wire [11:0] pwm_val_out = {~audio_data_test[15], audio_data_test[14:4]}; 
+	wire [15:0] big_pwm_out = SW[0] ? poly_audio_value : audio_data_test;
+	wire [11:0] pwm_val_out = {~big_pwm_out[15], big_pwm_out[14:4]}; 
 	sys_counter_pwm #(4096) bodge_pwm(clock, 1'b0, pwm_val_out, bodge_pwm_out);
 	assign AUD_PWM = bodge_pwm_out;
 
@@ -257,10 +274,10 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 		prev_word_clock <= word_clock_monitor;
 		word_clock_edge <= prev_word_clock ^ word_clock_monitor;
 	end
-	assign write_audio_buffer = word_clock_edge;
+	assign write_audio_buffer = word_clock_edge; // fuck I could've used a sys_counter here
 
-	assign JB[0] = wrise;
-	assign JB[1] = wfall;
+	assign JB[0] = midi_busy_reading;
+	assign JB[1] = midi_in_port;
 	assign JB[2] = bodge_pwm_out;
 	assign JB[3] = double_word_clock;
 
