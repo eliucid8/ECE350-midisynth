@@ -74,41 +74,41 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 	localparam INSTR_FILE = "dct";
 	
 	// Main Processing Unit
-	// processor CPU(.clock(clock), .reset(reset), 
+	processor CPU(.clock(clock), .reset(reset), 
 								
-	// 	// ROM
-	// 	.address_imem(instAddr), .q_imem(instData),
+		// ROM
+		.address_imem(instAddr), .q_imem(instData),
 									
-	// 	// Regfile
-	// 	.ctrl_writeEnable(rwe),     .ctrl_writeReg(rd),
-	// 	.ctrl_readRegA(rs1),     .ctrl_readRegB(rs2), 
-	// 	.data_writeReg(rData), .data_readRegA(regA), .data_readRegB(regB),
+		// Regfile
+		.ctrl_writeEnable(rwe),     .ctrl_writeReg(rd),
+		.ctrl_readRegA(rs1),     .ctrl_readRegB(rs2), 
+		.data_writeReg(rData), .data_readRegA(regA), .data_readRegB(regB),
 									
-	// 	// RAM
-	// 	.wren(mwe), .address_dmem(mem_addr), .mem_ren(mem_read_enable),
-	// 	.data(memDataIn), .q_dmem(/* memDataOut */memDataResult),
+		// RAM
+		.wren(mwe), .address_dmem(mem_addr), .mem_ren(mem_read_enable),
+		.data(memDataIn), .q_dmem(/* memDataOut */memDataResult),
 		
-	// 	.sevenseg_writeEnable(sevenseg_writeEnable), .sevenseg_data(sevenseg_data)); 
+		.sevenseg_writeEnable(sevenseg_writeEnable), .sevenseg_data(sevenseg_data)); 
 	
-	// // Instruction Memory (ROM)
-	// ROM #(.MEMFILE({INSTR_FILE, ".mem"}))
-	// InstMem(.clk(clock), 
-	// 	.addr(instAddr[11:0]), 
-	// 	.dataOut(instData));
+	// Instruction Memory (ROM)
+	ROM #(.MEMFILE({INSTR_FILE, ".mem"}))
+	InstMem(.clk(clock), 
+		.addr(instAddr[11:0]), 
+		.dataOut(instData));
 	
-	// // Register File
-	// regfile RegisterFile(.clock(clock), 
-	// 	.ctrl_writeEnable(rwe), .ctrl_reset(reset), 
-	// 	.ctrl_writeReg(rd),
-	// 	.ctrl_readRegA(rs1), .ctrl_readRegB(rs2), 
-	// 	.data_writeReg(rData), .data_readRegA(regA), .data_readRegB(regB));
+	// Register File
+	regfile RegisterFile(.clock(clock), 
+		.ctrl_writeEnable(rwe), .ctrl_reset(reset), 
+		.ctrl_writeReg(rd),
+		.ctrl_readRegA(rs1), .ctrl_readRegB(rs2), 
+		.data_writeReg(rData), .data_readRegA(regA), .data_readRegB(regB));
 						
-	// // Processor Memory (RAM)
-	// RAM ProcMem(.clk(clock), 
-	// 	.wEn(mwe), 
-	// 	.addr(mem_addr[11:0]), 
-	// 	.dataIn(memDataIn), 
-	// 	.dataOut(memDataOut));
+	// Processor Memory (RAM)
+	RAM ProcMem(.clk(clock), 
+		.wEn(mwe), 
+		.addr(mem_addr[11:0]), 
+		.dataIn(memDataIn), 
+		.dataOut(memDataOut));
 
 	// ====io====
 	reg[31:0] sevenseg_latch;
@@ -124,7 +124,7 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 		if(reset) begin
 			sevenseg_latch <= 32'd0;
 		end else if(/* sevenseg_writeEnable */ 0 == 0) begin
-			sevenseg_latch <= sevenseg_data /* sevenseg_override  */; // FIX: temp debug values
+			sevenseg_latch <= /* sevenseg_data */ sevenseg_override ; // FIX: temp debug values
 		end
 	end
 
@@ -158,7 +158,7 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 		dct_result_counter <= dct_result_counter + 1;
 	end
 
-	// assign sevenseg_override = SW[2] ? {dct_result_array[15], dct_result_array[14], dct_result_array[13], dct_result_array[12], dct_result_array[11], dct_result_array[10], dct_result_array[9], dct_result_array[8]} : {dct_result_array[7], dct_result_array[6], dct_result_array[5], dct_result_array[4], dct_result_array[3], dct_result_array[2], dct_result_array[1], dct_result_array[0]};
+	assign sevenseg_override = SW[2] ? {dct_result_array[15], dct_result_array[14], dct_result_array[13], dct_result_array[12], dct_result_array[11], dct_result_array[10], dct_result_array[9], dct_result_array[8]} : {dct_result_array[7], dct_result_array[6], dct_result_array[5], dct_result_array[4], dct_result_array[3], dct_result_array[2], dct_result_array[1], dct_result_array[0]};
 
 	wire[15:0] audio_data_test;
 	wire [15:0] poly_audio_value;
@@ -219,7 +219,7 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 		.running_dword(JB[4]), .running_midi(JB[5]), .amplitude_display(amplitude_display), .reset(reset)
 	);
 
-	assign sevenseg_override = SW[13] ? amplitude_display : {midi_note, pitch_display, inc_display};
+	// assign sevenseg_override = SW[13] ? amplitude_display : {midi_note, pitch_display, inc_display};
 
 	sys_counter_wide #(7) dble_word_clock(~audio_clock, 1'b0, double_word_clock); //weird but its on the not, i know right
 	always @(negedge double_word_clock) begin

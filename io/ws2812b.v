@@ -1,86 +1,90 @@
-module ws2812 #(parameter NUM = 8)(
-input clock_100, clear,
-input [((24*NUM)-1):0] rgb_strip,
-output out, done
+module ws2b(
+    input CLK100MHZ,
+    input push,
+    input [23:0] rgb_input,
+    // input [15:0] SW,
+    output out_signal,
+    // output [7:0] JA
 );
-//this module allows interfacing with ws2812b leds of length NUM based on array rgb_strip.
-//rgb_strip is of length num*24. rgb_strip should be 24 bit colors (8 bits each R, G, B in that order)
-//with MSB first. The leds that come first in the strip should be the most significant.
-//the done output goes high when all data is written, but it must be high for at least 50 us in order to
-//lock the new colors in to the strip and display them. the clear input can be pulled high to load in and
-//display a new array in the input. The input is saved to a reg, so after one cycle it can be changed and not
-//disrupt the writing to the strip. the out output should go to a pin. 
-//clock_100 should go to the 100MHZ CLOCK, NOT THE 50MHZ CPU CLOCK!
 
-reg out_reg, done_reg;
+wire [23:0] rgb_input;
+//assign rgb_input[0] = 24'hff0000;
+//assign rgb_input[1] = 24'h00ff00;
+//assign rgb_input[2] = 24'h0000ff;
+//assign rgb_input[3] = 24'hffff00;
+//assign rgb_input[4] = 24'h00ffff;
+//assign rgb_input[5] = 24'hff00ff;
+//assign rgb_input[6] = 24'h000000;
+//assign rgb_input[7] = 24'hffffff;
 
-reg [23:0] rgb;
-reg [((24*NUM)-1):0] rgb_strip_reg;
+// wire push;
+// assign push = SW[0];
+reg [23:0] GRB;
+wire clock_0, clock_1, bitclk, pixclk;
 
-integer counter;
-integer bit_loc;
-integer state;
-integer pixel_count;
+reg [5:0] bit_place;
+reg reset_bit_place;
 
-wire clock_20;
-sys_counter #(5) twenty(clock_100, clear, clock_20);
-
+reg out_reg, out_bit, push_reg;
+wire out_wire;
 initial begin
-    rgb_strip_reg = rgb_strip;
-    rgb = rgb_strip_reg[((24*NUM)-1):(24*(NUM-1))];
-    bit_loc <= 23;
-    counter <= 0; pixel_count <= 0;
-    GRB = {rgb[15:8], rgb[23:16], rgb[7:0]};
-    out_reg <= 1;
-    done_reg <= 0;
+    GRB = {rgb_input[15:8], rgb_input[23:16], rgb_input[7:0]};
+    bit_place = 6'd23;
+    //out_reg = 1;
 end
 
-always @(posedge clock_20) begin
-    if(state == 0 & counter == 8) begin //switch from zero_high to zero_low
-        out_reg <= 0;
-    end else if(state == 1 & counter == 16) begin //switch from one_high to one_low
-        out_reg <= 0;
-    end
-    if(counter < 25) begin
-        counter <= counter + 1;
-    end
+arb_clock #(35,90) ws_zero_clock(CLK100MHZ, clock_0);
 
-    else begin //done transmitting this bit
-        if(bit_loc == 0) begin state = 2; end
-        else begin 
-            bit_loc = bit_loc - 1;
-            state = GRB[bit_loc];
-            out_reg = 1;
-        end
-        counter <= 0;
-    end
+arb_clock #(90,35) ws_one_clock(CLK100MHZ, clock_1);
 
-    if(state == 2) begin
-        if(pixel_count == NUM-1)begin
-            done_reg = 1; out_reg = 0; //done with strip
-        end
-        else begin
-            pixel_count = pixel_count + 1;
-            bit_loc <= 23;
-            counter <= 0;
-            rgb_strip_reg = rgb_strip_reg << 24;
-            rgb = rgb_strip_reg[((24*NUM)-1):(24*(NUM-1))];
-            GRB = {rgb[15:8], rgb[23:16], rgb[7:0]};
-            out_reg <= 1;
-        end //done with one pixel, so we move on
+arb_clock #(120,5) ws_bit_clock(CLK100MHZ, bitclk); //falls 50ns before end of bit
 
-        if(clear) begin
-            rgb_strip_reg = rgb_strip;
-            rgb = rgb_strip_reg[((24*NUM)-1):(24*(NUM-1))];
-            bit_loc <= 23;
-            counter <= 0; pixel_count = 0;
-            GRB = {rgb[15:8], rgb[23:16], rgb[7:0]};
-            out_reg <= 1;
-            done_reg <= 0;
-        end
+arb_clock #(2980, 20) ws_pixel_clock(CLK100MHZ, pixclk); //falls 200ns before end of pixel
+
+//always @(negedge clock_0)begin out_reg = out_bit ? 1'b1 : 1'b0; end
+//always @(negedge clock_1)begin out_reg = 1'b0; end//out_bit ? clock_1 : clock_0; end
+//always @(posedge bitclk) begin out_reg = 1; end
+
+always @(negedge bitclk) begin
+    if(bit_place == 0)begin
+        bit_place = 6'd23;
+        out_bit = GRB[bit_place];end
+    else begin
+        out_bit = GRB[bit_place];
+        bit_place = bit_place - 1;
     end
 end
 
-assign out = out_reg;
-assign done = done_reg;
+always @(negedge pixclk) begin
+    GRB = ~GRB;//{rgb_input[15:8], rgb_input[23:16], rgb_input[7:0]};
+   // bit_place = 6'd23;
+   // out_reg = 1;
+    push_reg = push;
+end
+
+assign out_wire = out_bit ? clock_1 : clock_0;
+
+assign out_signal = push_reg ? 1'b0 : out_wire;
+// assign JA[2] = out_signal;
+// assign JA[1] = clock_1;
+// assign JA[0] = clock_0;
+// assign JA[3] = pixclk;
+// assign JA[4] = bitclk;
+endmodule
+
+
+
+module arb_clock #(parameter HIGH=50, LOW = 50)(input clk_100, output reg arb_clk);
+reg [31:0] counter;
+initial begin
+counter = 32'd0;
+arb_clk = 32'd0;
+end
+always @(posedge clk_100)
+begin
+    counter <= counter + 32'd1;
+    if(counter >= (LOW+HIGH-1))
+        counter <= 32'd0;
+    arb_clk <= (counter < HIGH) ? 1'b1 : 1'b0;
+end
 endmodule

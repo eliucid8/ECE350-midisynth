@@ -69,13 +69,13 @@ jal     dct
     addi    $t0,    $s2,    0
 
     lw      $t2,    0($t0)
-    sra     $t2,   $t2,    6        # NOTE: change this when changing DCT size!
+    sra     $t2,   $t2,    9        # NOTE: change this when changing DCT size!
     sw      $t2,    0($t0)
     addi    $t0,    $t0,    1
     _dct_normalize_loop:
         blt     $t1,    $t0,    _dct_normalize_loop_done
         lw      $t2,    0($t0)
-        sra     $t2,   $t2,    5        # NOTE: change this when changing DCT size!
+        sra     $t2,   $t2,    8        # NOTE: change this when changing DCT size!
         sw      $t2,    0($t0)
         addi    $t0,    $t0,    1
         j       _dct_normalize_loop
