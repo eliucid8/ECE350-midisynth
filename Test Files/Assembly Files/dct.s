@@ -37,10 +37,8 @@ addi    $s1,    $0,     0
 _load_audio_buffer_loop:
     blt     $s2,    $s1,    _done_load_buffer
     lw      $s4,    0($s0)
-    and     $t3,    $s4,    $t1
-    sra     $t3,    $t3,    15
-    mul     $t4,    $t3,    $t5
-    add     $s4,    $s4,    $t4
+    sll     $s4,    $s4,    16
+    sra     $s4,    $s4,    16
     # disp    $s4
     sw      $s4,    0($s1)
     addi    $s0,    $s0,    1
