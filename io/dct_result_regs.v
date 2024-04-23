@@ -26,4 +26,6 @@ module dct_result_regs(
 
     assign dct_result = dct_results[read_index];
 
+    
+
 endmodule

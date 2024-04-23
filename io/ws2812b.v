@@ -4,6 +4,7 @@ module ws2b(
     input [23:0] rgb_input,
     // input [15:0] SW,
     output out_signal,
+    output pixclk,
     // output [7:0] JA
 );
 
@@ -20,7 +21,7 @@ wire [23:0] rgb_input;
 // wire push;
 // assign push = SW[0];
 reg [23:0] GRB;
-wire clock_0, clock_1, bitclk, pixclk;
+wire clock_0, clock_1, bitclk/* , pixclk */;
 
 reg [5:0] bit_place;
 reg reset_bit_place;

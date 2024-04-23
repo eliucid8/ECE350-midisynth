@@ -27,3 +27,4 @@ io/random.v
 io/midi.v
 io/mmio.v
 io/i2s.v
+io/ws2812b.v

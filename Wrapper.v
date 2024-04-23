@@ -158,7 +158,7 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 		dct_result_counter <= dct_result_counter + 1;
 	end
 
-	assign sevenseg_override = SW[2] ? {dct_result_array[15], dct_result_array[14], dct_result_array[13], dct_result_array[12], dct_result_array[11], dct_result_array[10], dct_result_array[9], dct_result_array[8]} : {dct_result_array[7], dct_result_array[6], dct_result_array[5], dct_result_array[4], dct_result_array[3], dct_result_array[2], dct_result_array[1], dct_result_array[0]};
+	assign sevenseg_override = SW[4] ? {dct_result_array[15], dct_result_array[14], dct_result_array[13], dct_result_array[12], dct_result_array[11], dct_result_array[10], dct_result_array[9], dct_result_array[8]} : {dct_result_array[7], dct_result_array[6], dct_result_array[5], dct_result_array[4], dct_result_array[3], dct_result_array[2], dct_result_array[1], dct_result_array[0]};
 
 	wire[15:0] audio_data_test;
 	wire [15:0] poly_audio_value;
