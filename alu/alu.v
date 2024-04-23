@@ -11,7 +11,7 @@ module alu(
     output isNotEqual, isLessThan, overflow, result_rdy;
 
     wire Cout;
-    wire[7:0] alu_ctrl;
+    wire[16:0] alu_ctrl;
     /* 000 - add
      * 001 - subtract
      * 010 - and
@@ -28,7 +28,8 @@ module alu(
 
     // instruction decoding: liable to change with more additions to ISA?
     // We technically only need to know alu_ctrl atm... but perhaps that will change.
-    decoder_8 insn_dec(alu_ctrl, ctrl_ALUopcode[2:0]);
+    // decoder_8 insn_dec(alu_ctrl, ctrl_ALUopcode[2:0]);
+    assign alu_ctrl = 16'b1 << ctrl_ALUopcode[3:0];
 
     // creating negative b
     bitwise_not bitnot(B_not, data_operandB);
@@ -49,7 +50,7 @@ module alu(
 
     multdiv multdiv(
         .data_operandA(data_operandA), .data_operandB(data_operandB),
-        .ctrl_MULT(alu_ctrl[6]), .ctrl_DIV(ctrl_div), .shift16(ctrl_ALUopcode[3]),
+        .ctrl_MULT(alu_ctrl[6]), .ctrl_DIV(ctrl_div), .shift16(ctrl_ALUopcode[4]),
         .clock(clock),
         .data_result(md_result), .data_exception(md_except), .data_resultRDY(md_ready)
     );
@@ -64,11 +65,19 @@ module alu(
 
     // mux everything back together!
     // could be done with tristates as well, because we've already used a decoder?
-    mux_8 output_decider(
-        data_result, ctrl_ALUopcode[2:0], 
-        add_output, add_output, and_output, or_output, 
-        sll_output, sra_output, md_result, md_result
-        );
+    assign data_result = alu_ctrl[0] || alu_ctrl[1] ? add_output : 32'bz;
+    assign data_result = alu_ctrl[2] ? and_output : 32'bz;
+    assign data_result = alu_ctrl[3] ? or_output : 32'bz;
+    assign data_result = alu_ctrl[4] ? sll_output : 32'bz;
+    assign data_result = alu_ctrl[5] ? sra_output : 32'bz;
+    assign data_result = alu_ctrl[6] ? md_result : 32'bz;
+    assign data_result = alu_ctrl[7] ? md_result : 32'bz;
+    assign data_result = alu_ctrl[8] ? data_operandA ^ data_operandB : 32'bz;
+    // mux_8 output_decider(
+    //     data_result, ctrl_ALUopcode[2:0], 
+    //     add_output, add_output, and_output, or_output, 
+    //     sll_output, sra_output, md_result, md_result
+    //     );
 
     // overflow checker
     // TODO: minimize boolean logic?

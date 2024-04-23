@@ -1,2 +1,3 @@
 disp,JII,11000
-xpmul,R,01110
+xpmul,R,10110
+xor,R,01000

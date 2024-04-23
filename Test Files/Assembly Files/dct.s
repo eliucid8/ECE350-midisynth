@@ -11,81 +11,107 @@ addi    $sp,    $0,     4096    # initialize sp to end of memory
 
 # _end_test_loop:
 #     addi    $a0,    $0,     7
-#     addi    $a1,    $0,      16
-#     jal     zip_array
+#     addi    $a1,    $0,      32
+#     addi    $a2,    $0,     40
+#     jal     dct_plus_minus
 
 #     addi    $a0,    $0,     7
-#     addi    $a1,    $0,     32
+#     addi    $a1,    $0,     80
 #     jal     print_array
 
 # j halt
 
 # ====MAIN====
+_poll_audio_buffer:
+    lw      $s0,    8195($0)
+    bne     $s0,    $0,     _audio_buffer_ready
+    j _poll_audio_buffer
 
-addi    $s0,    $s0,    -65536  # 17 bit minimum?
+_audio_buffer_ready:
+addi    $s0,    $0,    -65536  # 17 bit minimum?
 addi    $t5,    $0,     -65536  # negative upper half
 # disp    $s0
-addi    $s2,    $s2,    63      # loop bounds     
+addi    $s2,    $0,     511      # loop bounds     
 addi    $t1,    $0,     32768   # sign bit mask
-lutloop:
-blt     $s2,    $s1,    _done_load_sin
-lw      $s4,    0($s0)
-and     $t3,    $s4,    $t1
-sra     $t3,    $t3,    15
-mul     $t4,    $t3,    $t5
-add     $s4,    $s4,    $t4
-disp    $s4
-sw      $s4,    0($s1)
-addi    $s0,    $s0,    1024
-addi    $s1,    $s1,    1
-j       lutloop
-_done_load_sin:
-addi    $s7,    $0,    -1
-disp    $s7
-disp    $s7
-disp    $s7
-disp    $s7
-add     $s7,    $0,     $0
+addi    $s1,    $0,     0   
+_load_audio_buffer_loop:
+    blt     $s2,    $s1,    _done_load_buffer
+    lw      $s4,    0($s0)
+    and     $t3,    $s4,    $t1
+    sra     $t3,    $t3,    15
+    mul     $t4,    $t3,    $t5
+    add     $s4,    $s4,    $t4
+    # disp    $s4
+    sw      $s4,    0($s1)
+    addi    $s0,    $s0,    1
+    addi    $s1,    $s1,    1
+j       _load_audio_buffer_loop
+_done_load_buffer:
+# addi    $s7,    $0,    -1
+# disp    $s7
+# disp    $s7
+# disp    $s7
+# disp    $s7
+# add     $s7,    $0,     $0
 
 addi    $s0,    $0,     0
-addi    $s1,    $0,     64
+addi    $s1,    $0,     512
 addi    $a0,    $s0,    0
 addi    $a1,    $s1,    0
+addi    $s2,    $0,     0
+addi    $a2,    $s2,    0
+addi    $a3,    $0,     0
 jal     dct
 
     sll     $t1,    $s1,    1
     addi    $t1,    $t1,    -1      # loop bounds
-    addi    $t0,    $s0,    0
+    add     $t1,    $t1,    $s2
+    addi    $t0,    $s2,    0
 
     lw      $t2,    0($t0)
-    sra     $t2,   $t2,    6        s# NOTE: change this when changing DCT size!
+    sra     $t2,   $t2,    6        # NOTE: change this when changing DCT size!
     sw      $t2,    0($t0)
     addi    $t0,    $t0,    1
     _dct_normalize_loop:
         blt     $t1,    $t0,    _dct_normalize_loop_done
         lw      $t2,    0($t0)
-        sra     $t2,   $t2,    5        s# NOTE: change this when changing DCT size!
+        sra     $t2,   $t2,    5        # NOTE: change this when changing DCT size!
         sw      $t2,    0($t0)
         addi    $t0,    $t0,    1
         j       _dct_normalize_loop
     _dct_normalize_loop_done:
 
+addi    $s4,    $0,     0       # iteration lower bound
+addi    $s3,    $0,     15      # iter variable
+_output_dct_loop:
+    blt     $s3,    $s4,    _done_output_dct_loop
+    lw      $t6,    1($s3)
+    sra     $t7,    $t6,    31      # 3 line absolute value!!!
+    xor     $t8,    $t7,    $t6
+    sub     $t6,    $t8,    $t7
 
-addi    $a0,    $0,     0
-addi    $a1,    $0,     64
-jal     print_array
+    sw      $t6,    12288($s3)      # store to mmio region?
 
-halt:   j halt
+    addi    $s3,    $s3,    -1
+    j       _output_dct_loop
+
+_done_output_dct_loop:
+j   _poll_audio_buffer
 
 # ====Inplace Discrete Cosine Transform====
 # a0: memory address of array
 # a1: length of array
+# a2: new addr
+# a3: is inplace
 dct:
     # disp    $a0
     # disp    $a1
+    # disp    $a2
+    # disp    $a3
     # addi    $t9,    $0,    -1
     # disp    $t9
-
+    addi    $at,    $at,    1
+    disp    $at
     nop  # FIX: bypassing error here
     addi    $t9,    $0,     3
     blt     $a1,    $t9,    _dct_base_case  # if N <= 2, go to base case. Second exit point. Ugh.
@@ -99,35 +125,48 @@ dct:
 
     add     $s0,    $a0,    0       # s0 = &vector[0]
     sra     $s1,    $a1,    1       # s1 = half = n / 2
-    add     $s2,    $s1,    $s0     # s2 = &vector[len(vector)/2], i.e. start of second half
-    
-    jal dct_plus_minus
+    addi    $s2,    $a2,    0     # s2 = &vector[len(vector)/2], i.e. start of second half
+    # addi    $a2,    $s0,    0
 
+    bne     $a3,    0,  _dct_plus_minus_inplace
+        nop                     # BUG: bypassing messes up here, branch/jal race condition?
+        addi    $a2,    $s0,    0
+        jal     dct_plus_minus
+        j       _dct_begin_mul
+    _dct_plus_minus_inplace:
+        nop
+        addi    $a3,    $0,     0
+        jal dct_plus_minus
+        # addi    $s0,    $s2,    0
+        # disp    $s0
+    _dct_begin_mul:
 
-
+    # addi    $a0,    $s2,    0
+    # addi    $a1,    $0,     8
     # jal print_array
     # addi    $t9,    $0,    -1
     # disp    $t9
     # IDEA: use length of array as index of LUTs! LUT for len 4 goes from mem[4:7], lut for len 8 goes from mem[8:15], etc!
 
     # vector_mul(&vector[half], half, &dct_lut[half])
-    addi    $a0,    $s2,    0       # a0 = &vector[half]
+    add     $a0,    $s0,    $s1       # a0 = &vector[half]
     addi    $a1,    $s1,    0       # a1 = half
     addi    $a2,    $s1,    16384   # dct_lut[len/2]
     jal		vector_mul
 
     # jal print_array
-
+    addi    $a2,    $a0,    0
     jal     dct         # dct(vector[half:])
 
     addi    $a0,    $s0,    0
     addi    $a1,    $s1,    0
-
+    addi    $a2,    $s0,    0
     jal     dct         # dct(vector[1:half])
 
-    addi    $t0,    $s2,    1       # t0 = &vector[half + 1]
-    add     $t1,    $s2,    $s1     # t1 = end of vector
-    addi	$t1,    $t1,    -1      # t1 = vector[len-1]
+    add     $t0,    $s0,    $s1
+    addi    $t0,    $t0,    1       # t0 = &vector[half + 1]
+    add     $t1,    $t0,    $s1     # t1 = end of vector
+    addi	$t1,    $t1,    -2      # t1 = vector[len-1]
 
     # disp    $s1
     # disp    $t0
@@ -183,10 +222,14 @@ jr      $ra
         jr      $ra
 
 
+
 # ====DCT plus/minus split====
 # a0: memory address of array
 # a1: length of array
+# a2: new memory address
 dct_plus_minus:
+    nop
+    nop
     # stack discipline baybey
     addi    $sp,    $sp,    -5
     sw      $s0,    0($sp)
@@ -198,7 +241,11 @@ dct_plus_minus:
     add     $s0,    $0,     $a0     # s0 = front half pointer
     add     $s1,    $s0,    $a1     # s1 = back half pointer
     addi    $s1,    $s1,    -1      # pointer points to actual array element
-    sra     $s2,    $a1,    1       # s2 = half
+    sra     $s2,    $a1,    1       # s2 = half 
+
+    add     $t8,    $0,     $a2     # t8 = dst front half pointer
+    add     $t9,    $t8,    $a1     # t9 = dst back half pointer
+    addi    $t9,    $t9,    -1
 
     # plus/minus loop
     sra     $s4,    $s2,    1       # loop iteration limit
@@ -212,22 +259,31 @@ dct_plus_minus:
         add     $t7,    $s0,    $s2     # t7 = half + i
         sub     $t6,    $s1,    $s2     # t6 = n-1-half - i
         # [s0    t6|t7     s1]
+        # [t2    t3|t4     t5]
         lw		$t3,    0($t6)		    # t3 = vector[half + i]
         lw		$t4,    0($t7)		    # t4 = vector[n-1-half - i]
+        # free t6, t7
         # [t2+t5  t3+t4|t2-t5  t3-t4]
-        # [t0        t1|t8        t9]
+        # [t0        t1|t6        t7]
         add     $t0,    $t2,    $t5
         add     $t1,    $t3,    $t4
-        sub     $t8,    $t2,    $t5
-        sub     $t9,    $t3,    $t4
-        sw		$t0,    0($s0) 
-        sw		$t1,    0($t6)
-        sw		$t8,    0($t7)
-        sw		$t9,    0($s1)
+        sub     $t6,    $t2,    $t5
+        sub     $t7,    $t3,    $t4
+        # free t2-t5: dst addrs:
+        # [t8   t3|t4   t9]
+        add     $t4,    $t8,    $s2     # t7 = half + i
+        sub     $t3,    $t9,    $s2     # t6 = n-1-half - i
+
+        sw		$t0,    0($t8) 
+        sw		$t1,    0($t3)
+        sw		$t6,    0($t4)
+        sw		$t7,    0($t9)
         # increment
         addi    $s3,    $s3,    1       # ++i
         addi    $s0,    $s0,    1       # ++front_half_pointer
         addi    $s1,    $s1,    -1      # --back_half_pointer
+        addi    $t8,    $t8,    1
+        addi    $t9,    $t9,    -1
     j _dct_pm_loop
     
     _dct_done_pm:

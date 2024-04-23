@@ -29,6 +29,7 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 	input[7:0] JA;
 	inout[7:0] JC;
 	output[7:0] JB, JD;
+	input[15:0] SW;
 	output [15:0] LED;
 	output[7:0] sevenseg, AN;
 	output AUD_PWM, AUD_SD;
@@ -54,7 +55,6 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
     sys_counter_wide #(3) downaudio(.clock(CLK_9600KHZ), .clr(1'b0), .down_clock(audio_clock));
 
 	input manual_clock; 
-	input[15:0] SW;
 
 	wire debounced_man_clock;
 	debouncer clock_debouncer(.debounced(debounced_man_clock), .sig(manual_clock), .clock(clock50mhz));
@@ -71,7 +71,7 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 
 
 	// ADD YOUR MEMORY FILE HERE
-	localparam INSTR_FILE = "basic_midi";
+	localparam INSTR_FILE = "dct";
 	
 	// Main Processing Unit
 	processor CPU(.clock(clock), .reset(reset), 
@@ -124,7 +124,7 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 		if(reset) begin
 			sevenseg_latch <= 32'd0;
 		end else if(sevenseg_writeEnable) begin
-			sevenseg_latch <= sevenseg_data; // FIX: temp debug values: wave_val
+			sevenseg_latch <= /* sevenseg_data */ {midi_result[15:0], dct_result}; // FIX: temp debug values
 		end
 	end
 
@@ -136,8 +136,19 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 	wire[31:0] midi_result;
 	wire midi_in_port;
 	wire midi_busy_reading;
-	mmio mamma_mmio(.mmio_result(mmio_result), .midi_result(midi_result), .midi_busy_reading(midi_busy_reading),
-		.clock(clock), .mem_addr(mem_addr), .mem_read_enable(mem_read_enable), .midi_data(midi_in_port)
+	wire[15:0] audio_buffer_write_val;
+	wire write_audio_buffer;
+	mmio mamma_mmio(
+		.mmio_result(mmio_result), .midi_result(midi_result), .midi_busy_reading(midi_busy_reading),
+		.clock(clock), .mem_addr(mem_addr), .mem_read_enable(mem_read_enable),
+		.midi_data(midi_in_port), .audio_buffer_write_val(audio_buffer_write_val), .write_audio_buffer(write_audio_buffer),
+		.audio_buff_ready(JA[4])
+	);
+
+	wire[15:0] dct_result;
+	dct_result_regs dct_regs(
+		.dct_result(dct_result), .clock(clock), .read_index(SW[5:2]), 
+		.mem_write_enable(mwe), .mem_addr(mem_addr), .mem_write_data(memDataIn)
 	);
 
 	wire[15:0] audio_data_test;
@@ -195,7 +206,7 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 		if(reset) begin
 			lut_index <= 32'b0;
 		end else begin
-		lut_index <= lut_index + bent_inc_rate;
+			lut_index <= lut_index + bent_inc_rate;
 		end
 	end
 
@@ -207,8 +218,8 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 			inc_rate <= 0;
 			bent_inc_rate <= 0;
 		end else if(midi_status == 4'h9) begin // \note on
-			freq_div <= FREQs[midi_note - 8'h15];
-			inc_rate_delta <= inc_rates[midi_note - 8'h14] - inc_rates[midi_note - 8'h15];
+			freq_div <= FREQs[midi_note - 8'd21];
+			inc_rate_delta <= inc_rates[midi_note - 8'd20] - inc_rates[midi_note - 8'd21];
 			cur_midi_note <= midi_note;
 			inc_rate = inc_rates[midi_note - 8'h15];
 			bent_inc_rate = inc_rate;
@@ -238,7 +249,15 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 
 	mux4 #(16) waveform_mux(
 		.out(audio_data_test), .sel(SW[15:14]), 
-		.in0(square_val), .in1(saw_val), .in2(sin_val), .in3(tri_val));;
+		.in0(square_val), .in1(saw_val), .in2(sin_val), .in3(tri_val));
+
+	assign audio_buffer_write_val = audio_data_test;
+	reg prev_word_clock, word_clock_edge;
+	always @(posedge clock) begin
+		prev_word_clock <= word_clock_monitor;
+		word_clock_edge <= prev_word_clock ^ word_clock_monitor;
+	end
+	assign write_audio_buffer = word_clock_edge;
 
 	assign JB[0] = wrise;
 	assign JB[1] = wfall;
@@ -246,13 +265,7 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 	assign JB[3] = double_word_clock;
 
 	assign midi_in_port = JC[0];
-	// assign JC[1] = audio_clock;
-	// assign JC[2] = data_audio_out;
-	// assign JC[3] = word_clock_monitor;
-	// assign JC[4] = audio_clock;
-	// assign JC[5] = audio_clock;
-	// assign JC[6] = data_audio_out;
-	// assign JC[7] = word_clock_monitor;
+	assign JC[2] = write_audio_buffer;
 
 	assign JD[1] = word_clock_monitor;
 	assign JD[2] = audio_clock;
