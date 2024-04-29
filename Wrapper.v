@@ -148,9 +148,16 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 	reg[3:0] dct_result_counter;
 	wire[15:0] dct_result;
 	reg[3:0] dct_result_array[15:0];
+	wire ws_out;
 	dct_result_regs dct_regs(
-		.dct_result(dct_result), .clock(clock), .read_index(dct_result_counter), 
-		.mem_write_enable(mwe), .mem_addr(mem_addr), .mem_write_data(memDataIn)
+		.dct_result(dct_result), 
+		.out_signal(ws_out),
+		.clock(clock), 
+		.read_index(dct_result_counter), 
+		.mem_write_enable(mwe), 
+		.mem_addr(mem_addr), 
+		.mem_write_data(memDataIn),
+		.CLK100MHZ(CLK100MHZ)
 	);
 	
 	always @(posedge clock) begin
@@ -158,7 +165,8 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 		dct_result_counter <= dct_result_counter + 1;
 	end
 
-	assign sevenseg_override = SW[4] ? {dct_result_array[15], dct_result_array[14], dct_result_array[13], dct_result_array[12], dct_result_array[11], dct_result_array[10], dct_result_array[9], dct_result_array[8]} : {dct_result_array[7], dct_result_array[6], dct_result_array[5], dct_result_array[4], dct_result_array[3], dct_result_array[2], dct_result_array[1], dct_result_array[0]};
+	// assign sevenseg_override = SW[4] ? {dct_result_array[15], dct_result_array[14], dct_result_array[13], dct_result_array[12], dct_result_array[11], dct_result_array[10], dct_result_array[9], dct_result_array[8]} : {dct_result_array[7], dct_result_array[6], dct_result_array[5], dct_result_array[4], dct_result_array[3], dct_result_array[2], dct_result_array[1], dct_result_array[0]};
+	assign sevenseg_override = {8'b0, midi_result};
 
 	wire[15:0] audio_data_test;
 	wire [15:0] poly_audio_value;
@@ -286,6 +294,7 @@ module Wrapper (CLK100MHZ, CPU_RESETN, sevenseg, AN, manual_clock, SW, LED, JA, 
 
 	assign midi_in_port = JC[0];
 	assign JC[2] = write_audio_buffer;
+	assign JB[7] = ws_out;
 
 	assign JD[5] = word_clock_monitor;
 	assign JD[2] = audio_clock;

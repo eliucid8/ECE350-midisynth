@@ -4,7 +4,7 @@ module ws2b(
     input [23:0] rgb_input,
     // input [15:0] SW,
     output out_signal,
-    output pixclk,
+    output pixclk
     // output [7:0] JA
 );
 

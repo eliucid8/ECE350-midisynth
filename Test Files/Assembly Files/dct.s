@@ -39,6 +39,7 @@ _load_audio_buffer_loop:
     lw      $s4,    0($s0)
     sll     $s4,    $s4,    16
     sra     $s4,    $s4,    16
+
     # disp    $s4
     sw      $s4,    0($s1)
     addi    $s0,    $s0,    1
@@ -106,10 +107,8 @@ dct:
     # disp    $a1
     # disp    $a2
     # disp    $a3
-    # addi    $t9,    $0,    -1
-    # disp    $t9
-    addi    $at,    $at,    1
-    disp    $at
+    # addi    $at,    $at,    -1
+    # disp    $at
     nop  # FIX: bypassing error here
     addi    $t9,    $0,     3
     blt     $a1,    $t9,    _dct_base_case  # if N <= 2, go to base case. Second exit point. Ugh.

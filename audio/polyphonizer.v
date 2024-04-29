@@ -109,7 +109,7 @@ module polyphonizer(
                     channels[midi_idx] <= midi_channel;
                     pitches[midi_idx] <= midi_note;
                     inc_rates[midi_idx] <= lut_inc_rates[midi_note - 8'd21];
-                    wave_selects[midi_idx] <= midi_channel[3:2];
+                    // wave_selects[midi_idx] <= midi_channel[3:2];
                     running_midi <= 0;
                     midi_idx <= 4'b0;
                 end else if(midi_idx != 4'hf) begin
@@ -149,5 +149,4 @@ module polyphonizer(
             dword_idx = dword_idx + 1;
         end
     end
-
 endmodule
